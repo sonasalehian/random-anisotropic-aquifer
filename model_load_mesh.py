@@ -8,7 +8,7 @@ import ufl
 import pprint
 from mpi4py import MPI
 from petsc4py import PETSc
-from dolfinx import fem, io
+from dolfinx import fem, io, mesh
 from dolfinx.io import gmshio
 from functools import partial
 from utils import print_root, print_all
@@ -339,13 +339,66 @@ def solve(parameters):
     # Define mesh
     Lx = parameters["Lx"]
     Ly = parameters["Ly"]
+    Lz1 = parameters["Lz1"]
+    Lz2 = parameters["Lz2"]
+    Lz3 = parameters["Lz3"]
+    Lz = Lz1 + Lz2 + Lz3
 
     gdim = parameters["gdim"]
 
     top_marker, sidesx_marker, sidesy_marker, bottom_marker, drywell_marker, pumpingwell_marker = 4, 5, 6, 7, 8, 9
 
-    # Cteating the mesh
+    # # Cteating the mesh
+    # model = create_mesh(parameters)
+
+    # # Interfacing with GMSH in DOLFINx
+    # gmsh_model_rank = 0
+    # mesh_comm = MPI.COMM_WORLD
+    # domain, mt, ft = gmshio.model_to_mesh(model, mesh_comm, gmsh_model_rank,
+    #                                       gdim=gdim)
+    # gmsh.finalize()
+    # print_all("gmsh finalized")
+
+    # domain.name = "aquifersys"
+    # mt.name = f"{domain.name}_cells"
+    # ft.name = f"{domain.name}_facets"
+
+    # domain.topology.create_connectivity(domain.topology.dim-1,
+    #                                     domain.topology.dim)
+    # with io.XDMFFile(domain.comm, f"{parameters['output_dir']}/facet_tags.xdmf", "w") as xdmf:
+    #     xdmf.write_mesh(domain)
+    #     domain.topology.create_connectivity(2, 3)
+    #     xdmf.write_meshtags(
+    #         mt, x=domain.geometry, geometry_xpath=f"/Xdmf/Domain/Grid[@Name='{domain.name}']/Geometry")
+    #     xdmf.write_meshtags(
+    #         ft, x=domain.geometry, geometry_xpath=f"/Xdmf/Domain/Grid[@Name='{domain.name}']/Geometry")
+
+     # Cteating the mesh
     model = create_mesh(parameters)
+
+    # model = gmsh.open(f"{parameters['output_dir']}/mesh.msh")
+
+    # model = meshio.read(f"{parameters['output_dir']}/mesh.msh")
+
+    # for cell in model.cells:
+    #     if cell.type == "triangle":
+    #         triangle_cells = cell.data
+    #     elif  cell.type == "tetra":
+    #         tetra_cells = cell.data
+
+    # for key in model.cell_data_dict["gmsh:physical"].keys():
+    #     if key == "triangle":
+    #         triangle_data = model.cell_data_dict["gmsh:physical"][key]
+    #     elif key == "tetra":
+    #         tetra_data = model.cell_data_dict["gmsh:physical"][key]
+    # tetra_mesh = meshio.Mesh(points=model.points, cells={"tetra": tetra_cells})
+    # triangle_mesh =meshio.Mesh(points=model.points,
+    #                            cells=[("triangle", triangle_cells)],
+    #                            cell_data={"name_to_read":[triangle_data]})
+    # meshio.write("mesh.xdmf", tetra_mesh)
+
+    # meshio.write("mf.xdmf", triangle_mesh)
+
 
     # Interfacing with GMSH in DOLFINx
     gmsh_model_rank = 0
@@ -357,17 +410,36 @@ def solve(parameters):
 
     domain.name = "aquifersys"
     mt.name = f"{domain.name}_cells"
-    ft.name = f"{domain.name}_facets"
+    ft.name = f"{domain.name}_facets"  
 
     domain.topology.create_connectivity(domain.topology.dim-1,
                                         domain.topology.dim)
-    with io.XDMFFile(domain.comm, f"{parameters['output_dir']}/facet_tags.xdmf", "w") as xdmf:
-        xdmf.write_mesh(domain)
-        domain.topology.create_connectivity(2, 3)
-        xdmf.write_meshtags(
+    with io.XDMFFile(domain.comm, "output/mesh/mesh.xdmf", "w") as mxdmf:
+        mxdmf.write_mesh(domain)
+
+    domain.topology.create_connectivity(2, 3)
+    with io.XDMFFile(domain.comm, "output/mesh/subdomain_tags.xdmf", "w") as sxdmf:
+        sxdmf.write_meshtags(
             mt, x=domain.geometry, geometry_xpath=f"/Xdmf/Domain/Grid[@Name='{domain.name}']/Geometry")
-        xdmf.write_meshtags(
+        
+    with io.XDMFFile(domain.comm, "output/mesh/boundaries_tags.xdmf", "w") as bxdmf:    
+        bxdmf.write_meshtags(
             ft, x=domain.geometry, geometry_xpath=f"/Xdmf/Domain/Grid[@Name='{domain.name}']/Geometry")
+
+    domain = mesh.create_box(MPI.COMM_WORLD, [np.array([0, 0, 0]), np.array([Lx, Ly, Lz])],
+                            [20, 6, 6], cell_type=mesh.CellType.tetrahedron)  
+    domain.name = "aquifersys"
+    # mt.name = f"{domain.name}_cells"
+    # ft.name = f"{domain.name}_facets"      
+    with io.XDMFFile(MPI.COMM_WORLD, "output/mesh/mesh.xdmf", "r") as mrxdmf:
+        domain = mrxdmf.read_mesh(name=domain.name)
+
+    with io.XDMFFile(MPI.COMM_WORLD, "output/mesh/subdomain_tags.xdmf", "r") as srxdmf:
+        mt = srxdmf.read_meshtags(domain, name=f"{domain.name}_cells")
+        
+    domain.topology.create_connectivity(2, 3)
+    with io.XDMFFile(MPI.COMM_WORLD, "output/mesh/boundaries_tags.xdmf", "r") as brxdmf:    
+        ft = brxdmf.read_meshtags(domain, name=f"{domain.name}_facets", xpath="Xdmf/Domain")
 
     # Defining the finite element function space
     Q_el = ufl.FiniteElement("BDM", domain.ufl_cell(), 1)
@@ -489,17 +561,17 @@ def solve(parameters):
     u_los_h = fem.Function(W)
     u_los_h.interpolate(u_los_expr)
 
-    pfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/pressure.bp", [ph_P0], engine="BP4")
+    pfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/pressure.bp", [ph_P0])
     pfile_vtx.write(t)
 
-    qfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/flux.bp", [qh_Q0], engine="BP4")
+    qfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/flux.bp", [qh_Q0])
     qfile_vtx.write(t)
 
-    ufile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/deformation.bp", [u_n], engine="BP4")
+    ufile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/deformation.bp", [u_n])
     ufile_vtx.write(t)
 
     losfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/deformation_LOS.bp", [
-        u_los_h], engine="BP4")
+        u_los_h])
     losfile_vtx.write(t)
 
     print_root("Starting timestepping...")
