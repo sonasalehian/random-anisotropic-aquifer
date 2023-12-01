@@ -2,14 +2,14 @@
 
 import numpy as np
 import dolfinx
-import gmsh
+# import gmsh
 import ufl
 
 import pprint
 from mpi4py import MPI
 from petsc4py import PETSc
 from dolfinx import fem, io, mesh
-from dolfinx.io import gmshio
+# from dolfinx.io import gmshio
 from functools import partial
 from utils import print_root, print_all
 from dolfinx.fem import petsc, assemble_scalar, form
@@ -373,64 +373,65 @@ def solve(parameters):
     #     xdmf.write_meshtags(
     #         ft, x=domain.geometry, geometry_xpath=f"/Xdmf/Domain/Grid[@Name='{domain.name}']/Geometry")
 
-     # Cteating the mesh
-    model = create_mesh(parameters)
+    #  # Cteating the mesh
+    # model = create_mesh(parameters)
 
-    # model = gmsh.open(f"{parameters['output_dir']}/mesh.msh")
+    # # model = gmsh.open(f"{parameters['output_dir']}/mesh.msh")
 
-    # model = meshio.read(f"{parameters['output_dir']}/mesh.msh")
+    # # model = meshio.read(f"{parameters['output_dir']}/mesh.msh")
 
-    # for cell in model.cells:
-    #     if cell.type == "triangle":
-    #         triangle_cells = cell.data
-    #     elif  cell.type == "tetra":
-    #         tetra_cells = cell.data
+    # # for cell in model.cells:
+    # #     if cell.type == "triangle":
+    # #         triangle_cells = cell.data
+    # #     elif  cell.type == "tetra":
+    # #         tetra_cells = cell.data
 
-    # for key in model.cell_data_dict["gmsh:physical"].keys():
-    #     if key == "triangle":
-    #         triangle_data = model.cell_data_dict["gmsh:physical"][key]
-    #     elif key == "tetra":
-    #         tetra_data = model.cell_data_dict["gmsh:physical"][key]
-    # tetra_mesh = meshio.Mesh(points=model.points, cells={"tetra": tetra_cells})
-    # triangle_mesh =meshio.Mesh(points=model.points,
-    #                            cells=[("triangle", triangle_cells)],
-    #                            cell_data={"name_to_read":[triangle_data]})
-    # meshio.write("mesh.xdmf", tetra_mesh)
+    # # for key in model.cell_data_dict["gmsh:physical"].keys():
+    # #     if key == "triangle":
+    # #         triangle_data = model.cell_data_dict["gmsh:physical"][key]
+    # #     elif key == "tetra":
+    # #         tetra_data = model.cell_data_dict["gmsh:physical"][key]
+    # # tetra_mesh = meshio.Mesh(points=model.points, cells={"tetra": tetra_cells})
+    # # triangle_mesh =meshio.Mesh(points=model.points,
+    # #                            cells=[("triangle", triangle_cells)],
+    # #                            cell_data={"name_to_read":[triangle_data]})
+    # # meshio.write("mesh.xdmf", tetra_mesh)
 
-    # meshio.write("mf.xdmf", triangle_mesh)
+    # # meshio.write("mf.xdmf", triangle_mesh)
 
 
-    # Interfacing with GMSH in DOLFINx
-    gmsh_model_rank = 0
-    mesh_comm = MPI.COMM_WORLD
-    domain, mt, ft = gmshio.model_to_mesh(model, mesh_comm, gmsh_model_rank,
-                                          gdim=gdim)
-    gmsh.finalize()
-    print_all("gmsh finalized")
+    # # Interfacing with GMSH in DOLFINx
+    # gmsh_model_rank = 0
+    # mesh_comm = MPI.COMM_WORLD
+    # domain, mt, ft = gmshio.model_to_mesh(model, mesh_comm, gmsh_model_rank,
+    #                                       gdim=gdim)
+    # gmsh.finalize()
+    # print_all("gmsh finalized")
 
-    domain.name = "aquifersys"
-    mt.name = f"{domain.name}_cells"
-    ft.name = f"{domain.name}_facets"  
+    # domain.name = "aquifersys"
+    # mt.name = f"{domain.name}_cells"
+    # ft.name = f"{domain.name}_facets"  
 
-    domain.topology.create_connectivity(domain.topology.dim-1,
-                                        domain.topology.dim)
-    with io.XDMFFile(domain.comm, "output/mesh/mesh.xdmf", "w") as mxdmf:
-        mxdmf.write_mesh(domain)
+    # domain.topology.create_connectivity(domain.topology.dim-1,
+    #                                     domain.topology.dim)
+    # with io.XDMFFile(domain.comm, "output/mesh/mesh.xdmf", "w") as mxdmf:
+    #     mxdmf.write_mesh(domain)
 
-    domain.topology.create_connectivity(2, 3)
-    with io.XDMFFile(domain.comm, "output/mesh/subdomain_tags.xdmf", "w") as sxdmf:
-        sxdmf.write_meshtags(
-            mt, x=domain.geometry, geometry_xpath=f"/Xdmf/Domain/Grid[@Name='{domain.name}']/Geometry")
+    # domain.topology.create_connectivity(2, 3)
+    # with io.XDMFFile(domain.comm, "output/mesh/subdomain_tags.xdmf", "w") as sxdmf:
+    #     sxdmf.write_meshtags(
+    #         mt, x=domain.geometry, geometry_xpath=f"/Xdmf/Domain/Grid[@Name='{domain.name}']/Geometry")
         
-    with io.XDMFFile(domain.comm, "output/mesh/boundaries_tags.xdmf", "w") as bxdmf:    
-        bxdmf.write_meshtags(
-            ft, x=domain.geometry, geometry_xpath=f"/Xdmf/Domain/Grid[@Name='{domain.name}']/Geometry")
+    # with io.XDMFFile(domain.comm, "output/mesh/boundaries_tags.xdmf", "w") as bxdmf:    
+    #     bxdmf.write_meshtags(
+    #         ft, x=domain.geometry, geometry_xpath=f"/Xdmf/Domain/Grid[@Name='{domain.name}']/Geometry")
 
     domain = mesh.create_box(MPI.COMM_WORLD, [np.array([0, 0, 0]), np.array([Lx, Ly, Lz])],
                             [20, 6, 6], cell_type=mesh.CellType.tetrahedron)  
     domain.name = "aquifersys"
     # mt.name = f"{domain.name}_cells"
     # ft.name = f"{domain.name}_facets"      
+    print_root("Reading mesh...")
     with io.XDMFFile(MPI.COMM_WORLD, "output/mesh/mesh.xdmf", "r") as mrxdmf:
         domain = mrxdmf.read_mesh(name=domain.name)
 
