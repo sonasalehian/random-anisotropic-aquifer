@@ -562,17 +562,17 @@ def solve(parameters):
     u_los_h = fem.Function(W)
     u_los_h.interpolate(u_los_expr)
 
-    pfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/pressure.bp", [ph_P0])
+    pfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/pressure.bp", [ph_P0], engine="BP4")
     pfile_vtx.write(t)
 
-    qfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/flux.bp", [qh_Q0])
+    qfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/flux.bp", [qh_Q0], engine="BP4")
     qfile_vtx.write(t)
 
-    ufile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/deformation.bp", [u_n])
+    ufile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/deformation.bp", [u_n], engine="BP4")
     ufile_vtx.write(t)
 
     losfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/deformation_LOS.bp", [
-        u_los_h])
+        u_los_h], engine="BP4")
     losfile_vtx.write(t)
 
     print_root("Starting timestepping...")
