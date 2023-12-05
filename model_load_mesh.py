@@ -14,6 +14,11 @@ from functools import partial
 from utils import print_root, print_all
 from dolfinx.fem import petsc, assemble_scalar, form
 
+import os
+
+with open(f"process-{os.getpid()}.txt", "w") as f:
+    pass
+
 
 def create_mesh(parameters):
     # Parameters
@@ -698,3 +703,5 @@ def solve(parameters):
     losfile_vtx.close()
 
     print_root('Finished solve.')
+
+    os.remove(f"process-{os.getpid()}.txt")
