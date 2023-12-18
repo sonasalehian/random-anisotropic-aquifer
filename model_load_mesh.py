@@ -704,4 +704,5 @@ def solve(parameters):
 
     print_root('Finished solve.')
 
-    os.remove(f"process-{os.getpid()}.txt")
+
+os.remove(f"process-{os.getpid()}.txt")
