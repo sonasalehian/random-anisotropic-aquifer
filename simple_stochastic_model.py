@@ -1,41 +1,35 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import lognorm
 
 
-mu, sigma = 0.0, 0.5 # mean and standard deviation
-x = np.random.lognormal(mu, sigma, 10000)
+
+mu, sigma = 0.0, 0.1 # mean and standard deviation
+x = np.random.lognormal(mu, sigma, 5)
+
+# x = lognorm.rvs(sigma, size=10000)
 
 plt.figure(1)
-count_x, bins_x, ignored_x = plt.hist(x, 100, density=True, align='mid', color='r', label="x")
+count_x, bins_x, ignored_x = plt.hist(x, 100, density=True, align='mid', color='pink', alpha=0.6, label="x")
 
-plt.savefig("output/histogram_x.png")  # save as png
+# xx = np.linspace(min(bins_x), max(bins_x), 10000)
+# pdf_x = (np.exp(-(np.log(xx) - mu)**2 / (2 * sigma**2))
+#        / (xx * sigma * np.sqrt(2 * np.pi)))
 
-# print(x)
+# plt.plot(xx, pdf_x, label="pdf of x", linewidth=2, color='r')
+
+xx = np.linspace(lognorm.ppf(0.01, sigma), lognorm.ppf(0.99, sigma), 10000)
+plt.plot(xx, lognorm.pdf(xx, sigma), 'r-', lw=2, alpha=1, label='lognorm pdf')
+
+plt.axis('tight')
+plt.legend(fontsize=10)
+plt.savefig("output/histogram+pdf_x.png")  # save as png
 
 def f(x):
     return x**2
 
 y = f(x)
 
-
-count_y, bins_y, ignored_y = plt.hist(y, 100, density=True, align='mid', color='b', label="y")
+count_y, bins_y, ignored_y = plt.hist(y, 1000, density=True, align='mid', color='b', label="y")
 plt.legend(fontsize=10)
 plt.savefig("output/histogram_x,y.png")  # save as png
-
-plt.figure(2)
-xx = np.linspace(min(bins_x), max(bins_x), 10000)
-pdf_x = (np.exp(-(np.log(xx) - mu)**2 / (2 * sigma**2))
-       / (xx * sigma * np.sqrt(2 * np.pi)))
-
-plt.plot(xx, pdf_x, label="pdf of x", linewidth=2, color='r')
-
-yy = np.linspace(min(bins_y), max(bins_y), 10000)
-mu_y = mu**(1/2)
-sigma_y = sigma**(1/2)
-pdf_y = (np.exp(-(np.log(yy) - mu_y)**2 / (2 * sigma_y**2))
-        / (yy * sigma_y * np.sqrt(2 * np.pi)))
-
-plt.plot(yy, pdf_y, label="pdf of y", linewidth=1, color='b')
-plt.axis('tight')
-plt.legend(fontsize=10)
-plt.savefig("output/pdf_x,y.png")  # save as png
