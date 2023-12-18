@@ -12,8 +12,15 @@ file_path='hpc_output/random_values.txt'
 # Run statistical analysis
 python3 statistical_analysis.py hpc_output/random_values.txt
 
-# Run function.py in parallel
-cat "$file_path" | parallel python3 random_ihc.py {}
+# # Run model.py in parallel
+# cat "$file_path" | parallel python3 random_ihc.py {}
+
+# Read parameters from files
+random_value=$(cat hpc_output/random_values.txt)
+output_directory=$(cat hpc_output/output_directories.txt)
+
+# Run the script for each pair of parameters
+paste -d' ' <(echo "$random_value") <(echo "$output_directory") | xargs -n 2 python3 random_ihc.py
 
 echo "Results are calculated"
 

@@ -11,10 +11,14 @@ def stretch_to_range(values, new_min, new_max):
     
     return stretched_values
 
+user_input = input("Enter size of random values: ")
+print(f"You entered: {user_input}")
+
 # Generate random values with lognorm
 sigma = 0.1 # standard deviation
+size = int(user_input)
 
-x = lognorm.rvs(sigma, size=2)
+x = lognorm.rvs(sigma, size=size)
 lower_limit = 4.7E-13
 upper_limit = 1.1E-11
 
@@ -26,10 +30,23 @@ file_name = 'hpc_output/random_values.txt'
 if os.path.exists(file_name):
   os.remove(file_name)
 else:
-  print("The file does not exist")
+  print("The random_values file does not exist to remove")
 
 with open(file_name, 'w') as file:
     for number in hc:
         file.write(f"{number}\n")
 
 print(f"Random values have been saved to {file_name}")
+
+file_name2 = 'hpc_output/output_directories.txt'        
+
+if os.path.exists(file_name2):
+  os.remove(file_name2)
+else:
+  print("The output_directories file does not exist to remove")
+
+with open(file_name2, 'w') as file2:
+    for n in range(size):
+        file2.write(f"random_ihc_{n}\n")
+
+print(f"Output directories have been saved to {file_name}")

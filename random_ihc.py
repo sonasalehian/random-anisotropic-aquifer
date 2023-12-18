@@ -3,11 +3,17 @@ from model_load_mesh import solve
 import sys
 
 if __name__ == "__main__":
-    hc = float(sys.argv[1])  # Read parameter from command line argument
+    # Check if the correct number of command line arguments is provided
+    if len(sys.argv) != 3:
+        print("Usage: python process_parameters.py <param1> <param2>")
+        sys.exit(1)  # Exit with an error code
 
-    parameters["k_x_aqfr"] = hc
-    parameters["k_y_aqfr"] = hc
+    random_value = float(sys.argv[1])
+    output_directory = sys.argv[2]
 
-    parameters["output_dir"] = './output/random_ihc'
+    parameters["k_x_aqfr"] = random_value
+    parameters["k_y_aqfr"] = random_value
+
+    parameters["output_dir"] = f'./output/{output_directory}'
 
     solve(parameters)
