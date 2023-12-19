@@ -12,12 +12,12 @@ def stretch_to_range(values, new_min, new_max):
     return stretched_values
 
 size = 2
-user_input = input("Enter size of random values(default=2): ")
-print(f"You entered: {user_input}")
+# user_input = input("Enter size of random values(default=2): ")
+# print(f"You entered: {user_input}")
 
 # Generate random values with lognorm
 sigma = 0.1 # standard deviation
-size = int(user_input)
+# size = int(user_input)
 
 x = lognorm.rvs(sigma, size=size)
 lower_limit = 4.7E-13
