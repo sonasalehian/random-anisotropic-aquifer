@@ -1,7 +1,6 @@
 #!/bin/bash -l
 #SBATCH --job-name=my_parallel_job
 #SBATCH --output=logs/%x-%j.out
-#SBATCH --error=error.log
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=2
 #SBATCH --time=01:30:00
@@ -27,7 +26,7 @@ output_directory=$(cat hpc_output/output_directories.txt)
 
 # parallel --jobs $JOBS_PER_NODE --slf hostfile --wd $WDIR --joblog task.log --resume --progress -a task.lst sh run-blast.sh {} output/{/.}.blst $SLURM_CPUS_PER_TASK
 
-parallel --jobs $JOBS_PER_NODE --wd $WDIR --joblog task.log --resume --progress -a <(paste -d' ' <(echo "$param1") <(echo "$param2")) python3 random_ihc.py {} $SLURM_CPUS_PER_TASK
+parallel --jobs $JOBS_PER_NODE --wd $WDIR --joblog task.log --resume --progress -a <(paste -d' ' <(echo "$random_value") <(echo "$output_directory")) python3 random_ihc.py {} $SLURM_CPUS_PER_TASK
 
 
 # # Run statistical analysis
