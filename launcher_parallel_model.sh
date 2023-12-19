@@ -19,14 +19,14 @@ cd $WDIR
 export JOBS_PER_NODE=$(( $SLURM_CPUS_ON_NODE / $SLURM_CPUS_PER_TASK ))
 
 # Read parameters from files
-random_value=$(cat hpc_output/random_values.txt)
-output_directory=$(cat hpc_output/output_directories.txt)
+random_value="hpc_output/random_values.txt"
+output_directory="hpc_output/output_directories.txt"
 
 # echo $SLURM_JOB_NODELIST |sed s/\,/\\n/g > hostfile
 
 # parallel --jobs $JOBS_PER_NODE --slf hostfile --wd $WDIR --joblog task.log --resume --progress -a task.lst sh run-blast.sh {} output/{/.}.blst $SLURM_CPUS_PER_TASK
 
-parallel --jobs $JOBS_PER_NODE --wd $WDIR --joblog task.log --resume --progress -a <(paste -d' ' <(echo "$random_value") <(echo "$output_directory")) python3 random_ihc.py {} $SLURM_CPUS_PER_TASK
+parallel --jobs $JOBS_PER_NODE --wd $WDIR --joblog task.log --resume --progress -a <(paste -d' ' <(cat "$random_value") <(cat "$output_directory")) python3 random_ihc.py {} $SLURM_CPUS_PER_TASK
 
 
 # # Run statistical analysis
