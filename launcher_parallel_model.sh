@@ -9,11 +9,11 @@
 #SBATCH -p batch
 
 ## Command(s) to run (example):
-module load gnu-parallel/2019.03.22
+# module load gnu-parallel/2019.03.22
 
 source ${SCRATCH}fenicsx-iris-gompi-32-0.7.2/bin/env-fenics.sh
 
-export WDIR=${HOME}stochastic_model
+export WDIR=${HOME}/stochastic_model
 cd $WDIR
 
 # # set number of jobs based on number of cores available and number of threads per job
