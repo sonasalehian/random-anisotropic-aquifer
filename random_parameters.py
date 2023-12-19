@@ -11,7 +11,8 @@ def stretch_to_range(values, new_min, new_max):
     
     return stretched_values
 
-user_input = input("Enter size of random values: ")
+size = 2
+user_input = input("Enter size of random values(default=2): ")
 print(f"You entered: {user_input}")
 
 # Generate random values with lognorm
@@ -49,4 +50,4 @@ with open(file_name2, 'w') as file2:
     for n in range(size):
         file2.write(f"random_ihc_{n}\n")
 
-print(f"Output directories have been saved to {file_name}")
+print(f"Output directories have been saved to {file_name2}")
