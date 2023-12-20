@@ -11,7 +11,7 @@ def stretch_to_range(values, new_min, new_max):
     
     return stretched_values
 
-size = 2
+size = 100
 # user_input = input("Enter size of random values(default=2): ")
 # print(f"You entered: {user_input}")
 
