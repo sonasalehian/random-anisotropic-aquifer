@@ -1,17 +1,22 @@
 import sys
 
-def model_computation(parameter):
-    # Replace this with your actual model computation
-    return parameter**2
+def process_parameters(param1):
+    # Replace this with your logic
+    result = param1**2
+    return result
 
 if __name__ == "__main__":
-    parameter = float(sys.argv[1])  # Read parameter from command line argument
+    # # Check if the correct number of command line arguments is provided
+    # if len(sys.argv) != 3:
+    #     print("Usage: python process_parameters.py <param1> <param2>")
+    #     sys.exit(1)  # Exit with an error code
 
-    result = model_computation(parameter)
+    random_value = float(sys.argv[1])
+    # output_directory = sys.argv[2]
 
-# print(f"Model computation for parameter {parameter}: {result}")
+    result = process_parameters(random_value)
 
-file_name = 'hpc_output/result.txt'
+    file_name = f'hpc_output/result.txt'
 
-with open(file_name, 'a') as file:
-    file.write(f"{result}\n")
+    with open(file_name, 'a') as file:
+        file.write(f"{result}\n")
