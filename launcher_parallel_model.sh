@@ -30,7 +30,7 @@ echo $JOBS_PER_NODE
 
 # parallel --jobs $JOBS_PER_NODE --slf hostfile --wd $WDIR --joblog task.log --resume --progress -a task.lst sh run-blast.sh {} output/{/.}.blst $SLURM_CPUS_PER_TASK
 
-parallel --jobs $JOBS_PER_NODE --resume --progress srun -n 1 -c 2 python3 random_ihc.py {} ::: {0..4}
+parallel --jobs $JOBS_PER_NODE srun -n 1 -c 2 python3 random_ihc.py {} ::: {0..4}
 
 
 # # Run statistical analysis
