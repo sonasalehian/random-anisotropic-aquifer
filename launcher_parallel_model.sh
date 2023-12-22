@@ -2,9 +2,9 @@
 #SBATCH --job-name=my_parallel_job
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=2
+#SBATCH --cpus-per-task=1
 #SBATCH --time=01:30:00
-#SBATCH --ntasks-per-node=14
+#SBATCH --ntasks-per-node=28
 #SBATCH -p bigmem
 
 ## Command(s) to run (example):
@@ -30,7 +30,7 @@ echo $JOBS_PER_NODE
 
 # parallel --jobs $JOBS_PER_NODE --slf hostfile --wd $WDIR --joblog task.log --resume --progress -a task.lst sh run-blast.sh {} output/{/.}.blst $SLURM_CPUS_PER_TASK
 
-parallel --jobs $JOBS_PER_NODE srun -n 1 -c 2 python3 random_ihc.py {} ::: {0..4}
+parallel --jobs $JOBS_PER_NODE srun -n 4 -c 1 python3 random_ihc.py {} ::: {0..4}
 
 
 # # Run statistical analysis
