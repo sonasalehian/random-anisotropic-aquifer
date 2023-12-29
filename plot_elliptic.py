@@ -28,8 +28,6 @@ for i, (radius_minor, radius_major) in enumerate(selected_radius_values):
     row = i // 5
     col = i % 5
 
-    print(f'radius major: {radius_major}')
-
     # Plot in the specified subplot
     plot_ellipse(axes[row, col], center, radius_major, radius_minor, angle, label=f'Ellipse {i+1}')
 
