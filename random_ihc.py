@@ -17,6 +17,6 @@ random_value = read_numbers_from_file(n)
 parameters["k_x_aqfr"] = random_value
 parameters["k_y_aqfr"] = random_value
 
-parameters["output_dir"] = f'./output/random_ihc_{n}'
+parameters["output_dir"] = f'./output/random_ihc_{random_value}'
 
 solve(parameters)
