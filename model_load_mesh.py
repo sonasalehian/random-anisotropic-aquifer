@@ -465,7 +465,7 @@ def solve(parameters):
         solver.solve(b, ah.vector)
         ah.x.scatter_forward()
         print_root("Finished linear solve.")
-        print(ah.x.norm())
+        # print(ah.x.norm())
 
         qh = ah.sub(0).collapse()
         ph = ah.sub(1).collapse()
