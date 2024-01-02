@@ -7,8 +7,8 @@ def read_numbers_from_file(n, file_path):
     elliptic_radius = np.loadtxt(file_path, delimiter=',')
     
     # Assuming the columns are numeric; adjust indexing if needed
-    k_x_aqfr = elliptic_radius[n, 0]
-    k_y_aqfr = elliptic_radius[n, 1]
+    k_x_aqfr = elliptic_radius[n, 1]
+    k_y_aqfr = elliptic_radius[n, 0]
 
     return k_x_aqfr, k_y_aqfr
 
