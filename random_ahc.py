@@ -24,6 +24,6 @@ formatted_random_value_y = "{:.1e}".format(random_value_y)
 parameters["k_x_aqfr"] = random_value_x
 parameters["k_y_aqfr"] = random_value_y
 
-parameters["output_dir"] = f'output/x_y/random_ahc_{formatted_random_value_x}_{formatted_random_value_y}'
+parameters["output_dir"] = f'./output/x_y/random_ahc_{formatted_random_value_x}_{formatted_random_value_y}'
 
 solve(parameters)
