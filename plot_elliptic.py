@@ -9,7 +9,7 @@ def plot_ellipse(ax, center, radius_x, radius_y, angle, label):
     ax.plot(x, y, label=label)
 
 # Load hydraulic conductivity data from CSV
-elliptic_radius = np.loadtxt('hpc_output/random_hc_fixed_orientation.csv', delimiter=',')
+elliptic_radius = np.loadtxt('hpc_output/random_hc_20filtered_fixed_orientation.csv', delimiter=',')
 
 
 # Randomly select 10 radius values
