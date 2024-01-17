@@ -17,13 +17,13 @@ file_path = 'hpc_output/random_hc_fixed_orientation.csv'
 
 random_value_x, random_value_y = read_numbers_from_file(n, file_path)
 
-# Format the values to print in scientific notation with two decimal places
-formatted_random_value_x = "{:.1e}".format(random_value_x)
-formatted_random_value_y = "{:.1e}".format(random_value_y)
+# # Format the values to print in scientific notation with two decimal places
+# formatted_random_value_x = "{:.1e}".format(random_value_x)
+# formatted_random_value_y = "{:.1e}".format(random_value_y)
 
 parameters["k_x_aqfr"] = random_value_x
 parameters["k_y_aqfr"] = random_value_y
 
-parameters["output_dir"] = f'./output/x_y/random_ahc_{formatted_random_value_x}_{formatted_random_value_y}'
+parameters["output_dir"] = f'./output/x_y/random_ahc_n'
 
 solve(parameters)
