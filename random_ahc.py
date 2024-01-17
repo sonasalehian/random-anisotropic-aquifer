@@ -1,5 +1,5 @@
 from default_parameters import parameters
-from model_load_mesh import solve
+from model_load_mesh_submesh import solve
 import sys
 import numpy as np
 
@@ -13,7 +13,7 @@ def read_numbers_from_file(n, file_path):
     return k_x_aqfr, k_y_aqfr
 
 n = int(sys.argv[1])
-file_path = 'hpc_output/random_hc_fixed_orientation.csv'
+file_path = 'hpc_output/random_hc_20filtered_fixed_orientation.csv'
 
 random_value_x, random_value_y = read_numbers_from_file(n, file_path)
 
@@ -24,6 +24,6 @@ random_value_x, random_value_y = read_numbers_from_file(n, file_path)
 parameters["k_x_aqfr"] = random_value_x
 parameters["k_y_aqfr"] = random_value_y
 
-parameters["output_dir"] = f'./output/x_y/random_ahc_n'
+parameters["output_dir"] = f'./output/submesh/random_ahc_{n}'
 
 solve(parameters)

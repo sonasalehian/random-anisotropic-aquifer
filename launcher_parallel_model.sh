@@ -22,7 +22,7 @@ echo "fenicsx-iris-gompi-32-20230116-r2"
 echo $SLURM_CPUS_ON_NODE
 echo $SLURM_CPUS_PER_TASK
 echo $JOBS_PER_NODE 
-echo "batch, n=8, c=1, t=4:00:00,1..3"
+echo "batch, n=8, c=1, t=4:00:00,0..2"
 
 # parallel --jobs $JOBS_PER_NODE --slf hostfile --wd $WDIR --joblog task.log --resume --progress -a task.lst sh run-blast.sh {} output/{/.}.blst $SLURM_CPUS_PER_TASK
 
