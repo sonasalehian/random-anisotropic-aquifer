@@ -3,6 +3,7 @@
 import numpy as np
 import dolfinx
 import ufl
+import basix.ufl
 
 import pprint
 from mpi4py import MPI
@@ -133,8 +134,10 @@ def equation_parameters(parameters, domain, mt):
     f_p = fem.Constant(domain, PETSc.ScalarType(0.0))
 
     # Subdomain
-    K = fem.FunctionSpace(domain, ufl.TensorElement("DG", domain.ufl_cell(), 0))
-    P = fem.FunctionSpace(domain, ("DG", 0))
+    # K = fem.FunctionSpace(domain, ufl.TensorElement("DG", domain.ufl_cell(), 0))
+    # P = fem.FunctionSpace(domain, ("DG", 0))
+    K = dolfinx.fem.functionspace(domain, basix.ufl.element("DG", "tetrahedron", 0, shape=(3,3)))
+    P = dolfinx.fem.functionspace(domain, basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 0))
     invkappa = fem.Function(K, dtype=PETSc.ScalarType)
 
     def invk_p(x, res):
@@ -241,11 +244,14 @@ def solve(parameters):
         ft = brxdmf.read_meshtags(domain, name=f"{domain.name}_facets", xpath="Xdmf/Domain")
 
     # Defining the finite element function space
-    Q_el = ufl.FiniteElement("BDM", domain.ufl_cell(), 1)
-    P_el = ufl.FiniteElement("Discontinuous Lagrange", domain.ufl_cell(), 0)
-    U_el = ufl.VectorElement("Lagrange", domain.ufl_cell(), 1)
-    V_el = ufl.MixedElement([Q_el, P_el, U_el])
-    V = fem.FunctionSpace(domain, V_el)
+    # Q_el = ufl.FiniteElement("BDM", domain.ufl_cell(), 1)
+    # P_el = ufl.FiniteElement("Discontinuous Lagrange", domain.ufl_cell(), 0)
+    # U_el = ufl.VectorElement("Lagrange", domain.ufl_cell(), 1)
+    # V_el = ufl.MixedElement([Q_el, P_el, U_el])
+    V_el = basix.ufl.mixed_element([basix.ufl.element("BDM", "tetrahedron", 1),
+                                   basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 0),
+                                   basix.ufl.element("Lagrange", "tetrahedron", 1, shape=(3,))])
+    V = dolfinx.fem.functionspace(domain, V_el)
 
     (q, p, u) = ufl.TrialFunctions(V)
     (q_t, p_t, u_t) = ufl.TestFunctions(V)
@@ -344,15 +350,18 @@ def solve(parameters):
     T_list = LOS@R2@R1
 
     # Interpolate q into a different finite element space
-    Q0 = fem.VectorFunctionSpace(domain, ("Discontinuous Lagrange", 1))
+    # Q0 = fem.VectorFunctionSpace(domain, ("Discontinuous Lagrange", 1))
+    Q0 = dolfinx.fem.functionspace(domain, basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 1, shape=(3,)))
     qh_Q0 = fem.Function(Q0, dtype=PETSc.ScalarType)
     qh_Q0.interpolate(q_n)
 
-    P0 = fem.FunctionSpace(domain, ("Discontinuous Lagrange", 1))
+    # P0 = fem.FunctionSpace(domain, ("Discontinuous Lagrange", 1))
+    P0 = dolfinx.fem.functionspace(domain, basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 1))
     ph_P0 = fem.Function(P0, dtype=PETSc.ScalarType)
     ph_P0.interpolate(p_n)
 
-    W = fem.FunctionSpace(domain, ("Lagrange", 1))
+    # W = fem.FunctionSpace(domain, ("Lagrange", 1))
+    W = dolfinx.fem.functionspace(domain, basix.ufl.element("Lagrange", "tetrahedron", 1))
     T_ufl = ufl.as_matrix(T_list)
     u_los = ufl.dot(T_ufl, u_n)
     u_los_expr = fem.Expression(u_los, W.element.interpolation_points())
@@ -374,25 +383,23 @@ def solve(parameters):
     losfile_vtx.write(t)
 
     # Submesh to reduce output size
-    cells = dolfinx.mesh.compute_incident_entities(
-        domain.topology, ft, domain.topology.dim-1, domain.topology.dim)
+    cells = dolfinx.mesh.compute_incident_entities(domain.topology, ft.find(top_marker), domain.topology.dim-1, domain.topology.dim)
 
 
-    submesh, cell_map, _, _ = dolfinx.mesh.create_submesh(
-        domain, domain.topology.dim, cells)
+    submesh, cell_map, _, _ = dolfinx.mesh.create_submesh(domain, domain.topology.dim, cells)
 
     U_sub = dolfinx.fem.functionspace(submesh, U.ufl_element())
     u_n_sub = dolfinx.fem.Function(U_sub)
 
     num_sub_cells = submesh.topology.index_map(submesh.topology.dim).size_local
-    for cell in range(num_sub_cells):
-        sub_dofs = U_sub.dofmap.cell_dofs(cell)
-        parent_dofs = U.dofmap.cell_dofs(cell_map[cell])
-        assert U_sub.dofmap.bs == U.dofmap.bs
-        for parent, child in zip(parent_dofs, sub_dofs):
-            for b in range(U_sub.dofmap.bs):
-                u_n_sub.x.array[child*U_sub.dofmap.bs +
-                            b] = u_n.x.array[parent*U.dofmap.bs+b]
+    # for cell in range(num_sub_cells):
+    #     sub_dofs = U_sub.dofmap.cell_dofs(cell)
+    #     parent_dofs = U.dofmap.cell_dofs(cell_map[cell])
+    #     assert U_sub.dofmap.bs == U.dofmap.bs
+    #     for parent, child in zip(parent_dofs, sub_dofs):
+    #         for bb in range(U_sub.dofmap.bs):
+    #             u_n_sub.x.array[child*U_sub.dofmap.bs +
+    #                         bb] = u_n.x.array[parent*U.dofmap.bs+bb]
                 
     with dolfinx.io.XDMFFile(submesh.comm, f"{parameters['output_dir']}/submesh.xdmf", "w") as xdmf:
         xdmf.write_mesh(submesh)
@@ -439,6 +446,14 @@ def solve(parameters):
         p_n.x.array[:] = ph.x.array
         q_n.x.array[:] = qh.x.array
         u_n.x.array[:] = uh.x.array
+        for cell in range(num_sub_cells):
+            sub_dofs = U_sub.dofmap.cell_dofs(cell)
+            parent_dofs = U.dofmap.cell_dofs(cell_map[cell])
+            assert U_sub.dofmap.bs == U.dofmap.bs
+            for parent, child in zip(parent_dofs, sub_dofs):
+                for bb in range(U_sub.dofmap.bs):
+                    u_n_sub.x.array[child*U_sub.dofmap.bs +
+                                bb] = u_n.x.array[parent*U.dofmap.bs+bb]
 
         if (i+1) % 20 == 0:
             # Interpolate q into a different finite element space
@@ -484,6 +499,7 @@ def solve(parameters):
         # Update the right hand side reusing the initial vector
         with b.localForm() as loc_b:
             loc_b.set(0)
+
         fem.petsc.assemble_vector(b, linear_form)
 
         # Apply Dirichlet boundary condition to the vector
@@ -511,6 +527,14 @@ def solve(parameters):
         p_n.x.array[:] = ph.x.array
         q_n.x.array[:] = qh.x.array
         u_n.x.array[:] = uh.x.array
+        for cell in range(num_sub_cells):
+            sub_dofs = U_sub.dofmap.cell_dofs(cell)
+            parent_dofs = U.dofmap.cell_dofs(cell_map[cell])
+            assert U_sub.dofmap.bs == U.dofmap.bs
+            for parent, child in zip(parent_dofs, sub_dofs):
+                for bb in range(U_sub.dofmap.bs):
+                    u_n_sub.x.array[child*U_sub.dofmap.bs +
+                                bb] = u_n.x.array[parent*U.dofmap.bs+bb]
 
         if (i + 1) % 20 == 0:
             # Interpolate q into a different finite element space
