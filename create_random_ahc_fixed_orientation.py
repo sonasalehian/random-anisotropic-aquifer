@@ -79,7 +79,7 @@ target_mean_1 = 4.7e-13
 target_mean_2 = 1.1e-11
 
 # Parameters for normal distribution
-std_dev_normal = 0.2  # Standard deviation for normal distribution
+std_dev_normal = 0.1  # Standard deviation for normal distribution
 
 # Calculate the mean and variance for the normal distribution
 mean_normal_1 = np.log(target_mean_1) - 0.5 * (std_dev_normal**2)
@@ -126,6 +126,7 @@ else:
 np.savetxt(file_name_filtered, final_hydraulic_conductivity, delimiter=',')
 
 print(f"Filtered values have been saved to {file_name_filtered}")
+print(max_attempts)
 
 # Calculate mean and standard deviation of the resulting values
 mean_hc_1 = np.mean(final_hydraulic_conductivity[:, 0])
@@ -140,10 +141,18 @@ print(f"Standard Deviation: {std_hc_1}, {std_hc_2}")
 print(final_hydraulic_conductivity.shape)
 
 # Plot the histogram of filtered values
-plt.hist(final_hydraulic_conductivity[:, 0], bins=100, density=True, alpha=0.5, color='b', label='Distribution 1', range=(0, 5e-12))
-plt.hist(final_hydraulic_conductivity[:, 1], bins=100, density=True, alpha=0.5, color='r', label='Distribution 2', range=(0, 5e-11))
-plt.title('Filtered Hydraulic Conductivity Distribution')
+plt.figure(1)
+plt.hist(final_hydraulic_conductivity[:, 0], bins=300, density=True, alpha=0.5, color='b', label='Distribution k_yy', range=(3e-13, 7e-13))
+plt.title('Random Hydraulic Conductivity Distribution')
 plt.xlabel('Hydraulic Conductivity')
 plt.ylabel('Frequency')
 plt.legend()
-plt.show()
+plt.savefig("hpc_output/Distribution_yy.png")  # save as png
+
+plt.figure(2)
+plt.hist(final_hydraulic_conductivity[:, 1], bins=100, density=True, alpha=0.5, color='r', label='Distribution k_xx', range=(8e-12, 1.4e-11))
+plt.title('Random Hydraulic Conductivity Distribution')
+plt.xlabel('Hydraulic Conductivity')
+plt.ylabel('Frequency')
+plt.legend()
+plt.savefig("hpc_output/Distribution_xx.png")  # save as png
