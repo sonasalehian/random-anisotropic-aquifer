@@ -1,5 +1,8 @@
 # Poroelasticity model for Anderson Junction aquifer
 
+import os, sys
+sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
+
 import numpy as np
 import dolfinx
 import ufl
@@ -371,18 +374,18 @@ def solve(parameters):
     u_los_h = fem.Function(W)
     u_los_h.interpolate(u_los_expr)
 
-    pfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/pressure.bp", [ph_P0], engine="BP4")
-    pfile_vtx.write(t)
+    # pfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/pressure.bp", [ph_P0], engine="BP4")
+    # pfile_vtx.write(t)
 
-    qfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/flux.bp", [qh_Q0], engine="BP4")
-    qfile_vtx.write(t)
+    # qfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/flux.bp", [qh_Q0], engine="BP4")
+    # qfile_vtx.write(t)
 
-    ufile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/deformation.bp", [u_n], engine="BP4")
-    ufile_vtx.write(t)
+    # ufile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/deformation.bp", [u_n], engine="BP4")
+    # ufile_vtx.write(t)
 
-    losfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/deformation_LOS.bp", [
-        u_los_h], engine="BP4")
-    losfile_vtx.write(t)
+    # losfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/deformation_LOS.bp", [
+    #     u_los_h], engine="BP4")
+    # losfile_vtx.write(t)
 
     # Submesh to reduce output size
     cells = dolfinx.mesh.compute_incident_entities(domain.topology, ft.find(top_marker), domain.topology.dim-1, domain.topology.dim)
@@ -403,14 +406,12 @@ def solve(parameters):
     #             u_n_sub.x.array[child*U_sub.dofmap.bs +
     #                         bb] = u_n.x.array[parent*U.dofmap.bs+bb]
                 
-    with dolfinx.io.XDMFFile(submesh.comm, f"{parameters['output_dir']}/submesh.xdmf", "w") as xdmf:
-        xdmf.write_mesh(submesh)
-        xdmf.write_function(u_n_sub, t)
+    # with dolfinx.io.XDMFFile(submesh.comm, f"{parameters['output_dir']}/submesh.xdmf", "w") as xdmf:
+    #     xdmf.write_mesh(submesh)
+    #     xdmf.write_function(u_n_sub, t)
 
-
-    # with dolfinx.io.XDMFFile(submesh.comm, "parentmesh.xdmf", "w") as xdmf:
-    #     xdmf.write_mesh(mesh)
-    #     xdmf.write_function(u)
+    sub_file_vtx = io.VTXWriter(submesh.comm, f"{parameters['output_dir']}/submesh.bp", [u_n_sub], engine="BP4")
+    sub_file_vtx.write(t)
 
     print_root("Starting timestepping...")
 
@@ -463,11 +464,12 @@ def solve(parameters):
             ph_P0.interpolate(p_n)
 
             # Write solution to file
-            pfile_vtx.write(t)
-            qfile_vtx.write(t)
-            ufile_vtx.write(t)
-            losfile_vtx.write(t)
-            xdmf.write_function(u_n_sub, t)
+            # pfile_vtx.write(t)
+            # qfile_vtx.write(t)
+            # ufile_vtx.write(t)
+            # losfile_vtx.write(t)
+            # xdmf.write_function(u_n_sub, t)
+            sub_file_vtx.write(t)
 
     print_root("Stop pumping.")
     print_root("Recalculating Dirichlet condition...")
@@ -544,15 +546,17 @@ def solve(parameters):
             ph_P0.interpolate(p_n)
 
             # Write solution to file
-            pfile_vtx.write(t)
-            qfile_vtx.write(t)
-            ufile_vtx.write(t)
-            losfile_vtx.write(t)
-            xdmf.write_function(u_n_sub, t)
+            # pfile_vtx.write(t)
+            # qfile_vtx.write(t)
+            # ufile_vtx.write(t)
+            # losfile_vtx.write(t)
+            # xdmf.write_function(u_n_sub, t)
+            sub_file_vtx.write(t)
 
-    pfile_vtx.close()
-    qfile_vtx.close()
-    ufile_vtx.close()
-    losfile_vtx.close()
+    # pfile_vtx.close()
+    # qfile_vtx.close()
+    # ufile_vtx.close()
+    # losfile_vtx.close()
+    sub_file_vtx.close()
 
     print_root('Finished solve.')
