@@ -456,7 +456,7 @@ def solve(parameters):
             for parent, child in zip(parent_dofs, sub_dofs):
                 for bb in range(U_sub.dofmap.bs):
                     u_n_sub.x.array[child*U_sub.dofmap.bs +
-                                bb] = u_n.x.array[parent*U.dofmap.bs+bb]
+                                bb] = u_los_h.x.array[parent*U.dofmap.bs+bb]
 
         if (i+1) % 20 == 0:
             # Interpolate q into a different finite element space
@@ -538,7 +538,7 @@ def solve(parameters):
             for parent, child in zip(parent_dofs, sub_dofs):
                 for bb in range(U_sub.dofmap.bs):
                     u_n_sub.x.array[child*U_sub.dofmap.bs +
-                                bb] = u_n.x.array[parent*U.dofmap.bs+bb]
+                                bb] = u_los_h.x.array[parent*U.dofmap.bs+bb]
 
         if (i + 1) % 20 == 0:
             # Interpolate q into a different finite element space
