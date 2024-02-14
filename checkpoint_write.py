@@ -11,7 +11,7 @@ import adios4dolfinx
 
 mesh = dolfinx.mesh.create_box(MPI.COMM_WORLD, [np.array([0, 0, 0]), np.array([100, 150, 40])],
                         [20, 6, 6], cell_type=dolfinx.mesh.CellType.tetrahedron)  
-el = basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 0)
+el = basix.ufl.element("Lagrange", "tetrahedron", 1)
 V = dolfinx.fem.functionspace(mesh, el)
 uh = dolfinx.fem.Function(V)
 

@@ -30,7 +30,7 @@ MPI.COMM_WORLD.Barrier()
 mesh = adios4dolfinx.read_mesh(
     MPI.COMM_WORLD, filename, engine, dolfinx.mesh.GhostMode.shared_facet
 )
-el = basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 1)
+el = basix.ufl.element("Lagrange", "tetrahedron", 1)
 V = dolfinx.fem.functionspace(mesh, el)
 v = dolfinx.fem.Function(V)
 v.name = "uh"
@@ -42,9 +42,9 @@ def f(x):
     return x[0]**2+x[1]**2
 
 v_ex.interpolate(f)
-
+t = 0
 sub_file_vtx = dolfinx.io.VTXWriter(mesh.comm, "output/mesh_checkpoint2.bp", [v], engine="BP4")
-sub_file_vtx.write()
+sub_file_vtx.write(t)
 sub_file_vtx.close()
 
 # res = np.finfo(dtype).resolution
