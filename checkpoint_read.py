@@ -43,9 +43,9 @@ def f(x):
 
 v_ex.interpolate(f)
 
-# sub_file_vtx = dolfinx.io.VTXWriter(mesh.comm, "output/mesh_checkpoint2.bp", [v], engine="BP4")
-# sub_file_vtx.write()
-# sub_file_vtx.close()
+sub_file_vtx = dolfinx.io.VTXWriter(mesh.comm, "output/mesh_checkpoint2.bp", [v], engine="BP4")
+sub_file_vtx.write()
+sub_file_vtx.close()
 
 # res = np.finfo(dtype).resolution
 # assert np.allclose(v.x.array, v_ex.x.array, atol=10 * res, rtol=10 * res)
