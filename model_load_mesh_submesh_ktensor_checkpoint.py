@@ -1,14 +1,15 @@
 # Poroelasticity model for Anderson Junction aquifer
 
-import os, sys
-sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
+# import os, sys
+# sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
 
 import numpy as np
 import dolfinx
 import ufl
 import basix.ufl
-
+import adios4dolfinx
 import pprint
+
 from mpi4py import MPI
 from petsc4py import PETSc
 from dolfinx import fem, io, mesh
@@ -16,12 +17,6 @@ from functools import partial
 from utils import print_root, print_all
 from dolfinx.fem import petsc, assemble_scalar, form
 
-from pathlib import Path
-from adios4dolfinx.adios2_helpers import resolve_adios_scope
-from adios4dolfinx import snapshot_checkpoint
-
-import adios2
-adios2 = resolve_adios_scope(adios2)
 
 def boundary_conditions(parameters, domain, ft, V):
     pumpingrate = parameters["P_r"]
@@ -416,11 +411,13 @@ def solve(parameters):
     #     xdmf.write_mesh(submesh)
     #     xdmf.write_function(u_n_sub, t)
 
-    sub_file_vtx = io.VTXWriter(submesh.comm, f"{parameters['output_dir']}/submesh.bp", [u_n_sub], engine="BP4")
-    sub_file_vtx.write(t)
+    # sub_file_vtx = io.VTXWriter(submesh.comm, f"{parameters['output_dir']}/submesh.bp", [u_n_sub], engine="BP4")
+    # sub_file_vtx.write(t)
 
-    # Snapshot_checkpoint
-    file = Path("snapshot_2D_vs.bp")
+    filename = f"{parameters['output_dir']}/submesh_checkpoint.bp"
+
+    adios4dolfinx.write_mesh(submesh, filename)
+    adios4dolfinx.write_function(u_n_sub, filename, time=t)
 
     print_root("Starting timestepping...")
 
@@ -466,8 +463,6 @@ def solve(parameters):
                 for bb in range(U_sub.dofmap.bs):
                     u_n_sub.x.array[child*U_sub.dofmap.bs +
                                 bb] = u_los_h.x.array[parent*U.dofmap.bs+bb]
-                    
-        snapshot_checkpoint(u_n_sub, file, adios2.Mode.Write)
 
         if (i+1) % 20 == 0:
             # Interpolate q into a different finite element space
@@ -480,8 +475,8 @@ def solve(parameters):
             # ufile_vtx.write(t)
             # losfile_vtx.write(t)
             # xdmf.write_function(u_n_sub, t)
-            sub_file_vtx.write(t)
-            
+            # sub_file_vtx.write(t)
+            adios4dolfinx.write_function(u_n_sub, filename, time=t)
 
     print_root("Stop pumping.")
     print_root("Recalculating Dirichlet condition...")
@@ -551,8 +546,6 @@ def solve(parameters):
                 for bb in range(U_sub.dofmap.bs):
                     u_n_sub.x.array[child*U_sub.dofmap.bs +
                                 bb] = u_los_h.x.array[parent*U.dofmap.bs+bb]
-                    
-        snapshot_checkpoint(u_n_sub, file, adios2.Mode.Write)
 
         if (i + 1) % 20 == 0:
             # Interpolate q into a different finite element space
@@ -565,12 +558,13 @@ def solve(parameters):
             # ufile_vtx.write(t)
             # losfile_vtx.write(t)
             # xdmf.write_function(u_n_sub, t)
-            sub_file_vtx.write(t)
+            # sub_file_vtx.write(t)
+            adios4dolfinx.write_function(u_n_sub, filename, time=t)
 
     # pfile_vtx.close()
     # qfile_vtx.close()
     # ufile_vtx.close()
     # losfile_vtx.close()
-    sub_file_vtx.close()
+    # sub_file_vtx.close()
 
     print_root('Finished solve.')
