@@ -22,7 +22,7 @@ def f(x):
 uh.interpolate(f)
 uh.name = "uh"
 
-filename = pathlib.Path(f"output/mesh_checkpoint.bp")
+filename = 'output/mesh_checkpoint.bp'
 
 adios4dolfinx.write_mesh(mesh, filename)
 adios4dolfinx.write_function(uh, filename, time=0.0)
