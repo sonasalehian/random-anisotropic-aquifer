@@ -1,57 +1,9 @@
-import itertools
-import pathlib
-
 import basix
 import basix.ufl
 import dolfinx
-import numpy as np
-import pytest
 from mpi4py import MPI
-import numpy.typing
 
 import adios4dolfinx
-
-# # from .test_utils import read_function, write_function, get_dtype, read_function_time_dep, write_function_time_dep
-
-
-# # def write_function(mesh, el, f, dtype, name="uh", append: bool = False) -> str:
-
-# mesh = dolfinx.mesh.create_box(MPI.COMM_WORLD, [np.array([0, 0, 0]), np.array([100, 150, 40])],
-#                         [20, 6, 6], cell_type=dolfinx.mesh.CellType.tetrahedron)  
-# el = basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 0)
-# V = dolfinx.fem.functionspace(mesh, el)
-# uh = dolfinx.fem.Function(V)
-
-
-# def f(x):
-#     return x[0]**2+x[1]**2
-
-# uh.interpolate(f)
-# uh.name = "uh"
-# # el_hash = (
-# #     V.element.signature()
-# #     .replace(" ", "")
-# #     .replace(",", "")
-# #     .replace("(", "")
-# #     .replace(")", "")
-# #     .replace("[", "")
-# #     .replace("]", "")
-# # )
-
-# # file_hash = f"{el_hash}_{np.dtype(dtype).name}"
-# # filename = pathlib.Path(f"output/mesh_{file_hash}.bp")
-# filename = pathlib.Path(f"output/mesh_checkpoint.bp")
-# # if mesh.comm.size != 1:
-# #     if not append:
-# adios4dolfinx.write_mesh(mesh, filename)
-# adios4dolfinx.write_function(uh, filename, time=0.0)
-# # else:
-# #     if MPI.COMM_WORLD.rank == 0:
-# #         if not append:
-# #             adios4dolfinx.write_mesh(mesh, filename)
-# #         adios4dolfinx.write_function(uh, filename, time=0.0)
-
-# # return file_hash
 
 
 # def get_dtype(in_dtype: np.dtype, complex: bool):
@@ -70,9 +22,6 @@ import adios4dolfinx
 #         raise ValueError("Unsuported dtype")
 #     return dtype
 
-# def read_function(comm, el, f, hash, dtype, name="uh"):
-# mesh = dolfinx.mesh.create_box(MPI.COMM_WORLD, [np.array([0, 0, 0]), np.array([100, 150, 40])],
-#                         [20, 6, 6], cell_type=dolfinx.mesh.CellType.tetrahedron)  
 # dtype = get_dtype(mesh.geometry.x.dtype, complex)
 filename = f"output/mesh_checkpoint.bp"
 engine = "BP4"
