@@ -1,5 +1,3 @@
-import pathlib
-
 import basix
 import basix.ufl
 import dolfinx
