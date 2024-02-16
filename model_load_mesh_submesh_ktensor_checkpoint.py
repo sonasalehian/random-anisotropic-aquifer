@@ -394,7 +394,7 @@ def solve(parameters):
 
     submesh, cell_map, _, _ = dolfinx.mesh.create_submesh(domain, domain.topology.dim, cells)
 
-    U_sub = dolfinx.fem.functionspace(submesh, U.ufl_element())
+    U_sub = dolfinx.fem.functionspace(submesh, W.ufl_element())
     u_n_sub = dolfinx.fem.Function(U_sub)
 
     num_sub_cells = submesh.topology.index_map(submesh.topology.dim).size_local
@@ -457,12 +457,12 @@ def solve(parameters):
         u_n.x.array[:] = uh.x.array
         for cell in range(num_sub_cells):
             sub_dofs = U_sub.dofmap.cell_dofs(cell)
-            parent_dofs = U.dofmap.cell_dofs(cell_map[cell])
-            assert U_sub.dofmap.bs == U.dofmap.bs
+            parent_dofs = W.dofmap.cell_dofs(cell_map[cell])
+            assert U_sub.dofmap.bs == W.dofmap.bs
             for parent, child in zip(parent_dofs, sub_dofs):
                 for bb in range(U_sub.dofmap.bs):
                     u_n_sub.x.array[child*U_sub.dofmap.bs +
-                                bb] = u_los_h.x.array[parent*U.dofmap.bs+bb]
+                                bb] = u_los_h.x.array[parent*W.dofmap.bs+bb]
 
         if (i+1) % 20 == 0:
             # Interpolate q into a different finite element space
@@ -540,12 +540,12 @@ def solve(parameters):
         u_n.x.array[:] = uh.x.array
         for cell in range(num_sub_cells):
             sub_dofs = U_sub.dofmap.cell_dofs(cell)
-            parent_dofs = U.dofmap.cell_dofs(cell_map[cell])
-            assert U_sub.dofmap.bs == U.dofmap.bs
+            parent_dofs = W.dofmap.cell_dofs(cell_map[cell])
+            assert U_sub.dofmap.bs == W.dofmap.bs
             for parent, child in zip(parent_dofs, sub_dofs):
                 for bb in range(U_sub.dofmap.bs):
                     u_n_sub.x.array[child*U_sub.dofmap.bs +
-                                bb] = u_los_h.x.array[parent*U.dofmap.bs+bb]
+                                bb] = u_los_h.x.array[parent*W.dofmap.bs+bb]
 
         if (i + 1) % 20 == 0:
             # Interpolate q into a different finite element space
