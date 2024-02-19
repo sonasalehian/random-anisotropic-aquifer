@@ -12,7 +12,7 @@ import dolfinx
 
 import dolfinx.io
 
-mesh = dolfinx.mesh.create_unit_square(MPI.COMM_WORLD, 3, 3)
+mesh = dolfinx.mesh.create_unit_square(MPI.COMM_WORLD, 10, 10)
 
 
 V = dolfinx.fem.functionspace(mesh, ("Lagrange", 1))
@@ -21,14 +21,16 @@ u = dolfinx.fem.Function(V)
 u.interpolate(lambda x: np.sin(x[1]))
 u.x.scatter_forward()
 
-mesh.topology.create_connectivity(mesh.topology.dim-1, mesh.topology.dim)
+mesh.topology.create_connectivity(mesh.topology.dim - 1, mesh.topology.dim)
 boundary_facets = dolfinx.mesh.exterior_facet_indices(mesh.topology)
 cells = dolfinx.mesh.compute_incident_entities(
-    mesh.topology, boundary_facets, mesh.topology.dim-1, mesh.topology.dim)
+    mesh.topology, boundary_facets, mesh.topology.dim - 1, mesh.topology.dim)
 
 
 submesh, cell_map, _, _ = dolfinx.mesh.create_submesh(
     mesh, mesh.topology.dim, cells)
+
+print(submesh.topology.dim)
 
 V_sub = dolfinx.fem.functionspace(submesh, ("Lagrange", 1))
 u_sub = dolfinx.fem.Function(V_sub)
