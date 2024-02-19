@@ -44,12 +44,10 @@ for cell in range(num_sub_cells):
 
 u_sub.x.scatter_forward()
 
-
 filename = 'output/submesh_checkpoint_MWE.bp'
 
 adios4dolfinx.write_mesh(submesh, filename)
 adios4dolfinx.write_function(u_sub, filename, time=0.0)
-
 
 # Read the checkpoint file
 filename = "output/submesh_checkpoint_MWE.bp"
@@ -61,19 +59,7 @@ submesh = adios4dolfinx.read_mesh(
 V = dolfinx.fem.functionspace(mesh, ("Lagrange", 1, (2, )))
 V_sub = dolfinx.fem.functionspace(submesh, V.ufl_element())
 
-# el = basix.ufl.element("Lagrange", 1, (2, ))
-# V_sub = dolfinx.fem.functionspace(submesh, el)
 v_sub = dolfinx.fem.Function(V_sub)
-v_sub.name = "u_sub"
 adios4dolfinx.read_function(v_sub, filename, engine)
-# v_ex = dolfinx.fem.Function(V)
 
-
-# def f(x):
-#     return x[0]**2+x[1]**2
-
-# v_ex.interpolate(f)
-t = 0
-sub_file_vtx = dolfinx.io.VTXWriter(submesh.comm, "output/submesh_checkpoint_MWE2.bp", [v_sub], engine="BP4")
-sub_file_vtx.write(t)
-sub_file_vtx.close()
+assert np.allclose(v_sub.x.array, u_sub.x.array)
