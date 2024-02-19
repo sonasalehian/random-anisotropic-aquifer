@@ -10,14 +10,15 @@ from mpi4py import MPI
 import numpy as np
 import dolfinx
 
+import dolfinx.io
 
-mesh = dolfinx.mesh.create_unit_square(MPI.COMM_WORLD, 10, 10)
+mesh = dolfinx.mesh.create_unit_square(MPI.COMM_WORLD, 3, 3)
 
 
-V = dolfinx.fem.functionspace(mesh, ("Lagrange", 1, (2, )))
+V = dolfinx.fem.functionspace(mesh, ("Lagrange", 1))
 u = dolfinx.fem.Function(V)
 
-u.interpolate(lambda x: (x[0], np.sin(x[1])))
+u.interpolate(lambda x: np.sin(x[1]))
 u.x.scatter_forward()
 
 mesh.topology.create_connectivity(mesh.topology.dim-1, mesh.topology.dim)
@@ -29,7 +30,7 @@ cells = dolfinx.mesh.compute_incident_entities(
 submesh, cell_map, _, _ = dolfinx.mesh.create_submesh(
     mesh, mesh.topology.dim, cells)
 
-V_sub = dolfinx.fem.functionspace(submesh, V.ufl_element())
+V_sub = dolfinx.fem.functionspace(submesh, ("Lagrange", 1))
 u_sub = dolfinx.fem.Function(V_sub)
 
 num_sub_cells = submesh.topology.index_map(submesh.topology.dim).size_local
@@ -44,22 +45,25 @@ for cell in range(num_sub_cells):
 
 u_sub.x.scatter_forward()
 
-filename = 'output/submesh_checkpoint_MWE.bp'
+with dolfinx.io.XDMFFile(submesh.comm, "output/before_checkpoint.xdmf", "w") as f:
+    f.write_mesh(submesh)
+    f.write_function(u_sub)
 
+filename = "output/checkpoint.bp"
 adios4dolfinx.write_mesh(submesh, filename)
-adios4dolfinx.write_function(u_sub, filename, time=0.0)
+adios4dolfinx.write_function(u_sub, filename)
 
 # Read the checkpoint file
-filename = "output/submesh_checkpoint_MWE.bp"
 engine = "BP4"
-MPI.COMM_WORLD.Barrier()
 submesh = adios4dolfinx.read_mesh(
     MPI.COMM_WORLD, filename, engine, dolfinx.mesh.GhostMode.shared_facet
 )
-V = dolfinx.fem.functionspace(mesh, ("Lagrange", 1, (2, )))
-V_sub = dolfinx.fem.functionspace(submesh, V.ufl_element())
-
+V_sub = dolfinx.fem.functionspace(submesh, ("Lagrange", 1))
 v_sub = dolfinx.fem.Function(V_sub)
 adios4dolfinx.read_function(v_sub, filename, engine)
 
-assert np.allclose(v_sub.x.array, u_sub.x.array)
+assert np.allclose(np.linalg.norm(v_sub.x.array), np.linalg.norm(u_sub.x.array))
+
+with dolfinx.io.XDMFFile(mesh.comm, "output/after_checkpoint.xdmf", "w") as f:
+    f.write_mesh(submesh)
+    f.write_function(v_sub)
