@@ -1,2 +1,2 @@
 #!/bin/bash
-docker run -v $(pwd):/shared -w /shared -ti dolfinx/dolfinx:v0.7.2
+docker run -v $(pwd):/shared -w /shared -ti dolfinx/dolfinx:nightly
