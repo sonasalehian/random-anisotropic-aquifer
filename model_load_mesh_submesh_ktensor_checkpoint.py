@@ -396,6 +396,7 @@ def solve(parameters):
 
     U_sub = dolfinx.fem.functionspace(submesh, W.ufl_element())
     u_n_sub = dolfinx.fem.Function(U_sub)
+    u_n_sub.name = "u_n_sub"
 
     num_sub_cells = submesh.topology.index_map(submesh.topology.dim).size_local
     # for cell in range(num_sub_cells):

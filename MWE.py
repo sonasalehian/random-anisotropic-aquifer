@@ -10,8 +10,27 @@ from mpi4py import MPI
 import numpy as np
 import dolfinx
 
+def get_dtype(in_dtype: np.dtype, complex: bool):
+    dtype: numpy.typing.DTypeLike
+    if in_dtype == np.float32:
+        if complex:
+            dtype = np.complex64
+        else:
+            dtype = np.float32
+    elif in_dtype == np.float64:
+        if complex:
+            dtype = np.complex128
+        else:
+            dtype = np.float64
+    else:
+        raise ValueError("Unsuported dtype")
+    return dtype
+
+
+
 
 mesh = dolfinx.mesh.create_unit_square(MPI.COMM_WORLD, 10, 10)
+dtype = get_dtype(mesh.geometry.x.dtype, complex)
 
 
 V = dolfinx.fem.functionspace(mesh, ("Lagrange", 1, (2, )))
@@ -43,6 +62,7 @@ for cell in range(num_sub_cells):
                           b] = u.x.array[parent*V.dofmap.bs+b]
 
 u_sub.x.scatter_forward()
+u_sub.name = "u_sub"
 
 
 filename = 'output/submesh_checkpoint_MWE.bp'
@@ -77,3 +97,6 @@ t = 0
 sub_file_vtx = dolfinx.io.VTXWriter(submesh.comm, "output/submesh_checkpoint_MWE2.bp", [v_sub], engine="BP4")
 sub_file_vtx.write(t)
 sub_file_vtx.close()
+
+res = np.finfo(dtype).resolution
+assert np.allclose(v_sub.x.array, u_sub.x.array, atol=10 * res, rtol=10 * res)
