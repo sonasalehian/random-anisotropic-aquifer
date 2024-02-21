@@ -4,7 +4,7 @@ import sys
 import numpy as np
 
 # n = int(sys.argv[1])
-n = 0
+n = 2
 file_path = 'hpc_output/random_hc_fixed_scaling.csv'
 
 # Load the list of arrays from the CSV file
@@ -16,7 +16,7 @@ parameters["k_xy_aqfr"] = k_flat[n, 1]
 parameters["k_yx_aqfr"] = k_flat[n, 2]
 parameters["k_y_aqfr"] = k_flat[n, 3]
 
-parameters["output_dir"] = f'./output/random_s/random_ahc_{n}'
+parameters["output_dir"] = f'./output/random_s_los/random_ahc_{n}'
 
 solve(parameters)
 
