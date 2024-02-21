@@ -7,9 +7,6 @@
 #SBATCH --ntasks-per-node=28
 #SBATCH -p batch
 
-## Command(s) to run (example):
-# module load gnu-parallel/2019.03.22
-
 source $SCRATCH/spack/share/spack/setup-env.sh
 
 spack env activate fenicsx-main-20230214
@@ -27,8 +24,6 @@ echo $SLURM_CPUS_ON_NODE
 echo $SLURM_CPUS_PER_TASK
 echo $JOBS_PER_NODE 
 echo "Spack, batch, n=14, c=1, t=2:00:00,0..3"
-
-# parallel --jobs $JOBS_PER_NODE --slf hostfile --wd $WDIR --joblog task.log --resume --progress -a task.lst sh run-blast.sh {} output/{/.}.blst $SLURM_CPUS_PER_TASK
 
 parallel --jobs $JOBS_PER_NODE srun -n 14 -c 1 python3 random_ahc_tensor_checkpoint.py {} ::: {0..3}
 

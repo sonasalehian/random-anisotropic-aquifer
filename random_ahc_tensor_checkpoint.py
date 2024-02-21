@@ -1,11 +1,11 @@
 from default_parameters import parameters
-from model_load_mesh_submesh_ktensor_checkpoint import solve
+from model import solve
 import sys
 import numpy as np
 
 n = int(sys.argv[1])
 # n = 0
-file_path = 'hpc_output/random_hc_fixed_scaling.csv'
+file_path = 'output/data/random_hc_fixed_scaling.csv'
 
 # Load the list of arrays from the CSV file
 k_flat = np.loadtxt(file_path, delimiter=',')

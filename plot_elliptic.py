@@ -1,3 +1,4 @@
+# # Plot ellipses of random values with fixed orientation
 # import matplotlib.pyplot as plt
 # import numpy as np
 
@@ -56,6 +57,8 @@
 
 # plt.savefig("hpc_output/elliptics.png")  # save as png
 
+
+# Plot ellipses of random values with fixed scaling
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg as la
@@ -76,7 +79,7 @@ def plot_line(ax, angle, label):
 
 
 # Load hydraulic conductivity data from CSV
-elliptic_radius = np.loadtxt('hpc_output/random_hc_fixed_scaling.csv', delimiter=',')
+elliptic_radius = np.loadtxt('output/data/random_hc_fixed_scaling.csv', delimiter=',')
 
 
 # Randomly select 10 radius values
@@ -135,4 +138,4 @@ plt.subplots_adjust(top=0.9)  # Increase the top parameter to adjust spacing
 # Display the plot
 plt.suptitle('Ellipses with fixed scaling and random orientation', y=1.0)
 
-plt.savefig("hpc_output/elliptics_fixed_scaling.png")  # save as png
+plt.savefig("output/plots/elliptics_fixed_scaling.png")  # save as png

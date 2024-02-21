@@ -18,7 +18,7 @@ plt.hist(random_angles_deg, bins=30, density=True, alpha=0.5, color='b')
 plt.title('Random Rotation Angles from von Mises Distribution')
 plt.xlabel('Angle (degrees)')
 plt.ylabel('Frequency')
-plt.savefig("hpc_output/Rotation_angle_distribution.png")  # save as png
+plt.savefig("output/plots/Rotation_angle_distribution.png")  # save as png
 
 k_initial = np.array([[1.1e-11,0],[0,4.7e-13]])
 R = [np.empty((2, 2)) for _ in range(num_samples)]
@@ -29,7 +29,7 @@ for i, angle in enumerate(random_angles):
     k[i] = np.dot(R, np.dot(k_initial, np.transpose(R)))
 
 # Save the random hydraulic conductivity tensor
-file_name = 'hpc_output/random_hc_fixed_scaling.csv'
+file_name = 'output/data/random_hc_fixed_scaling.csv'
 
 if os.path.exists(file_name):
     os.remove(file_name)
