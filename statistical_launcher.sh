@@ -22,4 +22,4 @@ echo $SLURM_CPUS_PER_TASK
 echo $JOBS_PER_NODE 
 echo "batch, c=1, t=0:20:00"
 
-srun -c 1 python3 read_checkpoint_output.py
+srun -c 1 python3 statistical_analysis_checkpoints.py
