@@ -23,7 +23,7 @@ echo "fenicsx-main-20230214 env"
 echo $SLURM_CPUS_ON_NODE
 echo $SLURM_CPUS_PER_TASK
 echo $JOBS_PER_NODE 
-echo "Spack, batch, n=14, c=1, t=2:00:00,0..3"
+echo "Spack, batch, n=14, c=1, t=2:00:00,4..9"
 
-parallel --jobs $JOBS_PER_NODE srun -n 14 -c 1 python3 random_ahc_tensor_checkpoint.py {} ::: {0..3}
+parallel --jobs $JOBS_PER_NODE srun -n 14 -c 1 python3 random_ahc_tensor_checkpoint.py {} ::: {4..9}
 

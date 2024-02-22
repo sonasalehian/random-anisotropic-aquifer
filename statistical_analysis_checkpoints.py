@@ -1,5 +1,5 @@
-# import os, sys
-# sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
+import os, sys
+sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
 
 import basix
 import basix.ufl
