@@ -1,3 +1,5 @@
+# JSH: Change this to be a function create_default_parameters that returns the
+# dictionary.
 # Parameters
 
 parameters = {}
