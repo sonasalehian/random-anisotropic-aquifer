@@ -37,6 +37,7 @@ def boundary_conditions(parameters, domain, ft, V):
     UY, _ = V.sub(2).sub(1).collapse()
     u_Dy = fem.Function(UY)
 
+    # JSH: Remove commented code if it is no longer used.
     # UZ, _ = V.sub(2).sub(2).collapse()
     # u_Dz = fem.Function(UZ)
 
@@ -46,6 +47,7 @@ def boundary_conditions(parameters, domain, ft, V):
         (V.sub(2).sub(1), UY), fdim, ft.find(sidesy_marker)), V.sub(2).sub(1))
     bcu_bottom = fem.dirichletbc(u_D, fem.locate_dofs_topological(
         (V.sub(2), U), fdim, ft.find(bottom_marker)), V.sub(2))
+    # JSH: Remove commented code if it is no longer used.
     # bcu_bottom = fem.dirichletbc(u_Dz, fem.locate_dofs_topological(
     #     (V.sub(2).sub(2), UZ), fdim, ft.find(bottom_marker)), V.sub(2).sub(2))
 
@@ -233,9 +235,10 @@ def solve(parameters):
 
     top_marker, sidesx_marker, sidesy_marker, bottom_marker, drywell_marker, pumpingwell_marker = 4, 5, 6, 7, 8, 9
 
+    # JSH: You never use this mesh!
     domain = mesh.create_box(MPI.COMM_WORLD, [np.array([0, 0, 0]), np.array([Lx, Ly, Lz])],
                             [20, 6, 6], cell_type=mesh.CellType.tetrahedron)  
-    
+   
     domain.name = "aquifersys"
       
     print_root("Reading mesh...")
@@ -249,6 +252,7 @@ def solve(parameters):
     with io.XDMFFile(MPI.COMM_WORLD, "output/mesh/boundaries_tags.xdmf", "r") as brxdmf:    
         ft = brxdmf.read_meshtags(domain, name=f"{domain.name}_facets", xpath="Xdmf/Domain")
 
+    # JSH: Remove, old code.
     # Defining the finite element function space
     # Q_el = ufl.FiniteElement("BDM", domain.ufl_cell(), 1)
     # P_el = ufl.FiniteElement("Discontinuous Lagrange", domain.ufl_cell(), 0)
@@ -304,16 +308,17 @@ def solve(parameters):
     ds = ufl.Measure("ds", domain=domain, subdomain_data=ft)
     n = ufl.FacetNormal(domain)
 
-    # Weak Forms #
+    # JSH: There is a mistake here. a and L are only valid for constant dt.
+    # Weak Forms
     a = ufl.inner(S_e * p, p_t) * dx + ufl.inner(alpha * ufl.div(u), p_t) * dx\
         + ufl.inner(dt * ufl.div(q), p_t) * dx \
         - ufl.inner(stress_bar(u, p), ufl.grad(u_t)) * dx \
-        + ufl.inner(dt * p, ufl.div(q_t)) * dx\
-        - ufl.inner(dt * invkappa * q, q_t) * dx\
-        - (ufl.dot((stress_bar(u, p) * n), n))*(ufl.dot(u_t, n)) * ds(drywell_marker)\
+        + ufl.inner(dt * p, ufl.div(q_t)) * dx \
+        - ufl.inner(dt * invkappa * q, q_t) * dx \
+        - (ufl.dot((stress_bar(u, p) * n), n))*(ufl.dot(u_t, n)) * ds(drywell_marker) \
         + (ufl.dot((stress_bar(u_t, p_t) * n), n)) * \
         (ufl.dot(u, n)) * ds(drywell_marker)
-    L = ufl.inner(dt * f_p, p_t) * dx + ufl.inner(S_e * p_n, p_t) * dx\
+    L = ufl.inner(dt * f_p, p_t) * dx + ufl.inner(S_e * p_n, p_t) * dx \
         + ufl.inner(alpha * ufl.div(u_n), p_t) * dx
     # - ufl.inner(g_u, u_t) * ds(top_marker) \
     # - ufl.inner(f_u, u_t) * dx \
@@ -341,6 +346,7 @@ def solve(parameters):
     print_root("Done.")
 
     # LOS displacement
+    # JSH: Typo variable name teta -> theta.
     teta = np.radians(180)  # Rotation around the axis y
     phi = np.radians(36)  # Rotation around the axis z
     R1 = np.array([[np.cos(teta), 0, -np.sin(teta)],
@@ -391,14 +397,17 @@ def solve(parameters):
     # Submesh to reduce output size
     cells = dolfinx.mesh.compute_incident_entities(domain.topology, ft.find(top_marker), domain.topology.dim-1, domain.topology.dim)
 
-
     submesh, cell_map, _, _ = dolfinx.mesh.create_submesh(domain, domain.topology.dim, cells)
 
+    # JSH: I would recommend calling this W_sub, so it is clear that it is
+    # related to W.
     U_sub = dolfinx.fem.functionspace(submesh, W.ufl_element())
+    # JSH: Nothing ever gets put in u_n_sub before it is written.
     u_n_sub = dolfinx.fem.Function(U_sub)
     u_n_sub.name = "u_n_sub"
 
     num_sub_cells = submesh.topology.index_map(submesh.topology.dim).size_local
+    # JSH: Remove commented code if it is no longer needed.
     # for cell in range(num_sub_cells):
     #     sub_dofs = U_sub.dofmap.cell_dofs(cell)
     #     parent_dofs = U.dofmap.cell_dofs(cell_map[cell])
@@ -442,9 +451,10 @@ def solve(parameters):
         print_root("Starting linear solve...")
         solver.solve(b, ah.vector)
         ah.x.scatter_forward()
+        
+        # JSH: Why is this scatter forward here?
         u_n_sub.x.scatter_forward()
         print_root("Finished linear solve.")
-        # print(ah.x.norm())
 
         qh = ah.sub(0).collapse()
         ph = ah.sub(1).collapse()
@@ -469,7 +479,9 @@ def solve(parameters):
             # Interpolate q into a different finite element space
             qh_Q0.interpolate(q_n)
             ph_P0.interpolate(p_n)
-
+            # JSH: In the general case, interpolate should be followed by
+            # scatter_forward.
+            
             # Write solution to file
             # pfile_vtx.write(t)
             # qfile_vtx.write(t)
@@ -499,11 +511,12 @@ def solve(parameters):
     #        bcp_sidesy, bcp_drywell, bcp_pumpingwell]
     print_root("Done.")
 
-    # NOTE: No new KSP operator! Might be OK, needs checking.
+    # JSH: WARNING: This operator never get's put into a KSP, i.e. it is never
+    # used in a solve.
     A = fem.petsc.assemble_matrix(bilinear_form, bcs=bcs)
     A.assemble()
     b = fem.petsc.create_vector(linear_form)
-        
+    
     for i in range(num_steps2):
         print_root(f"Started time step: {i + 361}")
         t += dt2

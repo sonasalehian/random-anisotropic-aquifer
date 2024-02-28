@@ -1,3 +1,5 @@
+# JSH: You should be able to recover this case by having one generation
+# function and setting the dispersion parameter low. 
 import numpy as np
 import matplotlib.pyplot as plt
 import os

@@ -1,3 +1,4 @@
+# JSH: Could call a general routine with small variance for the magnitudes?
 import numpy as np
 import matplotlib.pyplot as plt
 import os

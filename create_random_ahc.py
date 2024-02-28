@@ -2,6 +2,7 @@
 # converted into a reusable function(s)? For example, a function like the
 # existing random generators which take the distribution parameters and
 # num_samples.
+# JSH: scipy.random is better/more fully featured in my experience.
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -54,7 +55,7 @@ filtered_count = 0
 max_attempts = 10000  # Maximum attempts to reach 1000 valid samples
 
 # JSH: You cannot do this filtering, you are not left with a well-defined set
-# of samples from a pdf. We need to look at appropriate parameters above.
+# of samples from a pdf. We need to look at appropriate parameters/distribution.
 # Take a look at e.g. truncated normal to understand why:
 # https://en.wikipedia.org/wiki/Truncated_normal_distribution
 while filtered_count < num_samples and max_attempts > 0:
@@ -64,6 +65,7 @@ while filtered_count < num_samples and max_attempts > 0:
     normal_values_2 = np.random.normal(loc=mean_normal_2, scale=std_dev_normal, size=num_samples)
 
     # Calculate exponential values
+    # JSH: I do not understand why you don't use a lognormal distribution?
     eigenvalues[:, 0] = np.exp(normal_values_1)
     eigenvalues[:, 1] = np.exp(normal_values_2)
 
@@ -92,6 +94,7 @@ for i, angle in enumerate(random_angles):
     W = np.array([[0, -angle], [angle, 0]])
     R_r = np.identity(2) + (np.sin(angle)/angle) * W + ((1 - np.cos(angle))/angle**2) * np.dot(W, W)
     k_s = np.array([[final_eigenvalues[i, 0], 0], [0, final_eigenvalues[i, 1]]])
+    # JSH: @ instead of np.dot?
     k[i] = np.dot(R_r, np.dot(k_s, np.transpose(R_r)))
 
 # Save the random hydraulic conductivity tensor
