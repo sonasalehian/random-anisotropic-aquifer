@@ -14,7 +14,9 @@ from mpi4py import MPI
 from petsc4py import PETSc
 from dolfinx import fem, io, mesh
 from functools import partial
+# JSH: print_all unused
 from utils import print_root, print_all
+# JSH: imports petsc, assembly_scalar, form unused
 from dolfinx.fem import petsc, assemble_scalar, form
 
 
@@ -142,6 +144,7 @@ def equation_parameters(parameters, domain, mt):
     f_p = fem.Constant(domain, PETSc.ScalarType(0.0))
 
     # Subdomain
+    # JSH: Remove old/unused code.
     # K = fem.FunctionSpace(domain, ufl.TensorElement("DG", domain.ufl_cell(), 0))
     # P = fem.FunctionSpace(domain, ("DG", 0))
     K = dolfinx.fem.functionspace(domain, basix.ufl.element("DG", "tetrahedron", 0, shape=(3,3)))
@@ -231,8 +234,10 @@ def solve(parameters):
     Lz3 = parameters["Lz3"]
     Lz = Lz1 + Lz2 + Lz3
 
+    # JSH: gdim is unused
     gdim = parameters["gdim"]
 
+    # JSH: sidesx, sidesy, bottom_marker unused
     top_marker, sidesx_marker, sidesy_marker, bottom_marker, drywell_marker, pumpingwell_marker = 4, 5, 6, 7, 8, 9
 
     # JSH: You never use this mesh!
