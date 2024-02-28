@@ -457,7 +457,7 @@ def solve(parameters):
         solver.solve(b, ah.vector)
         ah.x.scatter_forward()
         
-        # JSH: Why is this scatter forward here?
+        # JSH: Why is this scatter forward here? Nothing has happened with u_n_sub
         u_n_sub.x.scatter_forward()
         print_root("Finished linear solve.")
 
@@ -521,7 +521,8 @@ def solve(parameters):
     A = fem.petsc.assemble_matrix(bilinear_form, bcs=bcs)
     A.assemble()
     b = fem.petsc.create_vector(linear_form)
-    
+   
+    # JSH: This timeloop is wrong, unless dt2 == dt1.
     for i in range(num_steps2):
         print_root(f"Started time step: {i + 361}")
         t += dt2
