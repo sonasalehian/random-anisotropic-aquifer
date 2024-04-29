@@ -20,8 +20,8 @@ T2 = parameters["T2"]
 num_steps2 = parameters["num_steps2"]
 dt2 = (T2-T) / num_steps2
 
-n_outputs = 4
-n = 0
+n_outputs = 12
+n = 10
 filename = f'./output/random_s_los/random_ahc_{n}/submesh_checkpoint.bp'
 engine = "BP4"
 MPI.COMM_WORLD.Barrier()
@@ -31,10 +31,10 @@ submesh = adios4dolfinx.read_mesh(
 U_sub = dolfinx.fem.functionspace(submesh, basix.ufl.element("Lagrange", "tetrahedron", 1))
 print(U_sub.dofmap.index_map.size_local)
 print(U_sub.dofmap.index_map.num_ghosts)
-u_loss = [dolfinx.fem.Function(U_sub) for _ in range(n_outputs)]
+u_loss = [dolfinx.fem.Function(U_sub) for _ in range(n, n_outputs)]
 u_los_mean = dolfinx.fem.Function(U_sub)
 
-sub_file_vtx = dolfinx.io.VTXWriter(submesh.comm, f"./output/random_s_los/final_mean.bp", [u_los_mean], engine="BP4")
+sub_file_vtx = dolfinx.io.VTXWriter(submesh.comm, f"./output/random_s_los/final_mean10-12.bp", [u_los_mean], engine="BP4")
 
 for i in range(num_steps):
     t += dt
@@ -47,7 +47,7 @@ for i in range(num_steps):
             u_los_mean.x.array[:] += u_los.x.array
             u_los_mean.x.scatter_forward()
 
-        n = 0
+        n = 10
         u_los_mean.x.array[:] /= len(u_loss)
         sub_file_vtx.write(t)
 
@@ -62,7 +62,7 @@ for i in range(num_steps2):
             u_los_mean.x.array[:] += u_los.x.array
             u_los_mean.x.scatter_forward()
 
-        n = 0
+        n = 10
         u_los_mean.x.array[:] /= len(u_loss)
         sub_file_vtx.write(t)
 

@@ -14,7 +14,7 @@ from mpi4py import MPI
 from petsc4py import PETSc
 from dolfinx import fem, io, mesh
 from functools import partial
-from utils import print_root, print_all
+from utils import print_root
 from dolfinx.fem import petsc, assemble_scalar, form
 
 
@@ -37,17 +37,12 @@ def boundary_conditions(parameters, domain, ft, V):
     UY, _ = V.sub(2).sub(1).collapse()
     u_Dy = fem.Function(UY)
 
-    # UZ, _ = V.sub(2).sub(2).collapse()
-    # u_Dz = fem.Function(UZ)
-
     bcu_sidesx = fem.dirichletbc(u_Dx, fem.locate_dofs_topological(
         (V.sub(2).sub(0), UX), fdim, ft.find(sidesx_marker)), V.sub(2).sub(0))
     bcu_sidesy = fem.dirichletbc(u_Dy, fem.locate_dofs_topological(
         (V.sub(2).sub(1), UY), fdim, ft.find(sidesy_marker)), V.sub(2).sub(1))
     bcu_bottom = fem.dirichletbc(u_D, fem.locate_dofs_topological(
         (V.sub(2), U), fdim, ft.find(bottom_marker)), V.sub(2))
-    # bcu_bottom = fem.dirichletbc(u_Dz, fem.locate_dofs_topological(
-    #     (V.sub(2).sub(2), UZ), fdim, ft.find(bottom_marker)), V.sub(2).sub(2))
 
     Q, _ = V.sub(0).collapse()
 
@@ -90,7 +85,6 @@ def boundary_conditions(parameters, domain, ft, V):
 
     bcs = {
         "bcu_bottom": bcu_bottom,
-        # "bcuy_bottom": bcuy_bottom,
         "bcu_sidesx": bcu_sidesx,
         "bcu_sidesy": bcu_sidesy,
         "bcp_bottom": bcp_bottom,
@@ -140,8 +134,6 @@ def equation_parameters(parameters, domain, mt):
     f_p = fem.Constant(domain, PETSc.ScalarType(0.0))
 
     # Subdomain
-    # K = fem.FunctionSpace(domain, ufl.TensorElement("DG", domain.ufl_cell(), 0))
-    # P = fem.FunctionSpace(domain, ("DG", 0))
     K = dolfinx.fem.functionspace(domain, basix.ufl.element("DG", "tetrahedron", 0, shape=(3,3)))
     P = dolfinx.fem.functionspace(domain, basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 0))
     invkappa = fem.Function(K, dtype=PETSc.ScalarType)
@@ -229,18 +221,16 @@ def solve(parameters):
     Lz3 = parameters["Lz3"]
     Lz = Lz1 + Lz2 + Lz3
 
-    gdim = parameters["gdim"]
+    top_marker, drywell_marker, pumpingwell_marker = 4, 8, 9
 
-    top_marker, sidesx_marker, sidesy_marker, bottom_marker, drywell_marker, pumpingwell_marker = 4, 5, 6, 7, 8, 9
-
-    domain = mesh.create_box(MPI.COMM_WORLD, [np.array([0, 0, 0]), np.array([Lx, Ly, Lz])],
-                            [20, 6, 6], cell_type=mesh.CellType.tetrahedron)  
+    # domain = mesh.create_box(MPI.COMM_WORLD, [np.array([0, 0, 0]), np.array([Lx, Ly, Lz])],
+    #                         [20, 6, 6], cell_type=mesh.CellType.tetrahedron)  
     
-    domain.name = "aquifersys"
+    # domain.name = "aquifersys"
       
     print_root("Reading mesh...")
     with io.XDMFFile(MPI.COMM_WORLD, "output/mesh/mesh.xdmf", "r") as mrxdmf:
-        domain = mrxdmf.read_mesh(name=domain.name)
+        domain = mrxdmf.read_mesh(name="aquifersys")
 
     with io.XDMFFile(MPI.COMM_WORLD, "output/mesh/subdomain_tags.xdmf", "r") as srxdmf:
         mt = srxdmf.read_meshtags(domain, name=f"{domain.name}_cells")
@@ -250,13 +240,13 @@ def solve(parameters):
         ft = brxdmf.read_meshtags(domain, name=f"{domain.name}_facets", xpath="Xdmf/Domain")
 
     # Defining the finite element function space
-    # Q_el = ufl.FiniteElement("BDM", domain.ufl_cell(), 1)
-    # P_el = ufl.FiniteElement("Discontinuous Lagrange", domain.ufl_cell(), 0)
-    # U_el = ufl.VectorElement("Lagrange", domain.ufl_cell(), 1)
-    # V_el = ufl.MixedElement([Q_el, P_el, U_el])
-    V_el = basix.ufl.mixed_element([basix.ufl.element("BDM", "tetrahedron", 1),
-                                   basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 0),
-                                   basix.ufl.element("Lagrange", "tetrahedron", 1, shape=(3,))])
+    Q_el = basix.ufl.element("BDM", "tetrahedron", 1)
+    P_el = basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 0)
+    U_el = basix.ufl.element("Lagrange", "tetrahedron", 1, shape=(3,))
+    V_el = basix.ufl.mixed_element([Q_el, P_el, U_el])
+    # V_el = basix.ufl.mixed_element([basix.ufl.element("BDM", "tetrahedron", 1),
+    #                                basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 0),
+    #                                basix.ufl.element("Lagrange", "tetrahedron", 1, shape=(3,))])
     V = dolfinx.fem.functionspace(domain, V_el)
 
     (q, p, u) = ufl.TrialFunctions(V)
@@ -303,21 +293,22 @@ def solve(parameters):
     dx = ufl.Measure("dx", domain=domain)
     ds = ufl.Measure("ds", domain=domain, subdomain_data=ft)
     n = ufl.FacetNormal(domain)
+    delta_t = fem.Constant(domain, PETSc.ScalarType(dt))
 
     # Weak Forms #
     a = ufl.inner(S_e * p, p_t) * dx + ufl.inner(alpha * ufl.div(u), p_t) * dx\
-        + ufl.inner(dt * ufl.div(q), p_t) * dx \
+        + ufl.inner(delta_t * ufl.div(q), p_t) * dx \
         - ufl.inner(stress_bar(u, p), ufl.grad(u_t)) * dx \
-        + ufl.inner(dt * p, ufl.div(q_t)) * dx\
-        - ufl.inner(dt * invkappa * q, q_t) * dx\
+        + ufl.inner(delta_t * p, ufl.div(q_t)) * dx\
+        - ufl.inner(delta_t * invkappa * q, q_t) * dx\
         - (ufl.dot((stress_bar(u, p) * n), n))*(ufl.dot(u_t, n)) * ds(drywell_marker)\
         + (ufl.dot((stress_bar(u_t, p_t) * n), n)) * \
         (ufl.dot(u, n)) * ds(drywell_marker)
-    L = ufl.inner(dt * f_p, p_t) * dx + ufl.inner(S_e * p_n, p_t) * dx\
+    L = ufl.inner(delta_t * f_p, p_t) * dx + ufl.inner(S_e * p_n, p_t) * dx\
         + ufl.inner(alpha * ufl.div(u_n), p_t) * dx
-    # - ufl.inner(g_u, u_t) * ds(top_marker) \
-    # - ufl.inner(f_u, u_t) * dx \
-    # + ufl.inner(dt * p_d, ufl.inner(q_t, n)) * ds(4)
+        # - ufl.inner(g_u, u_t) * ds(top_marker) \
+        # - ufl.inner(f_u, u_t) * dx \
+        # + ufl.inner(delta_t * p_d, ufl.inner(q_t, n)) * ds(4)
 
     bilinear_form = fem.form(a)
     linear_form = fem.form(L)
@@ -341,10 +332,10 @@ def solve(parameters):
     print_root("Done.")
 
     # LOS displacement
-    teta = np.radians(180)  # Rotation around the axis y
-    phi = np.radians(36)  # Rotation around the axis z
-    R1 = np.array([[np.cos(teta), 0, -np.sin(teta)],
-                   [0, 1, 0], [np.sin(teta), 0, np.cos(teta)]])
+    theta = np.radians(180)  # Rotation around the axis y
+    phi = np.radians(20)  # Rotation around the axis z
+    R1 = np.array([[np.cos(theta), 0, -np.sin(theta)],
+                   [0, 1, 0], [np.sin(theta), 0, np.cos(theta)]])
     R2 = np.array([[np.cos(phi), -np.sin(phi), 0],
                    [np.sin(phi), np.cos(phi), 0], [0, 0, 1]])
 
@@ -356,17 +347,14 @@ def solve(parameters):
     T_list = LOS@R2@R1
 
     # Interpolate q into a different finite element space
-    # Q0 = fem.VectorFunctionSpace(domain, ("Discontinuous Lagrange", 1))
     Q0 = dolfinx.fem.functionspace(domain, basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 1, shape=(3,)))
     qh_Q0 = fem.Function(Q0, dtype=PETSc.ScalarType)
     qh_Q0.interpolate(q_n)
 
-    # P0 = fem.FunctionSpace(domain, ("Discontinuous Lagrange", 1))
     P0 = dolfinx.fem.functionspace(domain, basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 1))
     ph_P0 = fem.Function(P0, dtype=PETSc.ScalarType)
     ph_P0.interpolate(p_n)
 
-    # W = fem.FunctionSpace(domain, ("Lagrange", 1))
     W = dolfinx.fem.functionspace(domain, basix.ufl.element("Lagrange", "tetrahedron", 1))
     T_ufl = ufl.as_matrix(T_list)
     u_los = ufl.dot(T_ufl, u_n)
@@ -375,47 +363,28 @@ def solve(parameters):
     u_los_h = fem.Function(W)
     u_los_h.interpolate(u_los_expr)
 
-    # pfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/pressure.bp", [ph_P0], engine="BP4")
-    # pfile_vtx.write(t)
-
-    # qfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/flux.bp", [qh_Q0], engine="BP4")
-    # qfile_vtx.write(t)
-
-    # ufile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/deformation.bp", [u_n], engine="BP4")
-    # ufile_vtx.write(t)
-
-    # losfile_vtx = io.VTXWriter(domain.comm, f"{parameters['output_dir']}/deformation_LOS.bp", [
-    #     u_los_h], engine="BP4")
-    # losfile_vtx.write(t)
-
     # Submesh to reduce output size
     cells = dolfinx.mesh.compute_incident_entities(domain.topology, ft.find(top_marker), domain.topology.dim-1, domain.topology.dim)
 
 
     submesh, cell_map, _, _ = dolfinx.mesh.create_submesh(domain, domain.topology.dim, cells)
 
-    U_sub = dolfinx.fem.functionspace(submesh, W.ufl_element())
-    u_n_sub = dolfinx.fem.Function(U_sub)
+    W_sub = dolfinx.fem.functionspace(submesh, W.ufl_element())
+    u_n_sub = dolfinx.fem.Function(W_sub)
     u_n_sub.name = "u_n_sub"
 
     num_sub_cells = submesh.topology.index_map(submesh.topology.dim).size_local
-    # for cell in range(num_sub_cells):
-    #     sub_dofs = U_sub.dofmap.cell_dofs(cell)
-    #     parent_dofs = U.dofmap.cell_dofs(cell_map[cell])
-    #     assert U_sub.dofmap.bs == U.dofmap.bs
-    #     for parent, child in zip(parent_dofs, sub_dofs):
-    #         for bb in range(U_sub.dofmap.bs):
-    #             u_n_sub.x.array[child*U_sub.dofmap.bs +
-    #                         bb] = u_n.x.array[parent*U.dofmap.bs+bb]
-                
-    # with dolfinx.io.XDMFFile(submesh.comm, f"{parameters['output_dir']}/submesh.xdmf", "w") as xdmf:
-    #     xdmf.write_mesh(submesh)
-    #     xdmf.write_function(u_n_sub, t)
 
-    # sub_file_vtx = io.VTXWriter(submesh.comm, f"{parameters['output_dir']}/submesh.bp", [u_n_sub], engine="BP4")
-    # sub_file_vtx.write(t)
+    for cell in range(num_sub_cells):
+            sub_dofs = W_sub.dofmap.cell_dofs(cell)
+            parent_dofs = W.dofmap.cell_dofs(cell_map[cell])
+            assert W_sub.dofmap.bs == W.dofmap.bs
+            for parent, child in zip(parent_dofs, sub_dofs):
+                for bb in range(W_sub.dofmap.bs):
+                    u_n_sub.x.array[child*W_sub.dofmap.bs +
+                                bb] = u_los_h.x.array[parent*W.dofmap.bs+bb]
 
-    filename = f"{parameters['output_dir']}/submesh_checkpoint.bp"
+    filename = f"{parameters['output_dir']}/los_submesh_checkpoint.bp"
 
     adios4dolfinx.write_mesh(submesh, filename)
     adios4dolfinx.write_function(u_n_sub, filename, time=t)
@@ -442,41 +411,34 @@ def solve(parameters):
         print_root("Starting linear solve...")
         solver.solve(b, ah.vector)
         ah.x.scatter_forward()
-        u_n_sub.x.scatter_forward()
         print_root("Finished linear solve.")
-        # print(ah.x.norm())
 
         qh = ah.sub(0).collapse()
         ph = ah.sub(1).collapse()
         uh = ah.sub(2).collapse()
 
         u_los_h.interpolate(u_los_expr)
+        u_los_h.x.scatter_forward()
 
         # Update solution at previous time step (u_n)
         p_n.x.array[:] = ph.x.array
         q_n.x.array[:] = qh.x.array
         u_n.x.array[:] = uh.x.array
         for cell in range(num_sub_cells):
-            sub_dofs = U_sub.dofmap.cell_dofs(cell)
+            sub_dofs = W_sub.dofmap.cell_dofs(cell)
             parent_dofs = W.dofmap.cell_dofs(cell_map[cell])
-            assert U_sub.dofmap.bs == W.dofmap.bs
+            assert W_sub.dofmap.bs == W.dofmap.bs
             for parent, child in zip(parent_dofs, sub_dofs):
-                for bb in range(U_sub.dofmap.bs):
-                    u_n_sub.x.array[child*U_sub.dofmap.bs +
+                for bb in range(W_sub.dofmap.bs):
+                    u_n_sub.x.array[child*W_sub.dofmap.bs +
                                 bb] = u_los_h.x.array[parent*W.dofmap.bs+bb]
 
         if (i+1) % 20 == 0:
             # Interpolate q into a different finite element space
             qh_Q0.interpolate(q_n)
             ph_P0.interpolate(p_n)
-
-            # Write solution to file
-            # pfile_vtx.write(t)
-            # qfile_vtx.write(t)
-            # ufile_vtx.write(t)
-            # losfile_vtx.write(t)
-            # xdmf.write_function(u_n_sub, t)
-            # sub_file_vtx.write(t)
+            qh_Q0.x.scatter_forward()
+            ph_P0.x.scatter_forward()
             adios4dolfinx.write_function(u_n_sub, filename, time=t)
 
     print_root("Stop pumping.")
@@ -494,14 +456,13 @@ def solve(parameters):
     bcs_dict["bcp_pumpingwell"] = bcp_pumpingwell
     bcs = list(bcs_dict.values())
 
-    # bcs = [bcu_bottom, bcu_sidesx, bcu_sidesy, bcux_drywell, bcuy_drywell,
-    #        bcux_pumpingwell, bcuy_pumpingwell, bcp_bottom, bcp_top, bcp_sidesx,
-    #        bcp_sidesy, bcp_drywell, bcp_pumpingwell]
     print_root("Done.")
 
-    # NOTE: No new KSP operator! Might be OK, needs checking.
+    delta_t.value = dt2
+    # bilinear_form = fem.form(a)
     A = fem.petsc.assemble_matrix(bilinear_form, bcs=bcs)
     A.assemble()
+    solver.setOperators(A)
     b = fem.petsc.create_vector(linear_form)
         
     for i in range(num_steps2):
@@ -524,9 +485,7 @@ def solve(parameters):
         print_root("Starting linear solve...")
         solver.solve(b, ah.vector)
         ah.x.scatter_forward()
-        u_n_sub.x.scatter_forward()
         print_root("Finished linear solve.")
-        # print(ah.x.norm())
 
         qh = ah.sub(0).collapse()
         ph = ah.sub(1).collapse()
@@ -534,38 +493,27 @@ def solve(parameters):
 
         # Interpolate LOS displacement
         u_los_h.interpolate(u_los_expr)
+        u_los_h.scatter_forward()
 
         # Update solution at previous time step (u_n)
         p_n.x.array[:] = ph.x.array
         q_n.x.array[:] = qh.x.array
         u_n.x.array[:] = uh.x.array
         for cell in range(num_sub_cells):
-            sub_dofs = U_sub.dofmap.cell_dofs(cell)
+            sub_dofs = W_sub.dofmap.cell_dofs(cell)
             parent_dofs = W.dofmap.cell_dofs(cell_map[cell])
-            assert U_sub.dofmap.bs == W.dofmap.bs
+            assert W_sub.dofmap.bs == W.dofmap.bs
             for parent, child in zip(parent_dofs, sub_dofs):
-                for bb in range(U_sub.dofmap.bs):
-                    u_n_sub.x.array[child*U_sub.dofmap.bs +
+                for bb in range(W_sub.dofmap.bs):
+                    u_n_sub.x.array[child*W_sub.dofmap.bs +
                                 bb] = u_los_h.x.array[parent*W.dofmap.bs+bb]
 
         if (i + 1) % 20 == 0:
             # Interpolate q into a different finite element space
             qh_Q0.interpolate(q_n)
             ph_P0.interpolate(p_n)
-
-            # Write solution to file
-            # pfile_vtx.write(t)
-            # qfile_vtx.write(t)
-            # ufile_vtx.write(t)
-            # losfile_vtx.write(t)
-            # xdmf.write_function(u_n_sub, t)
-            # sub_file_vtx.write(t)
+            qh_Q0.x.scatter_forward()
+            ph_P0.x.scatter_forward()
             adios4dolfinx.write_function(u_n_sub, filename, time=t)
-
-    # pfile_vtx.close()
-    # qfile_vtx.close()
-    # ufile_vtx.close()
-    # losfile_vtx.close()
-    # sub_file_vtx.close()
 
     print_root('Finished solve.')
