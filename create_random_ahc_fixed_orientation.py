@@ -47,9 +47,9 @@ def write_result(hydraulic_conductivity, file_name):
     if os.path.exists(file_name):
         os.remove(file_name)
     else:
-        print("The random_hc_fixed_orientation file does not exist to remove")
+        print(f"The {file_name} does not exist to remove")
 
-    np.savetxt(file_name, hydraulic_conductivity, delimiter=',')
+    np.save(file_name, hydraulic_conductivity)
 
     print(f"Random values have been saved to {file_name}")
 
@@ -57,7 +57,7 @@ def write_result(hydraulic_conductivity, file_name):
 mu_1 = 1.1e-11 # Mean for first eigenvalue
 mu_2 = 4.7e-13 # Mean for second eigenvalue
 std = 0.08  # Standard deviation for distribution
-num_samples = 1000
+num_samples = 8000
 
 hydraulic_conductivity, lambda_1, lambda_2 = generating_random_eigenvalues(mu_1, mu_2, std, num_samples)
 
@@ -67,7 +67,7 @@ filename_2 = "output/plots/Distribution_yy.png"
 plot_result(lambda_1, lambda_2, filename_1, filename_2)
 
 # Save the random values to a CSV file
-file_name = 'output/data/random_hc_fixed_orientation.csv'
+file_name = 'output/data/ahct_random_scaling.npy'
 
 write_result(hydraulic_conductivity, file_name)
 
