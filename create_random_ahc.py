@@ -18,7 +18,7 @@ for i, angle in enumerate(random_angles):
     k[i] = np.dot(R_r, np.dot(k_s, np.transpose(R_r)))
 
 # Save the random hydraulic conductivity tensor
-file_name = 'output/data/ahct_random_scaling_rotation.npy'
+file_name = 'output/data/ahct_random_scaling_and_rotation.npy'
 
 if os.path.exists(file_name):
     os.remove(file_name)
@@ -26,7 +26,7 @@ else:
     print(f"The {file_name} does not exist to remove")
 
 # Save the list of arrays to a CSV file
-np.savetxt(file_name, np.array(k).reshape(num_samples, -1))
+np.save(file_name, np.array(k).reshape(num_samples, -1))
 
 print(f"Random hydraulic conductivity tensors have been saved to {file_name}")
 

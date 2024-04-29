@@ -28,7 +28,7 @@ elliptic_angle = np.load('output/data/ahct_random_rotation.npy')
 # Randomly select 10 radius values
 selected_indices = np.random.choice(len(elliptic_radius), size=10, replace=False)
 print(selected_indices)
-selected_indices = [5501, 6012, 1547, 7138, 3152, 5157, 7596, 1490, 4820, 2888]
+# selected_indices = [5501, 6012, 1547, 7138, 3152, 5157, 7596, 1490, 4820, 2888]
 
 k_x_origin = 1.1E-11
 k_y_origin = 4.7E-13

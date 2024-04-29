@@ -31,7 +31,7 @@ parameters["P_r"] = 0.07  # pumping rate (m^3/s)
 
 # Define temporal parameters (s)
 parameters["t"] = 0  # Start time
-parameters["T"] = 345600  # (4d) #2073600 # (24d) # Final pumping time
+parameters["T"] = 345600  # (4d) # Final pumping time
 parameters["num_steps"] = 360
 parameters["T2"] = 1728000  # (20d) # Final time
 parameters["num_steps2"] = 360
