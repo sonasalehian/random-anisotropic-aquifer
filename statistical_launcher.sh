@@ -3,9 +3,11 @@
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=0:40:00
+#SBATCH --time=1-1:00:00
 #SBATCH --ntasks-per-node=28
 #SBATCH -p batch
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=sona.salehian.001@student.uni.lu
 
 source $SCRATCH/spack/share/spack/setup-env.sh
 spack env activate fenicsx-main-20230214
@@ -20,6 +22,6 @@ echo "spack env: fenicsx-main-20230214"
 echo $SLURM_CPUS_ON_NODE
 echo $SLURM_CPUS_PER_TASK
 echo $JOBS_PER_NODE 
-echo "batch, c=1, t=0:40:00"
+echo "batch, c=1, t=1-1:00:00"
 
 srun -c 1 python3 statistical_analysis_checkpoints.py

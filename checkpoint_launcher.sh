@@ -3,7 +3,7 @@
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=2:00:00
+#SBATCH --time=1-6:00:00
 #SBATCH --ntasks-per-node=28
 #SBATCH -p batch
 #SBATCH --mail-type=END,FAIL
@@ -25,7 +25,7 @@ echo "fenicsx-main-20230214 env"
 echo $SLURM_CPUS_ON_NODE
 echo $SLURM_CPUS_PER_TASK
 echo $JOBS_PER_NODE 
-echo "Spack, batch, n=14, c=1, t=2:00:00,4..9"
+echo "Spack, batch, n=14, c=1, t=1-6:00:00, 2601..2800"
 
-parallel --jobs $JOBS_PER_NODE srun -n 14 -c 1 python3 random_ahc_tensor_checkpoint.py {} ::: {4..9}
+parallel --jobs $JOBS_PER_NODE srun -n 14 -c 1 python3 random_ahc_tensor_checkpoint.py {} ::: {2601..2800}
 
