@@ -20,9 +20,9 @@ T2 = parameters["T2"]
 num_steps2 = parameters["num_steps2"]
 dt2 = T2 / num_steps2
 
-n_outputs = 12
-n = 10
-filename = f'./output/random_s_los/random_ahc_{n}/submesh_checkpoint.bp'
+n_outputs = 2000
+n = 0
+filename = f'./output/random_sr/random_ahc_{n}/los_submesh_checkpoint.bp'
 engine = "BP4"
 MPI.COMM_WORLD.Barrier()
 submesh = adios4dolfinx.read_mesh(
@@ -34,20 +34,20 @@ print(U_sub.dofmap.index_map.num_ghosts)
 u_loss = [dolfinx.fem.Function(U_sub) for _ in range(n, n_outputs)]
 u_los_mean = dolfinx.fem.Function(U_sub)
 
-sub_file_vtx = dolfinx.io.VTXWriter(submesh.comm, f"./output/random_s_los/final_mean10-12.bp", [u_los_mean], engine="BP4")
+sub_file_vtx = dolfinx.io.VTXWriter(submesh.comm, f"./output/random_sr/final_mean0-2000.bp", [u_los_mean], engine="BP4")
 
 for i in range(num_steps):
     t += dt
     if (i+1) % 20 == 0:
         for u_los in u_loss:
             u_los.name = "u_n_sub"
-            filename = f'./output/random_s_los/random_ahc_{n}/submesh_checkpoint.bp'
+            filename = f'./output/random_sr/random_ahc_{n}/los_submesh_checkpoint.bp'
             adios4dolfinx.read_function(u_los, filename, engine, time=t)
             n += 1
             u_los_mean.x.array[:] += u_los.x.array
             u_los_mean.x.scatter_forward()
 
-        n = 10
+        n = 0
         u_los_mean.x.array[:] /= len(u_loss)
         sub_file_vtx.write(t)
 
@@ -56,13 +56,13 @@ for i in range(num_steps2):
     if (i+1) % 20 == 0:
         for u_los in u_loss:
             u_los.name = "u_n_sub"
-            filename = f'./output/random_s_los/random_ahc_{n}/submesh_checkpoint.bp'
+            filename = f'./output/random_sr/random_ahc_{n}/los_submesh_checkpoint.bp'
             adios4dolfinx.read_function(u_los, filename, engine, time=t)
             n += 1
             u_los_mean.x.array[:] += u_los.x.array
             u_los_mean.x.scatter_forward()
 
-        n = 10
+        n = 0
         u_los_mean.x.array[:] /= len(u_loss)
         sub_file_vtx.write(t)
 

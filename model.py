@@ -1,7 +1,7 @@
 # Poroelasticity model for Anderson Junction aquifer
 
-# import os, sys
-# sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
+import os, sys
+sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
 
 import numpy as np
 import dolfinx
@@ -393,7 +393,7 @@ def solve(parameters):
 
     for i in range(num_steps):
         # Updating the solution and right hand side per time step
-        print_root(f"Started time step: {i + 1}")
+        # print_root(f"Started time step: {i + 1}")
         t += dt
 
         # Update the right hand side reusing the initial vector
@@ -408,10 +408,10 @@ def solve(parameters):
         fem.petsc.set_bc(b, bcs)
 
         # Solve linear problem
-        print_root("Starting linear solve...")
+        # print_root("Starting linear solve...")
         solver.solve(b, ah.vector)
         ah.x.scatter_forward()
-        print_root("Finished linear solve.")
+        # print_root("Finished linear solve.")
 
         qh = ah.sub(0).collapse()
         ph = ah.sub(1).collapse()
@@ -466,7 +466,7 @@ def solve(parameters):
     b = fem.petsc.create_vector(linear_form)
         
     for i in range(num_steps2):
-        print_root(f"Started time step: {i + 361}")
+        # print_root(f"Started time step: {i + 361}")
         t += dt2
 
         # Update the right hand side reusing the initial vector
@@ -482,10 +482,10 @@ def solve(parameters):
         fem.petsc.set_bc(b, bcs)
 
         # Solve linear problem
-        print_root("Starting linear solve...")
+        # print_root("Starting linear solve...")
         solver.solve(b, ah.vector)
         ah.x.scatter_forward()
-        print_root("Finished linear solve.")
+        # print_root("Finished linear solve.")
 
         qh = ah.sub(0).collapse()
         ph = ah.sub(1).collapse()
@@ -493,7 +493,7 @@ def solve(parameters):
 
         # Interpolate LOS displacement
         u_los_h.interpolate(u_los_expr)
-        u_los_h.scatter_forward()
+        u_los_h.x.scatter_forward()
 
         # Update solution at previous time step (u_n)
         p_n.x.array[:] = ph.x.array
