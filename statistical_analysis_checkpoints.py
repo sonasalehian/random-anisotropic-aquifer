@@ -20,8 +20,9 @@ T2 = parameters["T2"]
 num_steps2 = parameters["num_steps2"]
 dt2 = T2 / num_steps2
 
-n_outputs = 2000
-n = 0
+n_outputs = 8000
+n_0 = 0
+n = n_0
 filename = f'./output/random_sr/random_ahc_{n}/los_submesh_checkpoint.bp'
 engine = "BP4"
 MPI.COMM_WORLD.Barrier()
@@ -34,7 +35,7 @@ print(U_sub.dofmap.index_map.num_ghosts)
 u_loss = [dolfinx.fem.Function(U_sub) for _ in range(n, n_outputs)]
 u_los_mean = dolfinx.fem.Function(U_sub)
 
-sub_file_vtx = dolfinx.io.VTXWriter(submesh.comm, f"./output/random_sr/final_mean0-2000.bp", [u_los_mean], engine="BP4")
+sub_file_vtx = dolfinx.io.VTXWriter(submesh.comm, f"./output/random_sr/final_mean0-8000.bp", [u_los_mean], engine="BP4")
 
 for i in range(num_steps):
     t += dt
@@ -47,7 +48,7 @@ for i in range(num_steps):
             u_los_mean.x.array[:] += u_los.x.array
             u_los_mean.x.scatter_forward()
 
-        n = 0
+        n = n_0
         u_los_mean.x.array[:] /= len(u_loss)
         sub_file_vtx.write(t)
 
@@ -62,7 +63,7 @@ for i in range(num_steps2):
             u_los_mean.x.array[:] += u_los.x.array
             u_los_mean.x.scatter_forward()
 
-        n = 0
+        n = n_0
         u_los_mean.x.array[:] /= len(u_loss)
         sub_file_vtx.write(t)
 
