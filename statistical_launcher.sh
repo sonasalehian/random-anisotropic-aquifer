@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#SBATCH --job-name=statistical_analysis
+#SBATCH --job-name=statistical_analysis_s
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1

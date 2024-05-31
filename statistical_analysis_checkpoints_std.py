@@ -20,14 +20,15 @@ T2 = parameters["T2"]
 num_steps2 = parameters["num_steps2"]
 dt2 = T2 / num_steps2
 
-n_outputs = 8000
+n_outputs = 4000
 n_0 = 0
 n = n_0
 filename_mean = f'./output/random_sr/final_mean0-4000.bp'
+filename = f'./output/random_sr/random_ahc_{n}/los_submesh_checkpoint.bp'
 engine = "BP4"
 MPI.COMM_WORLD.Barrier()
 submesh = adios4dolfinx.read_mesh(
-    MPI.COMM_WORLD, filename_mean, engine, dolfinx.mesh.GhostMode.shared_facet
+    MPI.COMM_WORLD, filename, engine, dolfinx.mesh.GhostMode.shared_facet
 )
 U_sub = dolfinx.fem.functionspace(submesh, basix.ufl.element("Lagrange", "tetrahedron", 1))
 print(U_sub.dofmap.index_map.size_local)
