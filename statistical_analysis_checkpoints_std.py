@@ -20,8 +20,8 @@ T2 = parameters["T2"]
 num_steps2 = parameters["num_steps2"]
 dt2 = T2 / num_steps2
 
-random_folder = 'random_sr'
-n_outputs = 4000
+random_folder = 'random_r'
+n_outputs = 8000
 n_0 = 0
 n = n_0
 filename_mean = f'./output/{random_folder}/mean_for_std{n_0}-{n_outputs}.bp'

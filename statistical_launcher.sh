@@ -1,9 +1,9 @@
 #!/bin/bash -l
-#SBATCH --job-name=statistical_analysis_s
+#SBATCH --job-name=statistical_analysis_std_r
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=18:00:00
+#SBATCH --time=1-18:00:00
 #SBATCH --ntasks-per-node=28
 #SBATCH -p batch
 #SBATCH --mail-type=END,FAIL
@@ -22,6 +22,7 @@ echo "spack env: fenicsx-main-20230214"
 echo $SLURM_CPUS_ON_NODE
 echo $SLURM_CPUS_PER_TASK
 echo $JOBS_PER_NODE 
-echo "batch, c=1, t=18:00:00"
+echo "batch, c=1, t=1-18:00:00"
+echo "0-8000"
 
-srun -c 1 python3 statistical_analysis_checkpoints.py
+srun -c 1 python3 statistical_analysis_checkpoints_std.py
