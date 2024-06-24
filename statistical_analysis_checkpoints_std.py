@@ -21,7 +21,7 @@ num_steps2 = parameters["num_steps2"]
 dt2 = T2 / num_steps2
 
 random_folder = 'random_r'
-n_outputs = 8000
+n_outputs = 7999
 n_0 = 0
 n = n_0
 filename_mean = f'./output/{random_folder}/mean_for_std{n_0}-{n_outputs}.bp'
@@ -44,6 +44,8 @@ for i in range(num_steps):
     t += dt
     if (i+1) % 20 == 0:
         adios4dolfinx.read_function(u_los_mean, filename_mean, engine, time=t)
+        u_los_std.x.array[:] = 0
+        u_los_std.x.scatter_forward()
         for u_los in u_loss:
             u_los.name = "u_n_sub"
             filename = f'./output/{random_folder}/random_ahc_{n}/los_submesh_checkpoint.bp'
@@ -61,6 +63,8 @@ for i in range(num_steps2):
     t += dt2
     if (i+1) % 20 == 0:
         adios4dolfinx.read_function(u_los_mean, filename_mean, engine, time=t)
+        u_los_std.x.array[:] = 0
+        u_los_std.x.scatter_forward()
         for u_los in u_loss:
             u_los.name = "u_n_sub"
             filename = f'./output/{random_folder}/random_ahc_{n}/los_submesh_checkpoint.bp'
