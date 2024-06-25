@@ -35,7 +35,9 @@ domain = dolfinx.mesh.create_box(MPI.COMM_WORLD, [np.array([0, 0, 0]), np.array(
 U_sub = dolfinx.fem.functionspace(domain, basix.ufl.element("Lagrange", "tetrahedron", 1))
 print(U_sub.dofmap.index_map.size_local)
 print(U_sub.dofmap.index_map.num_ghosts)
-u_loss = [dolfinx.fem.Function(U_sub) for _ in range(n, n_outputs)]
+u_los = dolfinx.fem.Function(U_sub)
+u_loss = [dolfinx.fem.Function(U_sub) for _ in range(n_0, n_outputs)]
+print(len(u_loss))
 u_los_mean = dolfinx.fem.Function(U_sub)
 
 sub_file_vtx = dolfinx.io.VTXWriter(domain.comm, f'../output/{random_folder}/final_mean{n_0}-{n_outputs}.bp', [u_los_mean], engine="BP4")
@@ -49,14 +51,12 @@ for i in range(num_steps):
     if (i+1) % 20 == 0:
         u_los_mean.x.array[:] = 0
         u_los_mean.x.scatter_forward()
-        for u_los in u_loss:
+        for n in range(n_0, n_outputs):
             u_los.x.array[:] = n
-            n += 1
             u_los_mean.x.array[:] += u_los.x.array
             u_los_mean.x.scatter_forward()
 
-        n = n_0
-        u_los_mean.x.array[:] /= len(u_loss)
+        u_los_mean.x.array[:] /= (n_outputs-n_0)
         sub_file_vtx.write(t)
         adios4dolfinx.write_function(u_los_mean, filename_mean, time=t)
 
@@ -65,14 +65,12 @@ for i in range(num_steps2):
     if (i+1) % 20 == 0:
         u_los_mean.x.array[:] = 0
         u_los_mean.x.scatter_forward()
-        for u_los in u_loss:
+        for n in range(n_0, n_outputs):
             u_los.x.array[:] = n
-            n += 1
             u_los_mean.x.array[:] += u_los.x.array
             u_los_mean.x.scatter_forward()
 
-        n = n_0
-        u_los_mean.x.array[:] /= len(u_loss)
+        u_los_mean.x.array[:] /= (n_outputs-n_0)
         sub_file_vtx.write(t)
         adios4dolfinx.write_function(u_los_mean, filename_mean, time=t)
 
