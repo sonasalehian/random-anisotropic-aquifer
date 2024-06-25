@@ -26,7 +26,7 @@ n_0 = 0
 n = n_0
 # filename = f'./output/{random_folder}/random_ahc_{n}/los_submesh_checkpoint.bp'
 engine = "BP4"
-# MPI.COMM_WORLD.Barrier()
+MPI.COMM_WORLD.Barrier()
 # submesh = adios4dolfinx.read_mesh(
 #     MPI.COMM_WORLD, filename, engine, dolfinx.mesh.GhostMode.shared_facet
 # )
@@ -36,7 +36,7 @@ U_sub = dolfinx.fem.functionspace(domain, basix.ufl.element("Lagrange", "tetrahe
 print(U_sub.dofmap.index_map.size_local)
 print(U_sub.dofmap.index_map.num_ghosts)
 u_los = dolfinx.fem.Function(U_sub)
-u_loss = [dolfinx.fem.Function(U_sub) for _ in range(n_0, n_outputs)]
+u_loss = [dolfinx.fem.Function(U_sub) for _ in range(n_0, n_outputs+1)]
 print(len(u_loss))
 u_los_mean = dolfinx.fem.Function(U_sub)
 
@@ -51,13 +51,13 @@ for i in range(num_steps):
     if (i+1) % 20 == 0:
         u_los_mean.x.array[:] = 0
         u_los_mean.x.scatter_forward()
-        for n in range(n_0, n_outputs):
+        for n in range(n_0, n_outputs+1):
             print(n)
-            u_los.x.array[:] = n + 1
+            u_los.x.array[:] = n
             u_los_mean.x.array[:] += u_los.x.array
             u_los_mean.x.scatter_forward()
 
-        u_los_mean.x.array[:] /= (n_outputs-n_0)
+        u_los_mean.x.array[:] /= (n_outputs+1-n_0)
         sub_file_vtx.write(t)
         adios4dolfinx.write_function(u_los_mean, filename_mean, time=t)
 
