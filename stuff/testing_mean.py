@@ -52,7 +52,8 @@ for i in range(num_steps):
         u_los_mean.x.array[:] = 0
         u_los_mean.x.scatter_forward()
         for n in range(n_0, n_outputs):
-            u_los.x.array[:] = n
+            print(n)
+            u_los.x.array[:] = n + 1
             u_los_mean.x.array[:] += u_los.x.array
             u_los_mean.x.scatter_forward()
 
