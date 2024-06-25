@@ -3,15 +3,15 @@ sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
 
 import basix
 import basix.ufl
-import ufl
 import dolfinx
 from mpi4py import MPI
 import numpy as np
 
 import adios4dolfinx
 
-from default_parameters import parameters
+from default_parameters import create_default_parameters
 
+parameters = create_default_parameters()
 t = parameters["t"]
 T = parameters["T"]
 num_steps = parameters["num_steps"]

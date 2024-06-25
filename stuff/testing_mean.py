@@ -26,7 +26,7 @@ n_0 = 0
 n = n_0
 # filename = f'./output/{random_folder}/random_ahc_{n}/los_submesh_checkpoint.bp'
 engine = "BP4"
-MPI.COMM_WORLD.Barrier()
+# MPI.COMM_WORLD.Barrier()
 # submesh = adios4dolfinx.read_mesh(
 #     MPI.COMM_WORLD, filename, engine, dolfinx.mesh.GhostMode.shared_facet
 # )

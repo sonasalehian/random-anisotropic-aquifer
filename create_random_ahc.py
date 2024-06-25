@@ -1,14 +1,14 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import os
-from create_random_ahc_fixed_orientation import generating_random_eigenvalues
+# from create_random_ahc_fixed_orientation import generating_random_eigenvalues
 
 # Load generated random rotation angle
 random_angles = np.load('./output/data/random_rotation_angle.npy')
 random_angles = random_angles - np.radians(110.0)
 num_samples = len(random_angles)
 
-eigenvalues = np.load('./output/data/ahct_random_scaling.npy')
+# eigenvalues = generating_random_eigenvalues(mu_1=1.1e-11, mu_2 = 4.7e-13, std = 0.08, num_samples = 8000)
+eigenvalues = np.load('./output/data/ahct_random_scaling.npy')  
 
 k = [np.zeros((2, 2)) for _ in range(num_samples)]
 for i, angle in enumerate(random_angles):

@@ -1,7 +1,9 @@
-from default_parameters import parameters
 from model import solve
 import sys
 import numpy as np
+from default_parameters import create_default_parameters
+
+parameters = create_default_parameters()
 
 n = int(sys.argv[1])
 # n = 1
