@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from scipy import stats
+from default_parameters import create_default_parameters
+
+parameters = create_default_parameters()
 
 def generating_random_eigenvalues(mu_1, mu_2, std, num_samples):
     hydraulic_conductivity = np.zeros([num_samples, 4])
@@ -46,16 +49,13 @@ def plot_result(lambda_1, lambda_2, filename_1, filename_2):
 def write_result(hydraulic_conductivity, file_name):
     if os.path.exists(file_name):
         os.remove(file_name)
-    else:
-        print(f"The {file_name} does not exist to remove")
 
     np.save(file_name, hydraulic_conductivity)
-
     print(f"Random values have been saved to {file_name}")
 
 # Initialize variables
-mu_1 = 1.1e-11 # Mean for first eigenvalue
-mu_2 = 4.7e-13 # Mean for second eigenvalue
+mu_1 = parameters["k_x_aqfr"] # Mean for first eigenvalue
+mu_2 = parameters["k_y_aqfr"] # Mean for second eigenvalue
 std = 0.08  # Standard deviation for distribution
 num_samples = 8000
 
