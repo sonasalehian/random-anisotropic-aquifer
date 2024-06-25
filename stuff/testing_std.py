@@ -28,12 +28,12 @@ filename_mean = f'../output/{random_folder}/mean_for_std{n_0}-{n_outputs}.bp'
 # filename = f'./output/{random_folder}/random_ahc_{n}/los_submesh_checkpoint.bp'
 engine = "BP4"
 # MPI.COMM_WORLD.Barrier()
-# submesh = adios4dolfinx.read_mesh(
-#     MPI.COMM_WORLD, filename, engine, dolfinx.mesh.GhostMode.shared_facet
-# )
-domain = dolfinx.mesh.create_box(MPI.COMM_WORLD, [np.array([0, 0, 0]), np.array([20, 20, 5])],
-                            [20, 6, 6], cell_type=dolfinx.mesh.CellType.tetrahedron)
-U_sub = dolfinx.fem.functionspace(domain, basix.ufl.element("Lagrange", "tetrahedron", 1))
+submesh = adios4dolfinx.read_mesh(
+    MPI.COMM_WORLD, filename_mean, engine, dolfinx.mesh.GhostMode.shared_facet
+)
+# domain = dolfinx.mesh.create_box(MPI.COMM_WORLD, [np.array([0, 0, 0]), np.array([20, 20, 5])],
+#                             [20, 6, 6], cell_type=dolfinx.mesh.CellType.tetrahedron)
+U_sub = dolfinx.fem.functionspace(submesh, basix.ufl.element("Lagrange", "tetrahedron", 1))
 print(U_sub.dofmap.index_map.size_local)
 print(U_sub.dofmap.index_map.num_ghosts)
 u_los = dolfinx.fem.Function(U_sub)
@@ -41,7 +41,7 @@ u_los = dolfinx.fem.Function(U_sub)
 u_los_mean = dolfinx.fem.Function(U_sub)
 u_los_std = dolfinx.fem.Function(U_sub)
 
-sub_file_vtx = dolfinx.io.VTXWriter(domain.comm, f"../output/{random_folder}/final_std{n_0}-{n_outputs}.bp", [u_los_std], engine="BP4")
+sub_file_vtx = dolfinx.io.VTXWriter(submesh.comm, f"../output/{random_folder}/final_std{n_0}-{n_outputs}.bp", [u_los_std], engine="BP4")
 
 for i in range(num_steps):
     t += dt
