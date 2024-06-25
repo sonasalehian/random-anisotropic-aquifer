@@ -24,7 +24,7 @@ random_folder = 'test'
 n_outputs = 4
 n_0 = 0
 n = n_0
-filename_mean = f'./output/{random_folder}/mean_for_std{n_0}-{n_outputs}.bp'
+filename_mean = f'../output/{random_folder}/mean_for_std{n_0}-{n_outputs}.bp'
 # filename = f'./output/{random_folder}/random_ahc_{n}/los_submesh_checkpoint.bp'
 engine = "BP4"
 # MPI.COMM_WORLD.Barrier()
@@ -41,7 +41,7 @@ u_los = dolfinx.fem.Function(U_sub)
 u_los_mean = dolfinx.fem.Function(U_sub)
 u_los_std = dolfinx.fem.Function(U_sub)
 
-sub_file_vtx = dolfinx.io.VTXWriter(domain.comm, f"./output/{random_folder}/final_std{n_0}-{n_outputs}.bp", [u_los_std], engine="BP4")
+sub_file_vtx = dolfinx.io.VTXWriter(domain.comm, f"../output/{random_folder}/final_std{n_0}-{n_outputs}.bp", [u_los_std], engine="BP4")
 
 for i in range(num_steps):
     t += dt
