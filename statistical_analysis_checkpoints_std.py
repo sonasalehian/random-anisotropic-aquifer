@@ -23,18 +23,17 @@ dt2 = T2 / num_steps2
 random_folder = 'random_r'
 n_outputs = 7999
 n_0 = 0
-n = n_0
 filename_mean = f'./output/{random_folder}/mean_for_std{n_0}-{n_outputs}.bp'
-filename = f'./output/{random_folder}/random_ahc_{n}/los_submesh_checkpoint.bp'
+# filename = f'./output/{random_folder}/random_ahc_{n_0}/los_submesh_checkpoint.bp'
 engine = "BP4"
 MPI.COMM_WORLD.Barrier()
 submesh = adios4dolfinx.read_mesh(
-    MPI.COMM_WORLD, filename, engine, dolfinx.mesh.GhostMode.shared_facet
+    MPI.COMM_WORLD, filename_mean, engine, dolfinx.mesh.GhostMode.shared_facet
 )
 U_sub = dolfinx.fem.functionspace(submesh, basix.ufl.element("Lagrange", "tetrahedron", 1))
 print(U_sub.dofmap.index_map.size_local)
 print(U_sub.dofmap.index_map.num_ghosts)
-u_loss = [dolfinx.fem.Function(U_sub) for _ in range(n, n_outputs)]
+u_los = dolfinx.fem.Function(U_sub)
 u_los_mean = dolfinx.fem.Function(U_sub)
 u_los_std = dolfinx.fem.Function(U_sub)
 
@@ -46,16 +45,14 @@ for i in range(num_steps):
         adios4dolfinx.read_function(u_los_mean, filename_mean, engine, time=t)
         u_los_std.x.array[:] = 0
         u_los_std.x.scatter_forward()
-        for u_los in u_loss:
+        for n in range(n_0, n_outputs+1):
             u_los.name = "u_n_sub"
             filename = f'./output/{random_folder}/random_ahc_{n}/los_submesh_checkpoint.bp'
             adios4dolfinx.read_function(u_los, filename, engine, time=t)
-            n += 1
             u_los_std.x.array[:] += (u_los.x.array - u_los_mean.x.array)**2
             u_los_std.x.scatter_forward()
 
-        n = n_0
-        u_los_std.x.array[:] /= len(u_loss)
+        u_los_std.x.array[:] /= (n_outputs+1-n_0)
         u_los_std.x.array[:] = np.sqrt(u_los_std.x.array[:])
         sub_file_vtx.write(t)
 
@@ -65,16 +62,14 @@ for i in range(num_steps2):
         adios4dolfinx.read_function(u_los_mean, filename_mean, engine, time=t)
         u_los_std.x.array[:] = 0
         u_los_std.x.scatter_forward()
-        for u_los in u_loss:
+        for n in range(n_0, n_outputs+1):
             u_los.name = "u_n_sub"
             filename = f'./output/{random_folder}/random_ahc_{n}/los_submesh_checkpoint.bp'
             adios4dolfinx.read_function(u_los, filename, engine, time=t)
-            n += 1
             u_los_std.x.array[:] += (u_los.x.array - u_los_mean.x.array)**2
             u_los_std.x.scatter_forward()
 
-        n = n_0
-        u_los_std.x.array[:] /= len(u_loss)
+        u_los_std.x.array[:] /= (n_outputs+1-n_0)
         u_los_std.x.array[:] = np.sqrt(u_los_std.x.array[:])
         sub_file_vtx.write(t)
 
