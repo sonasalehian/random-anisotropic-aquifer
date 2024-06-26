@@ -71,7 +71,7 @@ for i in range(num_steps2):
             u_los_mean.x.array[:] += u_los.x.array
             u_los_mean.x.scatter_forward()
 
-        u_los_mean.x.array[:] /= (n_outputs-n_0)
+        u_los_mean.x.array[:] /= (n_outputs+1-n_0)
         sub_file_vtx.write(t)
         adios4dolfinx.write_function(u_los_mean, filename_mean, time=t)
 

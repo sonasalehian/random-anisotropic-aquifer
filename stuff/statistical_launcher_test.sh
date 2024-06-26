@@ -18,11 +18,8 @@ cd $WDIR
 # set number of jobs based on number of cores available and number of threads per job
 export JOBS_PER_NODE=$(( $SLURM_CPUS_ON_NODE / $SLURM_CPUS_PER_TASK ))
 
-echo "spack env: fenicsx-main-20230214"
-echo $SLURM_CPUS_ON_NODE
-echo $SLURM_CPUS_PER_TASK
-echo $JOBS_PER_NODE 
-echo "batch, c=1, t=8:00:00"
-echo "0-4"
+spack env status
+scontrol show job $SLURM_JOB_ID
+echo "0"
 
-srun -c 1 python3 testing_mean.py
+srun -c 1 python3 read_write_checkpoints.py
