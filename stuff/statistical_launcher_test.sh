@@ -12,7 +12,7 @@
 source $SCRATCH/spack/share/spack/setup-env.sh
 spack env activate fenicsx-main-20230214
 
-export WDIR=$SCRATCH/stochastic_model
+export WDIR=$SCRATCH/stochastic_model/stuff
 cd $WDIR
 
 # set number of jobs based on number of cores available and number of threads per job

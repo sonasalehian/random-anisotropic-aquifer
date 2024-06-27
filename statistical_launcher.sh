@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#SBATCH --job-name=statistical_analysis_std_r
+#SBATCH --job-name=statistical_analysis_r
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
@@ -19,7 +19,7 @@ cd $WDIR
 export JOBS_PER_NODE=$(( $SLURM_CPUS_ON_NODE / $SLURM_CPUS_PER_TASK ))
 
 spack env status
-scontrol show job ${SLURM_JOB_ID}
-echo "0-8000"
+scontrol show job $SLURM_JOB_ID
+echo"2200-2400"
 
-srun -c 1 python3 statistical_analysis_checkpoints_std.py
+srun -c 1 python3 statistical_analysis_checkpoints.py

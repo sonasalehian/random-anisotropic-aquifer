@@ -21,8 +21,8 @@ num_steps2 = parameters["num_steps2"]
 dt2 = T2 / num_steps2
 
 random_folder = 'random_r'
-n_outputs = 7999
-n_0 = 0
+n_outputs = 2400
+n_0 = 2200
 filename = f'./output/{random_folder}/random_ahc_{n_0}/los_submesh_checkpoint.bp'
 engine = "BP4"
 MPI.COMM_WORLD.Barrier()
@@ -47,6 +47,7 @@ for i in range(num_steps):
     t += dt
     if (i+1) % 20 == 0:
         # print("time_step:", i)
+        u_los_mean.x.array[:] = 0
         for n in range(n_0, n_outputs+1):
             # print("n:", n)
             u_los.name = "u_n_sub"
@@ -63,6 +64,7 @@ for i in range(num_steps2):
     t += dt2
     if (i+1) % 20 == 0:
         # print("time_step:", i)
+        u_los_mean.x.array[:] = 0
         for n in range(n_0, n_outputs+1):
             u_los.name = "u_n_sub"
             filename = f'./output/{random_folder}/random_ahc_{n}/los_submesh_checkpoint.bp'

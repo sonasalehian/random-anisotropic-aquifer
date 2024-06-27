@@ -19,7 +19,7 @@ cd $WDIR
 export JOBS_PER_NODE=$(( $SLURM_CPUS_ON_NODE / $SLURM_CPUS_PER_TASK ))
 
 spack env status
-scontrol show job ${SLURM_JOB_ID}
+scontrol show job $SLURM_JOB_ID
 
-parallel --jobs $JOBS_PER_NODE srun -n 14 -c 1 python3 random_ahc_tensor_checkpoint_r.py {} ::: {801..1000}
+parallel --jobs $JOBS_PER_NODE srun -n 14 -c 1 python3 random_ahc_tensor_checkpoint_r.py {} ::: {2200..2400}
 
