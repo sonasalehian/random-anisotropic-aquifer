@@ -35,14 +35,18 @@ u_los_write.name = "u_n_sub"
 for n in range(n_0, n_outputs+1):
     filename = f'../output/{random_folder}/u_los_{n}.bp'
     adios4dolfinx.write_mesh(domain, filename)
-    u_los_write.x.array[:] = n
+    t = parameters["t"]
     for i in range(num_steps):
         t += dt
         if (i+1) % 20 == 0:
+            u_los_write.x.array[:] = n
+            u_los_write.x.scatter_forward()
             adios4dolfinx.write_function(u_los_write, filename, time=t)
     for i in range(num_steps2):
         t += dt2
         if (i+1) % 20 == 0:
+            u_los_write.x.array[:] = n
+            u_los_write.x.scatter_forward()
             adios4dolfinx.write_function(u_los_write, filename, time=t)
 
 filename = f'../output/{random_folder}/u_los_{n_0}.bp'
@@ -60,7 +64,7 @@ sub_file_vtx = dolfinx.io.VTXWriter(submesh.comm, f'../output/{random_folder}/fi
 filename_mean = f'../output/{random_folder}/mean_for_std{n_0}-{n_outputs}.bp'
 adios4dolfinx.write_mesh(submesh, filename_mean)
 
-
+t = parameters["t"]
 for i in range(num_steps):
     t += dt
     if (i+1) % 20 == 0:
@@ -68,7 +72,7 @@ for i in range(num_steps):
         u_los_mean.x.scatter_forward()
         for n in range(n_0, n_outputs+1):
             u_los.name = "u_n_sub"
-            filename = f'./output/{random_folder}/u_los_{n}.bp'
+            filename = f'../output/{random_folder}/u_los_{n}.bp'
             adios4dolfinx.read_function(u_los, filename, engine, time=t)
             u_los_mean.x.array[:] += u_los.x.array
             u_los_mean.x.scatter_forward()
@@ -82,9 +86,9 @@ for i in range(num_steps2):
     if (i+1) % 20 == 0:
         u_los_mean.x.array[:] = 0
         u_los_mean.x.scatter_forward()
-        for n in range(n_0, n_outputs):
+        for n in range(n_0, n_outputs+1):
             u_los.name = "u_n_sub"
-            filename = f'./output/{random_folder}/u_los_{n}.bp'
+            filename = f'../output/{random_folder}/u_los_{n}.bp'
             adios4dolfinx.read_function(u_los, filename, engine, time=t)
             u_los_mean.x.array[:] += u_los.x.array
             u_los_mean.x.scatter_forward()

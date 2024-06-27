@@ -47,7 +47,7 @@ for i in range(num_steps):
         u_los_std.x.scatter_forward()
         for n in range(n_0, n_outputs+1):
             u_los.name = "u_n_sub"
-            filename = f'./output/{random_folder}/u_los_{n}.bp'
+            filename = f'../output/{random_folder}/u_los_{n}.bp'
             adios4dolfinx.read_function(u_los, filename, engine, time=t)
             u_los_std.x.array[:] += (u_los.x.array - u_los_mean.x.array)**2
             u_los_std.x.scatter_forward()
@@ -65,7 +65,7 @@ for i in range(num_steps2):
         u_los_std.x.scatter_forward()
         for n in range(n_0, n_outputs+1):
             u_los.name = "u_n_sub"
-            filename = f'./output/{random_folder}/u_los_{n}.bp'
+            filename = f'../output/{random_folder}/u_los_{n}.bp'
             adios4dolfinx.read_function(u_los, filename, engine, time=t)
             u_los_std.x.array[:] += (u_los.x.array - u_los_mean.x.array)**2
             u_los_std.x.scatter_forward()
