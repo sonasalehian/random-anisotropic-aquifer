@@ -24,15 +24,11 @@ random_folder = 'test'
 n_outputs = 4
 n_0 = 0
 n = n_0
-filename_mean = f'../output/{random_folder}/mean_for_std{n_0}-{n_outputs}.bp'
-# filename = f'./output/{random_folder}/random_ahc_{n}/los_submesh_checkpoint.bp'
 engine = "BP4"
-# MPI.COMM_WORLD.Barrier()
+filename_mean = f'../output/{random_folder}/mean_for_std{n_0}-{n_outputs}.bp'
 submesh = adios4dolfinx.read_mesh(
     MPI.COMM_WORLD, filename_mean, engine, dolfinx.mesh.GhostMode.shared_facet
 )
-# domain = dolfinx.mesh.create_box(MPI.COMM_WORLD, [np.array([0, 0, 0]), np.array([20, 20, 5])],
-#                             [20, 6, 6], cell_type=dolfinx.mesh.CellType.tetrahedron)
 U_sub = dolfinx.fem.functionspace(submesh, basix.ufl.element("Lagrange", "tetrahedron", 1))
 print(U_sub.dofmap.index_map.size_local)
 print(U_sub.dofmap.index_map.num_ghosts)
@@ -50,7 +46,9 @@ for i in range(num_steps):
         u_los_std.x.array[:] = 0
         u_los_std.x.scatter_forward()
         for n in range(n_0, n_outputs+1):
-            u_los.x.array[:] = n
+            u_los.name = "u_n_sub"
+            filename = f'./output/{random_folder}/u_los_{n}.bp'
+            adios4dolfinx.read_function(u_los, filename, engine, time=t)
             u_los_std.x.array[:] += (u_los.x.array - u_los_mean.x.array)**2
             u_los_std.x.scatter_forward()
 
@@ -66,7 +64,9 @@ for i in range(num_steps2):
         u_los_std.x.array[:] = 0
         u_los_std.x.scatter_forward()
         for n in range(n_0, n_outputs+1):
-            u_los.x.array[:] = n
+            u_los.name = "u_n_sub"
+            filename = f'./output/{random_folder}/u_los_{n}.bp'
+            adios4dolfinx.read_function(u_los, filename, engine, time=t)
             u_los_std.x.array[:] += (u_los.x.array - u_los_mean.x.array)**2
             u_los_std.x.scatter_forward()
 
