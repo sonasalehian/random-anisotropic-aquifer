@@ -21,7 +21,7 @@ num_steps2 = parameters["num_steps2"]
 dt2 = T2 / num_steps2
 
 random_folder = 'random_r'
-n_outputs = 7999
+n_outputs = 3
 n_0 = 0
 filename_mean = f'./output/{random_folder}/mean_for_std{n_0}-{n_outputs}.bp'
 # filename = f'./output/{random_folder}/random_ahc_{n_0}/los_submesh_checkpoint.bp'

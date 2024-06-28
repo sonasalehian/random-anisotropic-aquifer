@@ -21,8 +21,8 @@ num_steps2 = parameters["num_steps2"]
 dt2 = T2 / num_steps2
 
 random_folder = 'random_r'
-n_outputs = 2400
-n_0 = 2200
+n_outputs = 3
+n_0 = 0
 filename = f'./output/{random_folder}/random_ahc_{n_0}/los_submesh_checkpoint.bp'
 engine = "BP4"
 MPI.COMM_WORLD.Barrier()
