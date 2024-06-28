@@ -222,11 +222,6 @@ def solve(parameters):
     Lz = Lz1 + Lz2 + Lz3
 
     top_marker, drywell_marker, pumpingwell_marker = 4, 8, 9
-
-    # domain = mesh.create_box(MPI.COMM_WORLD, [np.array([0, 0, 0]), np.array([Lx, Ly, Lz])],
-    #                         [20, 6, 6], cell_type=mesh.CellType.tetrahedron)  
-    
-    # domain.name = "aquifersys"
       
     print_root("Reading mesh...")
     with io.XDMFFile(MPI.COMM_WORLD, "output/mesh/mesh.xdmf", "r") as mrxdmf:
