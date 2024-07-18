@@ -95,6 +95,7 @@ class TimeReader:
 
     def __next__(self):
         self.current += 1
+        print(self.current)
         if self.current < len(self):
             adios4dolfinx.read_function(
                 self.file, self.f, "BP4", time=float(self.timesteps[self.current])
@@ -110,5 +111,8 @@ np.testing.assert_allclose(m.x.array, (r[-1] + r[0]) / 2)
 m = mean(timeseries)
 np.testing.assert_allclose(m.x.array, (r[-1] + r[0]) / 2)
 
-# var = var(timeseries)
+m = mean(timeseries)
+np.testing.assert_allclose(m.x.array, (r[-1] + r[0]) / 2)
+
+var = var(timeseries)
 # np.testing.assert_allclose(var.x.array, ((len(r) - 1.0) * (len(r) + 1.0)) / 12.0)
