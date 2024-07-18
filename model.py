@@ -187,7 +187,7 @@ def equation_parameters(parameters, domain, mt):
     # Subdomain
     K = dolfinx.fem.functionspace(
         domain,
-        basix.ufl.element("Discontinous Lagrange", "tetrahedron", 0, shape=(3, 3)),
+        basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 0, shape=(3, 3)),
     )
     P = dolfinx.fem.functionspace(
         domain, basix.ufl.element("Discontinuous Lagrange", "tetrahedron", 0)
