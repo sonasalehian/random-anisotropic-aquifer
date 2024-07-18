@@ -522,7 +522,7 @@ def solve(parameters):
             print_root("Done.")
 
     print_root("Finished pumping phase.")
-    
+
     print_root("Starting drawdown phase...")
     print_root("Recalculating Dirichlet condition...")
 
