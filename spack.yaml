@@ -5,21 +5,22 @@
 spack:
   # add package specs to the `specs` list
   specs:
-  - fenics-dolfinx@git.4f575964c70efd02dca92f2cf10c125071b17e4d=main%gcc@13.2.0+adios2
-  - py-fenics-dolfinx@git.4f575964c70efd02dca92f2cf10c125071b17e4d=main
+  - fenics-dolfinx@0.8.0%gcc@13.3.0+adios2
+  - py-fenics-dolfinx@0.8.0
 
-  - py-fenics-basix@git.2e2a7048ea5f4255c22af18af3b828036f1c8b50=main
-  - fenics-basix@git.2e2a7048ea5f4255c22af18af3b828036f1c8b50=main
+  - py-fenics-basix@0.8.0
+  - fenics-basix@0.8.0
 
-  - py-fenics-ufl@git.b15d8d3fdfea5ad6fe78531ec4ce6059cafeaa89=main
+  - py-fenics-ufl@0.8.0
 
-  - py-fenics-ffcx@git.7bc8be738997e7ce68ef0f406eab63c00d467092=main
+  - py-fenics-ffcx@0.8.0
 
+  - gmsh
   - petsc+mumps
   - adios2~sst+python
   - boost
   - py-pip
-  - py-pytest
+
   view: true
   concretizer:
     unify: true
