@@ -137,7 +137,7 @@ def write_mesh(parameters):
     # Cteating the mesh
     model = create_mesh(parameters)
 
-    gdim = parameters["gdim"]
+    gdim = 3
 
     # Interfacing with GMSH in DOLFINx
     gmsh_model_rank = 0
