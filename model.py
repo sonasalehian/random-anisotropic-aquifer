@@ -28,6 +28,10 @@ from utils import print_root
 def main():
     parameters = create_default_parameters()
     parameters["output_dir"] = "./output/single_run/"
+    # NOTE: These are for fast testing - may not be sufficiently fine!
+    parameters["num_steps"] = 36
+    parameters["num_steps2"] = 36
+    parameters["output_every_n_steps"] = 6
 
     solve(parameters)
 
@@ -364,7 +368,7 @@ def solve(parameters):
 
     print_root("Assembling bilinear form...")
     A = fem.petsc.create_matrix(bilinear_form)
-    fem.petsc.assemble_matrix(bilinear_form, A, bcs=bcs)
+    fem.petsc.assemble_matrix(A, bilinear_form, bcs=bcs)
     A.assemble()
     print_root("Done.")
 
@@ -461,7 +465,7 @@ def solve(parameters):
     adios4dolfinx.write_mesh(adios2_filename, submesh)
     adios4dolfinx.write_function(adios2_filename, u_n_sub, time=t)
 
-    print_root("Starting timestepping...")
+    print_root("Starting pumping phase...")
 
     output_ts = []
     for i in range(num_steps):
@@ -543,12 +547,15 @@ def solve(parameters):
     delta_t.value = dt2
     print_root("Re-assembling bilinear form...")
     A.zeroEntries()
-    fem.petsc.assemble_matrix(A, bilinear_form, bcs=bcs)
+    fem.petsc.assemble_matrix(bilinear_form, A, bcs=bcs)
     A.assemble()
     print_root("Done.")
 
+    # NOTE: Necessary?
     solver.setOperators(A)
     b = fem.petsc.create_vector(linear_form)
+
+    print_root("Starting drawdown phase...")
 
     for i in range(num_steps2):
         t += dt2
