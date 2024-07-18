@@ -549,7 +549,7 @@ def solve(parameters):
     delta_t.value = dt2
     print_root("Re-assembling bilinear form...")
     A.zeroEntries()
-    fem.petsc.assemble_matrix(bilinear_form, A, bcs=bcs)
+    fem.petsc.assemble_matrix(A, bilinear_form, bcs=bcs)
     A.assemble()
     print_root("Done.")
 
