@@ -392,9 +392,11 @@ def solve(parameters):
     linear_form = fem.form(L)
 
     print_root("Assembling bilinear form...")
-    A = fem.petsc.assemble_matrix(bilinear_form, bcs=bcs)
+    A = fem.petsc.create_matrix(bilinear_form)
+    fem.petsc.assemble_matrix(bilinear_form, A, bcs=bcs)
     A.assemble()
     print_root("Done.")
+
     b = fem.petsc.create_vector(linear_form)
 
     # Define solver
@@ -489,13 +491,14 @@ def solve(parameters):
                     parent * W.dofmap.bs + bb
                 ]
 
-    filename = f"{parameters['output_dir']}/los_submesh_checkpoint.bp"
+    adios2_filename = f"{parameters['output_dir']}/solution.bp"
 
-    adios4dolfinx.write_mesh(filename, submesh)
-    adios4dolfinx.write_function(filename, u_n_sub, time=t)
+    adios4dolfinx.write_mesh(adios2_filename, submesh)
+    adios4dolfinx.write_function(adios2_filename, u_n_sub, time=t)
 
     print_root("Starting timestepping...")
 
+    output_ts = []
     for i in range(num_steps):
         # Updating the solution and right hand side per time step
         t += dt
@@ -503,7 +506,7 @@ def solve(parameters):
 
         # Update the right hand side reusing the initial vector
         with b.localForm() as loc_b:
-            loc_b.set(0)
+            loc_b.set(0.0)
         fem.petsc.assemble_vector(b, linear_form)
 
         # Apply Dirichlet boundary condition to the vector
@@ -538,13 +541,14 @@ def solve(parameters):
                         parent * W.dofmap.bs + bb
                     ]
 
-        if (i + 1) % 20 == 0:
+        if (i + 1) % parameters["output_every_n_steps"] == 0:
             # Interpolate q into a different finite element space
             qh_Q0.interpolate(q_n)
             ph_P0.interpolate(p_n)
             qh_Q0.x.scatter_forward()
             ph_P0.x.scatter_forward()
-            adios4dolfinx.write_function(u_n_sub, filename, time=t)
+            adios4dolfinx.write_function(adios2_filename, u_n_sub, time=t)
+            output_ts.append(t)
 
     print_root("Stop pumping.")
     print_root("Recalculating Dirichlet condition...")
@@ -568,10 +572,11 @@ def solve(parameters):
 
     print_root("Done.")
 
+    print_root("Changing timestep.")
     delta_t.value = dt2
-    # bilinear_form = fem.form(a)
-    print_root("Assembling bilinear form...")
-    A = fem.petsc.assemble_matrix(bilinear_form, bcs=bcs)
+    print_root("Re-assembling bilinear form...")
+    A.zeroEntries()
+    fem.petsc.assemble_matrix(A, bilinear_form, bcs=bcs)
     A.assemble()
     print_root("Done.")
 
@@ -621,13 +626,18 @@ def solve(parameters):
                         parent * W.dofmap.bs + bb
                     ]
 
-        if (i + 1) % 20 == 0:
+        if (i + 1) % parameters["output_every_n_steps"] == 0:
             # Interpolate q into a different finite element space
             qh_Q0.interpolate(q_n)
             ph_P0.interpolate(p_n)
             qh_Q0.x.scatter_forward()
             ph_P0.x.scatter_forward()
             adios4dolfinx.write_function(u_n_sub, filename, time=t)
+            output_ts.append(t)
+
+    filename_output_ts = f"{parameters['output_dir']}/output_ts.npy"
+    if MPI.COMM_WORLD.rank == 0:
+        np.save(filename_output_ts, output_ts)
 
     print_root("Finished solution.")
 

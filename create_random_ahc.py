@@ -27,4 +27,3 @@ if os.path.exists(file_name):
 np.save(file_name, np.array(k).reshape(num_samples, -1))
 
 print(f"Random hydraulic conductivity tensors have been saved to {file_name}")
-

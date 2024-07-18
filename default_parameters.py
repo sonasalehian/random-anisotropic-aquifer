@@ -1,13 +1,11 @@
 def create_default_parameters():
     parameters = {}
 
-    # Output file name
+    # Output directory
     parameters["output_dir"] = 'output/AJ/'
+    parameters["output_every_n_steps"] = 20
 
-    # Define dimention
-    parameters["gdim"] = 3
-
-    # Define spacial parameters
+    # Define spatial parameters
     parameters["Lx"] = 2000  # Length of aquifer in x direction
     parameters["Ly"] = 3500  # Length of aquifer in y direction
     parameters["Lxw"] = 750  # Distance of well in x direction
@@ -19,7 +17,6 @@ def create_default_parameters():
     parameters["Ld2"] = 30  # Depth of the pumping part of pumping well
     parameters["Lr"] = 7  # 3.38  # radius of pumping well
 
-    # T = s
     parameters["beta_s"] = 1.1E-11  # solid grain compressibility (pa^(-1))
     parameters["phi"] = 0.32  # medium porosity(-)
     parameters["beta_f"] = 4.4E-10  # fluid compresibility (pa^(-1))
