@@ -164,5 +164,5 @@ def write_mesh(parameters):
     with io.XDMFFile(domain.comm, "output/mesh/boundaries_tags.xdmf", "w") as bxdmf:    
         bxdmf.write_meshtags(
             ft, x=domain.geometry, geometry_xpath=f"/Xdmf/Domain/Grid[@Name='{domain.name}']/Geometry")
-        
+
 write_mesh(parameters)
