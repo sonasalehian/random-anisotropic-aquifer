@@ -521,7 +521,9 @@ def solve(parameters):
             output_ts.append(t)
             print_root("Done.")
 
-    print_root("Stop pumping.")
+    print_root("Finished pumping phase.")
+    
+    print_root("Starting drawdown phase...")
     print_root("Recalculating Dirichlet condition...")
 
     def f(x):
@@ -554,8 +556,6 @@ def solve(parameters):
     # NOTE: Necessary?
     solver.setOperators(A)
     b = fem.petsc.create_vector(linear_form)
-
-    print_root("Starting drawdown phase...")
 
     for i in range(num_steps2):
         t += dt2
