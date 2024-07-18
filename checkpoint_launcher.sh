@@ -22,4 +22,3 @@ spack env status
 scontrol show job $SLURM_JOB_ID
 
 parallel --jobs $JOBS_PER_NODE srun -n 14 -c 1 python3 random_ahc_tensor_checkpoint_r.py {} ::: {2200..2400}
-
