@@ -1,30 +1,33 @@
 # Poroelasticity model for Anderson Junction aquifer
 
-import os, sys
+import os
+import sys
 
 sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
+
+import pprint
+from functools import partial
 
 from mpi4py import MPI
 from petsc4py import PETSc
 
+import adios4dolfinx
 import numpy as np
+
+import basix.ufl
 import dolfinx
 import ufl
-import basix.ufl
-import adios4dolfinx
-import pprint
-
-from dolfinx import fem, io, mesh
-from functools import partial
-from utils import print_root
-from dolfinx.fem import petsc  #  noqa: F401
-from dolfinx.fem import assemble_scalar, form
 from default_parameters import create_default_parameters
+from dolfinx import fem, io
+from dolfinx.fem import (
+    petsc,  #  noqa: F401
+)
+from utils import print_root
 
 
 def main():
     parameters = create_default_parameters()
-    parameters["output_dir"] = f"./output/single_run/"
+    parameters["output_dir"] = "./output/single_run/"
 
     solve(parameters)
 
@@ -464,7 +467,7 @@ def solve(parameters):
     for i in range(num_steps):
         # Updating the solution and right hand side per time step
         t += dt
-        print_root(f"Started time step {i + 1} with t = {t}...")
+        print_root(f"Started time step {i + 1}/{num_steps} with t = {t}...")
 
         # Update the right hand side reusing the initial vector
         with b.localForm() as loc_b:
@@ -504,6 +507,7 @@ def solve(parameters):
                     ]
 
         if (i + 1) % parameters["output_every_n_steps"] == 0:
+            print_root(f"Writing solution t = {t}...")
             # Interpolate q into a different finite element space
             qh_Q0.interpolate(q_n)
             ph_P0.interpolate(p_n)
@@ -511,6 +515,7 @@ def solve(parameters):
             ph_P0.x.scatter_forward()
             adios4dolfinx.write_function(adios2_filename, u_n_sub, time=t)
             output_ts.append(t)
+            print_root("Done.")
 
     print_root("Stop pumping.")
     print_root("Recalculating Dirichlet condition...")
@@ -546,8 +551,8 @@ def solve(parameters):
     b = fem.petsc.create_vector(linear_form)
 
     for i in range(num_steps2):
-        print_root(f"Started time step: {num_steps + i + 1}")
         t += dt2
+        print_root(f"Started time step {num_steps + i + 1}/{num_steps + num_steps2} with t = {t}")
 
         # Update the right hand side reusing the initial vector
         with b.localForm() as loc_b:
@@ -589,13 +594,15 @@ def solve(parameters):
                     ]
 
         if (i + 1) % parameters["output_every_n_steps"] == 0:
+            print_root(f"Writing solution t = {t}...")
             # Interpolate q into a different finite element space
             qh_Q0.interpolate(q_n)
             ph_P0.interpolate(p_n)
             qh_Q0.x.scatter_forward()
             ph_P0.x.scatter_forward()
-            adios4dolfinx.write_function(u_n_sub, filename, time=t)
+            adios4dolfinx.write_function(u_n_sub, adios2_filename, time=t)
             output_ts.append(t)
+            print_root("Done.")
 
     filename_output_ts = f"{parameters['output_dir']}/output_ts.npy"
     if MPI.COMM_WORLD.rank == 0:
