@@ -1,6 +1,5 @@
 import numpy as np
 from mpi4py import MPI
-import dolfinx
 import dolfinx.mesh as mesh
 import dolfinx.fem as fem
 import basix
@@ -23,6 +22,7 @@ fs = [fem.Function(V) for _ in r]
 for i, f in zip(r, fs):
     f.x.array[:] = np.float64(i)
 
+
 def mean(fs):
     m = fem.Function(V)
     for f in fs:
@@ -33,7 +33,8 @@ def mean(fs):
 
 m = mean(fs)
 # Mean of arithmetic series https://en.wikipedia.org/wiki/Arithmetic_progression
-np.testing.assert_allclose(m.x.array, (r[-1] + r[0])/2)
+np.testing.assert_allclose(m.x.array, (r[-1] + r[0]) / 2)
+
 
 def variance(fs):
     m = mean(fs)
@@ -46,6 +47,7 @@ def variance(fs):
     var.x.array[:] /= len(fs)
 
     return var
+
 
 var = variance(fs)
 # Variance of arithmetic series https://en.wikipedia.org/wiki/Arithmetic_progression
@@ -70,7 +72,43 @@ for i in r:
     fs.append(f)
 
 m = mean(fs)
-np.testing.assert_allclose(m.x.array, (r[-1] + r[0])/2)
+np.testing.assert_allclose(m.x.array, (r[-1] + r[0]) / 2)
 
 var = variance(fs)
 np.testing.assert_allclose(var.x.array, ((len(r) - 1.0) * (len(r) + 1.0)) / 12.0)
+
+del fs
+
+
+class TimeReader:
+    def __init__(self, file, timesteps):
+        self.file = file
+        self.timesteps = timesteps
+        self.current = -1
+        self.f = fem.Function(V)
+
+    def __len__(self):
+        return len(self.timesteps)
+
+    def __iter__(self):
+        return TimeReader(self.file, self.timesteps)
+
+    def __next__(self):
+        self.current += 1
+        if self.current < len(self):
+            adios4dolfinx.read_function(
+                self.file, self.f, "BP4", time=float(self.timesteps[self.current])
+            )
+            return self.f
+        raise StopIteration
+
+
+timeseries = TimeReader(filename, r)
+m = mean(timeseries)
+np.testing.assert_allclose(m.x.array, (r[-1] + r[0]) / 2)
+
+m = mean(timeseries)
+np.testing.assert_allclose(m.x.array, (r[-1] + r[0]) / 2)
+
+# var = var(timeseries)
+# np.testing.assert_allclose(var.x.array, ((len(r) - 1.0) * (len(r) + 1.0)) / 12.0)
