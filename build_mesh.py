@@ -26,7 +26,7 @@ def create_mesh(parameters):
     Lr = parameters["Lr"]
     Lz = Lz1 + Lz2 + Lz3
 
-    gdim = parameters["gdim"]
+    gdim = 3
 
     # Markers
     aquitard_marker = 1
