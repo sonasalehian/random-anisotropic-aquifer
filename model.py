@@ -22,7 +22,7 @@ from dolfinx import fem, io
 from dolfinx.fem import (
     petsc,  #  noqa: F401
 )
-from utils import print_root
+from utils import print_root, print_all
 
 
 def main():
@@ -151,7 +151,6 @@ def boundary_conditions(parameters, domain, ft, V):
 
 
 def equation_parameters(parameters, domain, mt):
-    # parameters
     mu_f = parameters["mu_f"]
 
     # Aquitard layer
@@ -298,6 +297,8 @@ def solve(parameters):
     U_el = basix.ufl.element("Lagrange", "tetrahedron", 1, shape=(3,))
     V_el = basix.ufl.mixed_element([Q_el, P_el, U_el])
     V = dolfinx.fem.functionspace(domain, V_el)
+
+    print_all(f"Local dofmap size: {V.dofmap.index_map.size_local}")
 
     (q, p, u) = ufl.TrialFunctions(V)
     (q_t, p_t, u_t) = ufl.TestFunctions(V)
@@ -607,7 +608,7 @@ def solve(parameters):
             ph_P0.interpolate(p_n)
             qh_Q0.x.scatter_forward()
             ph_P0.x.scatter_forward()
-            adios4dolfinx.write_function(u_n_sub, adios2_filename, time=t)
+            adios4dolfinx.write_function(adios2_filename, u_n_sub, time=t)
             output_ts.append(t)
             print_root("Done.")
 
