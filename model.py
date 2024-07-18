@@ -471,7 +471,7 @@ def solve(parameters):
     for i in range(num_steps):
         # Updating the solution and right hand side per time step
         t += dt
-        print_root(f"Started time step {i + 1}/{num_steps} with t = {t}...")
+        print_root(f"Started time step {i + 1}/{num_steps + num_steps2} with t = {t}...")
 
         # Update the right hand side reusing the initial vector
         with b.localForm() as loc_b:
