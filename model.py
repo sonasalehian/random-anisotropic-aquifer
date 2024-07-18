@@ -41,9 +41,7 @@ def boundary_conditions(parameters, domain, ft, V):
         pumpingwell_marker,
     ) = 4, 5, 6, 7, 8, 9
     ds = ufl.Measure("ds", domain=domain, subdomain_data=ft)
-    area = MPI.COMM_WORLD.allreduce(
-        fem.assemble_scalar(fem.form(1.0 * ds(pumpingwell_marker)))
-    )
+    area = MPI.COMM_WORLD.allreduce(fem.assemble_scalar(fem.form(1.0 * ds(pumpingwell_marker))))
 
     fdim = domain.topology.dim - 1
 
@@ -58,16 +56,12 @@ def boundary_conditions(parameters, domain, ft, V):
 
     bcu_sidesx = fem.dirichletbc(
         u_Dx,
-        fem.locate_dofs_topological(
-            (V.sub(2).sub(0), UX), fdim, ft.find(sidesx_marker)
-        ),
+        fem.locate_dofs_topological((V.sub(2).sub(0), UX), fdim, ft.find(sidesx_marker)),
         V.sub(2).sub(0),
     )
     bcu_sidesy = fem.dirichletbc(
         u_Dy,
-        fem.locate_dofs_topological(
-            (V.sub(2).sub(1), UY), fdim, ft.find(sidesy_marker)
-        ),
+        fem.locate_dofs_topological((V.sub(2).sub(1), UY), fdim, ft.find(sidesy_marker)),
         V.sub(2).sub(1),
     )
     bcu_bottom = fem.dirichletbc(
@@ -195,9 +189,7 @@ def equation_parameters(parameters, domain, mt):
     invkappa = fem.Function(K, dtype=PETSc.ScalarType)
 
     def invk_p(x, res):
-        values = np.zeros(
-            (domain.geometry.dim * domain.geometry.dim, x.shape[1]), dtype=np.float64
-        )
+        values = np.zeros((domain.geometry.dim * domain.geometry.dim, x.shape[1]), dtype=np.float64)
         values[0] = res[0, 0]
         values[1] = res[0, 1]
         values[2] = res[0, 2]
@@ -228,16 +220,10 @@ def equation_parameters(parameters, domain, mt):
             )
             invk = partial(invk_p, res=res)
             invkappa.interpolate(invk, cells)
-            S_e.x.array[cells] = np.full_like(
-                cells, S_epsilon_aqtrd, dtype=PETSc.ScalarType
-            )
-            lmbda.x.array[cells] = np.full_like(
-                cells, lmbda_aqtrd, dtype=PETSc.ScalarType
-            )
+            S_e.x.array[cells] = np.full_like(cells, S_epsilon_aqtrd, dtype=PETSc.ScalarType)
+            lmbda.x.array[cells] = np.full_like(cells, lmbda_aqtrd, dtype=PETSc.ScalarType)
             G.x.array[cells] = np.full_like(cells, G_aqtrd, dtype=PETSc.ScalarType)
-            alpha.x.array[cells] = np.full_like(
-                cells, alpha_aqtrd, dtype=PETSc.ScalarType
-            )
+            alpha.x.array[cells] = np.full_like(cells, alpha_aqtrd, dtype=PETSc.ScalarType)
         elif tag == 2:
             res = np.linalg.inv(
                 np.array(
@@ -250,16 +236,10 @@ def equation_parameters(parameters, domain, mt):
             )
             invk = partial(invk_p, res=res)
             invkappa.interpolate(invk, cells)
-            S_e.x.array[cells] = np.full_like(
-                cells, S_epsilon_aqfr, dtype=PETSc.ScalarType
-            )
-            lmbda.x.array[cells] = np.full_like(
-                cells, lmbda_aqfr, dtype=PETSc.ScalarType
-            )
+            S_e.x.array[cells] = np.full_like(cells, S_epsilon_aqfr, dtype=PETSc.ScalarType)
+            lmbda.x.array[cells] = np.full_like(cells, lmbda_aqfr, dtype=PETSc.ScalarType)
             G.x.array[cells] = np.full_like(cells, G_aqfr, dtype=PETSc.ScalarType)
-            alpha.x.array[cells] = np.full_like(
-                cells, alpha_aqfr, dtype=PETSc.ScalarType
-            )
+            alpha.x.array[cells] = np.full_like(cells, alpha_aqfr, dtype=PETSc.ScalarType)
         elif tag == 3:
             res = np.linalg.inv(
                 np.array(
@@ -272,16 +252,10 @@ def equation_parameters(parameters, domain, mt):
             )
             invk = partial(invk_p, res=res)
             invkappa.interpolate(invk, cells)
-            S_e.x.array[cells] = np.full_like(
-                cells, S_epsilon_bed, dtype=PETSc.ScalarType
-            )
-            lmbda.x.array[cells] = np.full_like(
-                cells, lmbda_bed, dtype=PETSc.ScalarType
-            )
+            S_e.x.array[cells] = np.full_like(cells, S_epsilon_bed, dtype=PETSc.ScalarType)
+            lmbda.x.array[cells] = np.full_like(cells, lmbda_bed, dtype=PETSc.ScalarType)
             G.x.array[cells] = np.full_like(cells, G_bed, dtype=PETSc.ScalarType)
-            alpha.x.array[cells] = np.full_like(
-                cells, alpha_bed, dtype=PETSc.ScalarType
-            )
+            alpha.x.array[cells] = np.full_like(cells, alpha_bed, dtype=PETSc.ScalarType)
 
     return f_p, invkappa, S_e, lmbda, G, alpha
 
@@ -308,9 +282,7 @@ def solve(parameters):
 
     domain.topology.create_connectivity(2, 3)
     with io.XDMFFile(MPI.COMM_WORLD, "output/mesh/boundaries_tags.xdmf", "r") as brxdmf:
-        ft = brxdmf.read_meshtags(
-            domain, name=f"{domain.name}_facets", xpath="Xdmf/Domain"
-        )
+        ft = brxdmf.read_meshtags(domain, name=f"{domain.name}_facets", xpath="Xdmf/Domain")
     print_root("Done.")
 
     # Defining the finite element function space
@@ -354,9 +326,7 @@ def solve(parameters):
         return ufl.sym(ufl.grad(u))
 
     def stress(u):
-        return 2.0 * G * epsilon(u) + lmbda * ufl.tr(epsilon(u)) * ufl.Identity(
-            domain.topology.dim
-        )
+        return 2.0 * G * epsilon(u) + lmbda * ufl.tr(epsilon(u)) * ufl.Identity(domain.topology.dim)
 
     def stress_bar(u, p):
         return stress(u) - alpha * p * ufl.Identity(domain.topology.dim)
@@ -375,9 +345,7 @@ def solve(parameters):
         + ufl.inner(delta_t * p, ufl.div(q_t)) * dx
         - ufl.inner(delta_t * invkappa * q, q_t) * dx
         - (ufl.dot((stress_bar(u, p) * n), n)) * (ufl.dot(u_t, n)) * ds(drywell_marker)
-        + (ufl.dot((stress_bar(u_t, p_t) * n), n))
-        * (ufl.dot(u, n))
-        * ds(drywell_marker)
+        + (ufl.dot((stress_bar(u_t, p_t) * n), n)) * (ufl.dot(u, n)) * ds(drywell_marker)
     )
     L = (
         ufl.inner(delta_t * f_p, p_t) * dx
@@ -421,9 +389,7 @@ def solve(parameters):
             [np.sin(theta), 0, np.cos(theta)],
         ]
     )
-    R2 = np.array(
-        [[np.cos(phi), -np.sin(phi), 0], [np.sin(phi), np.cos(phi), 0], [0, 0, 1]]
-    )
+    R2 = np.array([[np.cos(phi), -np.sin(phi), 0], [np.sin(phi), np.cos(phi), 0], [0, 0, 1]])
 
     incidence_angle = np.radians(43.86)
     satellite_heading = np.radians(-15)
@@ -453,9 +419,7 @@ def solve(parameters):
     ph_P0 = fem.Function(P0, dtype=PETSc.ScalarType)
     ph_P0.interpolate(p_n)
 
-    W = dolfinx.fem.functionspace(
-        domain, basix.ufl.element("Lagrange", "tetrahedron", 1)
-    )
+    W = dolfinx.fem.functionspace(domain, basix.ufl.element("Lagrange", "tetrahedron", 1))
     T_ufl = ufl.as_matrix(T_list)
     u_los = ufl.dot(T_ufl, u_n)
     u_los_expr = fem.Expression(u_los, W.element.interpolation_points())
@@ -471,9 +435,7 @@ def solve(parameters):
         domain.topology.dim,
     )
 
-    submesh, cell_map, _, _ = dolfinx.mesh.create_submesh(
-        domain, domain.topology.dim, cells
-    )
+    submesh, cell_map, _, _ = dolfinx.mesh.create_submesh(domain, domain.topology.dim, cells)
 
     W_sub = dolfinx.fem.functionspace(submesh, W.ufl_element())
     u_n_sub = dolfinx.fem.Function(W_sub)
