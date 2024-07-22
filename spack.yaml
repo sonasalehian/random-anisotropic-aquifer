@@ -5,13 +5,13 @@
 spack:
   # add package specs to the `specs` list
   specs:
-  - fenics-dolfinx@0.8.0%gcc@13.3.0+adios2
+  - fenics-dolfinx@0.8.0%gcc@13.2.0+adios2
   - py-fenics-dolfinx@0.8.0
 
   - py-fenics-basix@0.8.0
   - fenics-basix@0.8.0
 
-  - py-fenics-ufl@0.8.0
+  - py-fenics-ufl@2024.1.0
 
   - py-fenics-ffcx@0.8.0
 
