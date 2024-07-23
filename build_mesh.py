@@ -1,7 +1,11 @@
+import os
+import sys
+
+sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
+
 import numpy as np
 import dolfinx
 import gmsh
-import os
 
 from mpi4py import MPI
 from dolfinx import io
