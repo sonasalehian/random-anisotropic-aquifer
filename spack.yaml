@@ -15,7 +15,7 @@ spack:
 
   - py-fenics-ffcx@0.8.0
 
-  - gmsh
+  - gmsh+opencascade
   - petsc+mumps
   - adios2~sst+python
   - boost
