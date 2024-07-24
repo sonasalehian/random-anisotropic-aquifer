@@ -1,35 +1,31 @@
 import os
+
 from jax import config
 
 config.update("jax_enable_x64", True)
-import jax.random as random
-
 import jax.numpy as jnp
+import jax.random as random
 import numpy as np
-
 import numpyro
 
 NUM_CHAINS = 4
 numpyro.set_host_device_count(NUM_CHAINS)
 
+import arviz as az
+import matplotlib.pyplot as plt
 import numpyro.distributions as dist
 import numpyro.infer.reparam
 from numpyro.infer import Predictive
 
-import arviz as az
-
-import matplotlib.pyplot as plt
-
-
 # Load generated data from rose diagram as obseration
-y_obs = np.load('../output/data/generated_data_from_rose_diagram.npy')
+y_obs = np.load("../output/data/generated_data_from_rose_diagram.npy")
 y_obs = jnp.radians(y_obs)
 
 # Required random seeds
 random_seed = jnp.frombuffer(os.urandom(8), dtype=jnp.int64)[0]
 # random_seed = 584479765808204282  # Seed for reproducing the results
 print(random_seed)
-np.save('../output/data/random_seed_mixture_model.npy', random_seed)
+np.save("../output/data/random_seed_mixture_model.npy", random_seed)
 key, subkey = random.split(random.PRNGKey(random_seed))
 
 # # Generate data from prior model
@@ -39,7 +35,7 @@ key, subkey = random.split(random.PRNGKey(random_seed))
 
 #     mu_1 = numpyro.sample("mu_1", dist.VonMises(loc=jnp.radians(40), concentration=1/jnp.radians(5)**2))
 #     mu_2 = numpyro.sample("mu_2", dist.VonMises(loc=jnp.radians(110), concentration=1/jnp.radians(5)**2))
-    
+
 #     vm_1 = dist.VonMises(loc=mu_1, concentration=kappa_1)
 #     vm_2 = dist.VonMises(loc=mu_2, concentration=kappa_2)
 
@@ -54,10 +50,13 @@ key, subkey = random.split(random.PRNGKey(random_seed))
 # np.save('../output/data/generated_data_mixture_model.npy', y_obs)
 del subkey
 
+
 @numpyro.handlers.reparam(
-    config={"mu_1": numpyro.infer.reparam.CircularReparam(), 
-            "mu_2": numpyro.infer.reparam.CircularReparam(), 
-            })
+    config={
+        "mu_1": numpyro.infer.reparam.CircularReparam(),
+        "mu_2": numpyro.infer.reparam.CircularReparam(),
+    }
+)
 def model(y_obs=None):
     kappa_1 = numpyro.sample("kappa_1", dist.Gamma(20.0, 0.1))
     kappa_2 = numpyro.sample("kappa_2", dist.Gamma(20.0, 0.1))
@@ -67,9 +66,13 @@ def model(y_obs=None):
     # mu_2 = numpyro.sample("mu_2", dist.VonMises(loc=jnp.radians(105), concentration=1/jnp.radians(5)**2))
 
     # Means for generated data from rose diagram
-    mu_1 = numpyro.sample("mu_1", dist.VonMises(loc=jnp.radians(105), concentration=1/jnp.radians(10)**2))
-    mu_2 = numpyro.sample("mu_2", dist.VonMises(loc=jnp.radians(125), concentration=1/jnp.radians(10)**2))
-    
+    mu_1 = numpyro.sample(
+        "mu_1", dist.VonMises(loc=jnp.radians(105), concentration=1 / jnp.radians(10) ** 2)
+    )
+    mu_2 = numpyro.sample(
+        "mu_2", dist.VonMises(loc=jnp.radians(125), concentration=1 / jnp.radians(10) ** 2)
+    )
+
     vm_1 = dist.VonMises(loc=mu_1, concentration=kappa_1)
     vm_2 = dist.VonMises(loc=mu_2, concentration=kappa_2)
 
@@ -79,13 +82,12 @@ def model(y_obs=None):
     with numpyro.plate("y_obs", len(y_obs) if y_obs is not None else 1):
         _ = numpyro.sample("y", dist.MixtureGeneral(mix, [vm_1, vm_2]), obs=y_obs)
 
+
 key, subkey = random.split(random.PRNGKey(random_seed))
 del subkey
 
 nuts_kernel = numpyro.infer.NUTS(model)
-mcmc = numpyro.infer.MCMC(
-    nuts_kernel, num_warmup=5000, num_samples=50000, num_chains=NUM_CHAINS
-)
+mcmc = numpyro.infer.MCMC(nuts_kernel, num_warmup=5000, num_samples=50000, num_chains=NUM_CHAINS)
 key, *subkey = random.split(key, NUM_CHAINS + 1)
 mcmc.run(jnp.array(subkey), y_obs=y_obs)
 del subkey
@@ -94,7 +96,9 @@ posterior_samples = mcmc.get_samples()
 posterior_predictive = Predictive(model, posterior_samples=posterior_samples)
 key, subkey = random.split(key)
 posterior_predictive_samples = posterior_predictive(subkey)
-np.save('../output/data/random_rotation_angle.npy', posterior_predictive_samples["y"][::25].flatten())
+np.save(
+    "../output/data/random_rotation_angle.npy", posterior_predictive_samples["y"][::25].flatten()
+)
 
 print(posterior_predictive_samples["y"][::25].flatten())
 print(len(posterior_predictive_samples["y"][::25].flatten()))
