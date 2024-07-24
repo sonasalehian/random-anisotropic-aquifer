@@ -20,4 +20,3 @@ parameters["k_y_aqfr"] = k_flat[n, 3]
 parameters["output_dir"] = f'./output/random_sr/random_ahc_{n}'
 
 solve(parameters)
-

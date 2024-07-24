@@ -1,1 +1,2 @@
 adios4dolfinx@git+https://github.com/jorgensd/adios4dolfinx@v0.8.2
+numpyro@https://github.com/pyro-ppl/numpyro.git@v0.15.1
