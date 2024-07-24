@@ -6,7 +6,6 @@ from default_parameters import create_default_parameters
 parameters = create_default_parameters()
 
 n = int(sys.argv[1])
-# n = 1
 
 # Load the list of arrays
 k_flat = np.load('output/data/ahct_random_scaling_and_rotation.npy')
