@@ -13,16 +13,16 @@ from petsc4py import PETSc
 
 import adios4dolfinx
 import numpy as np
+from default_parameters import create_default_parameters
+from utils import print_all, print_root
 
 import basix.ufl
 import dolfinx
 import ufl
-from default_parameters import create_default_parameters
 from dolfinx import fem, io
 from dolfinx.fem import (
     petsc,  #  noqa: F401
 )
-from utils import print_root, print_all
 
 
 def main():

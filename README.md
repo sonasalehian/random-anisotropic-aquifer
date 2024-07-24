@@ -41,5 +41,4 @@ uni.lu HPC cluster as it is installed in `lib64/` not `lib/`.
 It seems necessary to add the Python adios2 interface location to `PYTHONPATH`
 as it is not found via Spack's venv integration.
 
-    export PYTHONPATH=$SPACK_ENV/.spack-env/view/
-
+    export PYTHONPATH=$SPACK_ENV/.spack-env/view
