@@ -1,10 +1,10 @@
 # This is a Spack Environment file.
 #
-# It describes a set of packages to be installed, along with
-# configuration settings.
+# Note that there is also a requirements.txt file to install some Python
+# dependencies that do not have Spack packages
 spack:
-  # add package specs to the `specs` list
   specs:
+  # For FEniCSx part
   - fenics-dolfinx@0.8.0%gcc@13.2.0+adios2
   - py-fenics-dolfinx@0.8.0
 
@@ -16,10 +16,17 @@ spack:
   - py-fenics-ffcx@0.8.0
 
   - gmsh+opencascade
+  
   - petsc+mumps
   - adios2~sst+python
-  - boost
+  - parallel
+
+  # For numpyro part 
   - py-pip
+  - py-matplotlib
+  - py-arviz
+  - py-jax
+  - py-numpy
 
   view: true
   concretizer:
