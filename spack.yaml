@@ -1,7 +1,7 @@
 # This is a Spack Environment file.
 #
 # Note that there is also a requirements.txt file to install some Python
-# dependencies that do not have Spack packages
+# dependencies that do not have Spack packages.
 spack:
   specs:
   # For FEniCSx part
@@ -27,6 +27,9 @@ spack:
   - py-arviz
   - py-jax
   - py-numpy
+
+  # Extra tools
+  - py-ruff
 
   view: true
   concretizer:

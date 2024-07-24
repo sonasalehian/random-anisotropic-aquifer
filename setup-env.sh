@@ -4,7 +4,7 @@
 source $SCRATCH/spack/share/spack/setup-env.sh
 spack env activate aquifer_env
 
-# Workarounds for broken Python module find
+# Workarounds for broken Python module find for gmsh
 export PYTHONPATH=$SPACK_ENV/.spack-env/view/lib64/:$PYTHONPATH
 
 # Output useful information at start of job
