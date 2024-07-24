@@ -15,15 +15,12 @@ The output is written in DOLFINx-compatible XDMF to `output/mesh/*`.
 This stochastic part of this study involves a Monte Carlo forward uncertainty
 analysis through a finite element model. This is only feasible on a HPC. The
 instructions below are designed around a HPC environment with SLURM and Spack
-available.
+available at `$SCRATCH/spack`.
 
 A Spack environment file `spack.yaml` is provided to install the basic
 dependencies.
 
-    spack env create aquifer_env spack.yml
-    spack env activate aquifer_env
-    spack install -j16 # Adjust build threads to your environment.
-    python -m pip install -r requirements.txt
+    sbatch build-enviroment.sh
 
 To quickly bring up the environment:
 

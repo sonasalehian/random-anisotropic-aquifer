@@ -28,9 +28,6 @@ spack:
   - py-jax
   - py-numpy
 
-  # Extra tools
-  - py-ruff
-
   view: true
   concretizer:
     unify: true
