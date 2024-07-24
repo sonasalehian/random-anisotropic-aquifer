@@ -4,9 +4,7 @@
 source $SCRATCH/spack/share/spack/setup-env.sh
 spack env activate aquifer_env
 
-# Workarounds for broken Python module find for gmsh
+# Workaround for broken Python module find for gmsh on uni.lu cluster
 export PYTHONPATH=$SPACK_ENV/.spack-env/view/lib64/:$PYTHONPATH
 
-# Output useful information at start of job
-spack env status
-scontrol show job $SLURM_JOB_ID
+# TODO: Add workaround for broken Python module find for adios2
