@@ -26,6 +26,15 @@ To quickly bring up the environment:
 
     . setup-env.sh
 
+### uni.lu MPI issue
+
+Running:
+
+    import mpi4py
+
+on the uni.lu HPC leads to `error: plugin_load_from_file`. This can be fixed
+by adding the  
+
 ### gmsh workaround (uni.lu)
 
 It is necessary to add the Python gmsh interface location to `PYTHONPATH` on
@@ -33,9 +42,13 @@ uni.lu HPC cluster as it is installed in `lib64/` not `lib/`.
 
     export PYTHONPATH=$SPACK_ENV/.spack-env/view/lib64/:$PYTHONPATH
 
+This fix is applied in `setup-env.sh`.
+
 ### adios2 workaroud (spack issue?)
 
 It seems necessary to add the Python adios2 interface location to `PYTHONPATH`
 as it is not found via Spack's venv integration.
+ 
+    export PYTHONPATH=$(find $SPACK_ENV/.spack-env -type d -name 'site-packages' | grep venv):$PYTHONPATH
 
-    export PYTHONPATH=$SPACK_ENV/.spack-env/view
+This fix is applied in `setup-env.sh`.

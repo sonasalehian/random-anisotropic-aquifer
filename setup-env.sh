@@ -7,4 +7,5 @@ spack env activate aquifer_sys
 # Workaround for broken Python module find for gmsh on uni.lu cluster
 export PYTHONPATH=$SPACK_ENV/.spack-env/view/lib64/:$PYTHONPATH
 
-# TODO: Add workaround for broken Python module find for adios2
+# Workaround for broken Python module find for adios2
+export PYTHONPATH=$(find $SPACK_ENV/.spack-env -type d -name 'site-packages' | grep venv):$PYTHONPATH
