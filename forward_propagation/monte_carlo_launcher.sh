@@ -7,7 +7,20 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --output=logs/%x-%j.out
 
+# Instructions on job sizing (aion).
+#
+# One run takes ~10 minutes on aion using 32 tasks (MPI ranks) per run.
+# One node (128 cores) can run 4x32 task jobs simultaneously.
+# Therefore one node can execute ~24 runs each hour.
+# Define the total number of runs (e.g. 2000) and the desired number of nodes
+# (e.g. 32 - max 64).
+# Wall time = 2000/(32 * 24) = 2.6 hours
+# 
+# Instructions on GNU parallel sizing (aion).
+#
+# The parameter passed to --jobs should be equal to (nodes*ntasks-per-node)/32.
+
 source ../setup-env.sh
 ../print-env.sh
 
-parallel --jobs 4 "srun -N 1 -n 32 python3 dummy_script.py {}" ::: {0..16} 
+parallel --jobs 4 "srun -N 1 -n 32 python3 dummy_script.py {}" ::: {0..7} 
