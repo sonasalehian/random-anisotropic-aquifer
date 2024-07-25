@@ -24,9 +24,6 @@
 source ../setup-env.sh
 ../print-env.sh
 
-PARALLEL_JOBLOG_FILE = "logs/${SLURM_JOB_NAME}-${SLURM_JOB_ID}-parallel.txt"
-SLURM_TASK_FILE = "logs/%x-%j.txt"
+PARALLEL_JOBLOG_FILE="logs/${SLURM_JOB_NAME}-${SLURM_JOB_ID}-parallel.txt"
 
-parallel --delay 0.2 --jobs 2 \
-  --resume-failed --joblog ${PARALLEL_JOBLOG_FILE} \
-  "srun --output=${SLURM_TASK_FILE} --exclusive -N 1 -n 32 python3 single_run.py {}" ::: {0..1}
+parallel --delay 0.2 --jobs 2 --joblog ${PARALLEL_JOBLOG_FILE} "srun --output=logs/%x-%j-{}.txt --exclusive -N 1 -n 32 python3 single_run.py {}" ::: {0..1}

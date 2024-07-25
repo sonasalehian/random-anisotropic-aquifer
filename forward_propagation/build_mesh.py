@@ -56,7 +56,7 @@ def create_mesh(parameters):
         bed = model.occ.addBox(0, 0, Lz1 + Lz2, Lx, Ly, Lz3)
         dry_well = model.occ.addCylinder(Lxw, Lyw, 0, 0, 0, Ld1, Lr)
         pumping_well = model.occ.addCylinder(Lxw, Lyw, Ld1, 0, 0, Ld2, Lr)
-        model_dim_tags = model.occ.cut(
+        model.occ.cut(
             [(3, aquitard), (3, aquifer), (3, bed)], [(3, dry_well), (3, pumping_well)]
         )
         model.occ.synchronize()
