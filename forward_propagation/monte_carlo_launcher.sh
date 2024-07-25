@@ -10,4 +10,4 @@
 source ../setup-env.sh
 ../print-env.sh
 
-parallel --jobs 4 "srun -N 1 -n 32 python3 -c 'from mpi4py import MPI; print(MPI.COMM_WORLD.size)'" ::: {0..3} 
+parallel --jobs 4 "srun -N 1 -n 32 python3 dummy_script.py {}" ::: {0..16} 
