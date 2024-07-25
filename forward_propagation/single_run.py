@@ -17,6 +17,6 @@ n = int(sys.argv[1])
 #parameters["k_yx_aqfr"] = k_flat[n, 2]
 #parameters["k_y_aqfr"] = k_flat[n, 3]
 
-parameters["output_dir"] = f"./output/randomr/run_{str(n).zfill(4)}"
+parameters["output_dir"] = f"output/run_{str(n).zfill(4)}"
 
 solve(parameters)
