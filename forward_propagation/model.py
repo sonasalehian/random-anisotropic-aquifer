@@ -23,9 +23,9 @@ def main():
     parameters = create_default_parameters()
     parameters["output_dir"] = "./output/single_run/"
     # NOTE: These are for fast testing - may not be sufficiently fine!
-    parameters["num_steps"] = 36
-    parameters["num_steps2"] = 36
-    parameters["output_every_n_steps"] = 6
+    #parameters["num_steps"] = 36
+    #parameters["num_steps2"] = 36
+    #parameters["output_every_n_steps"] = 6
 
     solve(parameters)
 

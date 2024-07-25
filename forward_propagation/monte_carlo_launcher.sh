@@ -1,14 +1,13 @@
 #!/bin/bash -l
-#SBATCH --job-name=checkpoint_parallel_r
-#SBATCH --output=logs/%x-%j.out
+#SBATCH --job-name=monte_carlo_runner
+#SBATCH --partition batch
+#SBATCH --time=00:10:00
 #SBATCH --nodes=1
+#SBATCH --ntasks-per-node=128
 #SBATCH --cpus-per-task=1
-#SBATCH --time=1-18:00:00
-#SBATCH --ntasks-per-node=28
-#SBATCH -p batch
-#SBATCH --mail-type=END,FAIL
-#SBATCH --mail-user
+#SBATCH --output=logs/%x-%j.out
 
-source setup-env.sh
+source ../setup-env.sh
+../print-env.sh
 
-parallel --jobs $JOBS_PER_NODE srun -n 14 -c 1 python3 random_ahc_tensor_checkpoint_r.py {} ::: {2200..2400}
+parallel --jobs 4 srun -n 32 python3 single_run.py {} ::: {0..4} 

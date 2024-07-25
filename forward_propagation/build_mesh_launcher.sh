@@ -1,6 +1,6 @@
 #!/bin/bash -l
 #SBATCH --job-name=build_mesh
-#SBATCH -p batch
+#SBATCH --partition batch
 #SBATCH --time=00:02:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
