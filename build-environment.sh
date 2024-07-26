@@ -10,6 +10,8 @@ set -e
 
 source $HOME/spack/share/spack/setup-env.sh
 
+./print-env.sh
+
 spack env create aquifer_sys spack.yaml
 spack env activate aquifer_sys
 spack concretize

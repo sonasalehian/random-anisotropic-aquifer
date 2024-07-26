@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Original histogram data (bin edges and frequencies)
-bin_edges_original = np.array([90, 100, 110, 120, 130, 140])
-frequencies_original = np.array([9, 14, 4, 22, 4])
+bin_edges_original = np.array([90, 100, 110, 120, 130, 140], dtype=np.float64)
+frequencies_original = np.array([9, 14, 4, 22, 4], dtype=np.int64)
 
 
 # Generate random data based on the original histogram
@@ -25,7 +25,7 @@ generated_data = generate_data_from_histogram(
 )
 
 # Save generated data
-np.save("../output/data/generated_data_from_rose_diagram.npy", generated_data)
+np.save("output/rose_diagram.npy", generated_data)
 
 # Validate generated data
 # Compare summary statistics (mean, standard deviation)
@@ -38,7 +38,7 @@ print(
 
 # Plot original histogram
 plt.figure(figsize=(10, 5))
-plt.subplot(1, 2, 1)
+lt.subplot(1, 2, 1)
 plt.bar(
     bin_edges_original[:-1],
     frequencies_original,
@@ -62,4 +62,4 @@ plt.title("Histogram of Generated Data")
 plt.legend()
 
 plt.tight_layout()
-plt.savefig("../output/plots/von-mises-fisher-fit/histogram_regenerated_data.png")  # save as png
+plt.savefig("../output/histogram_regenerated_data.pdf")
