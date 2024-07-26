@@ -19,5 +19,5 @@ spack install -j16
 pip install -r requirements.txt
 
 # Apply patch to mpi4py
-INIT_FILE = $(find $SPACK_ENV/.spack-env -type f -name '__init__.py' | grep mpi4py)
-patch -u $INIT_FILE -i mpi4py-patch-unilu.patch
+INIT_FILE=$(find -L ${SPACK_ENV}/.spack-env/view/lib -type f -name '__init__.py' | grep "mpi4py/__init__.py")
+patch --folow-symlinks -u $INIT_FILE -i mpi4py-patch-unilu.patch
