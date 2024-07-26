@@ -5,6 +5,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=32
 #SBATCH --output=logs/%x-%j.out
+set -e
 
 source ../setup-env.sh
 ../print-env.sh

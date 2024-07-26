@@ -1,6 +1,8 @@
 #!/bin/bash -l
 # This file is sourced at the start of job launch scripts and can be adjusted
 # to your environment.
+set -e
+
 source $HOME/spack/share/spack/setup-env.sh
 spack env activate -p ./spack_env
 

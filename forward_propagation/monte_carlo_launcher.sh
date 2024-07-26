@@ -6,6 +6,7 @@
 #SBATCH --ntasks-per-node=128
 #SBATCH --cpus-per-task=1
 #SBATCH --output=logs/%x-%j.out
+set -e
 
 # TODO: Automate this.
 # Instructions on job sizing (aion).

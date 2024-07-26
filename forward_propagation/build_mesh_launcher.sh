@@ -6,6 +6,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --output=logs/%x-%j.out
+set -e
 
 source ../setup-env.sh
 ../print-env.sh
