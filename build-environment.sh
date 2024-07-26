@@ -1,10 +1,10 @@
 #!/bin/bash -l
-#SBATCH -p batch
+#SBATCH --job-name=build-environment
+#SBATCH --partition batch
 #SBATCH --time=0-4:00:00
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=1
 #SBATCH --ntasks-per-node=16
-#SBATCH --job-name=build-environment
+#SBATCH --cpus-per-task=1
 #SBATCH --output=logs/%x-%j.out
 set -e
 
