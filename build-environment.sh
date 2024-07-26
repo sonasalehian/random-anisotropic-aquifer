@@ -12,8 +12,8 @@ source $HOME/spack/share/spack/setup-env.sh
 
 ./print-env.sh
 
-spack env create aquifer_sys spack.yaml
-spack env activate aquifer_sys
+spack env activate --create ./spack_env
+cp spack.yaml spack_env/
 spack concretize
 spack install -j16
 pip install -r requirements.txt
