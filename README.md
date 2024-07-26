@@ -15,7 +15,7 @@ The output is written in DOLFINx-compatible XDMF to `output/mesh/*`.
 This stochastic part of this study involves a Monte Carlo forward uncertainty
 analysis through a finite element model. This is only feasible on a HPC. The
 instructions below are designed around a HPC environment with SLURM and Spack
-available at `$SCRATCH/spack`.
+`v0.22` available at `$HOME/spack`.
 
 A Spack environment file `spack.yaml` is provided to install the basic
 dependencies.

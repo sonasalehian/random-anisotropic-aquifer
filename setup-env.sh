@@ -1,7 +1,7 @@
 #!/bin/bash -l
 # This file is sourced at the start of job launch scripts and can be adjusted
 # to your environment.
-source $SCRATCH/spack/share/spack/setup-env.sh
+source $HOME/spack/share/spack/setup-env.sh
 spack env activate -p aquifer_sys
 
 # Workaround for broken Python module find for gmsh on uni.lu cluster
