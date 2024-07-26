@@ -8,7 +8,7 @@
 #SBATCH --output=logs/%x-%j.out
 set -e
 
-source $SCRATCH/spack/share/spack/setup-env.sh
+source $HOME/spack/share/spack/setup-env.sh
 
 spack env create aquifer_sys spack.yaml
 spack env activate aquifer_sys
