@@ -1,3 +1,4 @@
 adios4dolfinx@git+https://github.com/jorgensd/adios4dolfinx.git@v0.8.2
 numpyro@git+https://github.com/pyro-ppl/numpyro.git@0.15.1
 ruff
+arviz

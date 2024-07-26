@@ -24,7 +24,6 @@ spack:
   # For numpyro part 
   - py-pip
   - py-matplotlib
-  - py-arviz
   - py-jax
   - py-numpy
 
