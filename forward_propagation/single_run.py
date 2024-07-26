@@ -1,4 +1,5 @@
 import sys
+import os
 
 from default_parameters import create_default_parameters
 from model import solve
@@ -16,6 +17,6 @@ n = int(sys.argv[1])
 # parameters["k_yx_aqfr"] = k_flat[n, 2]
 # parameters["k_y_aqfr"] = k_flat[n, 3]
 
-parameters["output_dir"] = f"output/run_{str(n).zfill(4)}"
+parameters["output_dir"] = f"{os.getenv('SCRATCH')}/stochastic_model/forward_propagation/output/run_{str(n).zfill(4)}"
 
 solve(parameters)
