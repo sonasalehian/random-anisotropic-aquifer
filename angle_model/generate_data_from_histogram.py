@@ -19,7 +19,7 @@ def generate_data_from_histogram(bin_edges, frequencies, num_samples):
 
 
 # Generate data
-num_samples_generated = 100
+num_samples_generated = 1000
 generated_data = generate_data_from_histogram(
     bin_edges_original, frequencies_original, num_samples_generated
 )
@@ -38,7 +38,7 @@ print(
 
 # Plot original histogram
 plt.figure(figsize=(10, 5))
-lt.subplot(1, 2, 1)
+plt.subplot(1, 2, 1)
 plt.bar(
     bin_edges_original[:-1],
     frequencies_original,
@@ -62,4 +62,4 @@ plt.title("Histogram of Generated Data")
 plt.legend()
 
 plt.tight_layout()
-plt.savefig("../output/histogram_regenerated_data.pdf")
+plt.savefig("output/histogram_regenerated_data.pdf")
