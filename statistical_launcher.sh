@@ -1,10 +1,10 @@
 #!/bin/bash -l
-#SBATCH --job-name=statistical_analysis_r
+#SBATCH --job-name=statistical_analysis_std
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
 #SBATCH --time=1-18:00:00
-#SBATCH --ntasks-per-node=28
+#SBATCH --ntasks-per-node=1
 #SBATCH -p batch
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=sona.salehian.001@student.uni.lu
@@ -20,6 +20,6 @@ export JOBS_PER_NODE=$(( $SLURM_CPUS_ON_NODE / $SLURM_CPUS_PER_TASK ))
 
 spack env status
 scontrol show job $SLURM_JOB_ID
-echo"2200-2400"
+echo "0-7999"
 
-srun -c 1 python3 statistical_analysis_checkpoints.py
+srun -c 1 python3 statistical_analysis_checkpoints_std.py

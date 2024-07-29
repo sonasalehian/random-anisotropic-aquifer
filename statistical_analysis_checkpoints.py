@@ -32,8 +32,6 @@ submesh = adios4dolfinx.read_mesh(
 U_sub = dolfinx.fem.functionspace(submesh, basix.ufl.element("Lagrange", "tetrahedron", 1))
 print(U_sub.dofmap.index_map.size_local)
 print(U_sub.dofmap.index_map.num_ghosts)
-u_loss = [dolfinx.fem.Function(U_sub) for _ in range(n_0, n_outputs)]
-print(len(u_loss))
 u_los = dolfinx.fem.Function(U_sub)
 u_los_mean = dolfinx.fem.Function(U_sub)
 
@@ -46,7 +44,7 @@ adios4dolfinx.write_mesh(submesh, filename_mean)
 for i in range(num_steps):
     t += dt
     if (i+1) % 20 == 0:
-        # print("time_step:", i)
+        print("time_step:", i)
         u_los_mean.x.array[:] = 0
         for n in range(n_0, n_outputs+1):
             # print("n:", n)
@@ -63,7 +61,7 @@ for i in range(num_steps):
 for i in range(num_steps2):
     t += dt2
     if (i+1) % 20 == 0:
-        # print("time_step:", i)
+        print("time_step:", i)
         u_los_mean.x.array[:] = 0
         for n in range(n_0, n_outputs+1):
             u_los.name = "u_n_sub"
