@@ -29,6 +29,7 @@ def plot_rose_diagram(random_angles):
     ax.set_thetamax(180)
     ax.set_thetagrids(np.arange(90,181,10))
     ax.set_rgrids([1000,2000,3000], labels=[])
+    # ax.set_rgrids([10,20,30,40], labels=[])
     ax.set_theta_direction(-1)
 
     # project strike distribution as histogram bars
