@@ -25,7 +25,7 @@ y_obs = jnp.radians(y_obs)
 random_seed = jnp.frombuffer(os.urandom(8), dtype=jnp.int64)[0]
 # random_seed = 584479765808204282  # Seed for reproducing the results
 print(f"Random seed: {random_seed}")
-np.save("output/random_seed.npy", random_seed)
+np.save("output/random_seed_von_mises_fixture_mixture.npy", random_seed)
 key, subkey = random.split(random.PRNGKey(random_seed))
 
 
