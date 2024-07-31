@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import scienceplots
+
+plt.style.use(['science'])
 
 # Original histogram data (bin edges and frequencies)
 bin_edges_original = np.array([90, 100, 110, 120, 130, 140], dtype=np.float64)
