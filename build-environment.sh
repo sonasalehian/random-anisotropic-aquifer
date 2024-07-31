@@ -20,4 +20,4 @@ pip install -r requirements.txt
 
 # Apply patch to mpi4py
 INIT_FILE=$(find -L ${SPACK_ENV}/.spack-env/view/lib -type f -name '__init__.py' | grep "mpi4py/__init__.py")
-patch --folow-symlinks -u $INIT_FILE -i mpi4py-patch-unilu.patch
+patch --follow-symlinks -u $INIT_FILE -i mpi4py-patch-unilu.patch
