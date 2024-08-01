@@ -1,34 +1,40 @@
 import os
 
+import arviz as az
 import jax.numpy as jnp
 import jax.random as random
+import matplotlib.pyplot as plt
 import numpy as np
 import numpyro
-import arviz as az
-import matplotlib.pyplot as plt
 import numpyro.distributions as dist
 import numpyro.infer.reparam
 import scienceplots
-from numpyro.infer import Predictive
+import sys
+sys.path.insert(0, "../postprocessing")
+from rose_diagram import plot_rose_diagram, extract_bar_parameters
 from jax import config
-
+from numpyro.infer import Predictive
 
 plt.style.use(['science'])
+
 config.update("jax_enable_x64", True)
 NUM_CHAINS = 4
 numpyro.set_host_device_count(NUM_CHAINS)
 
-# Load generated data from rose diagram as obseration
+# parameters:
+num_warmup = 2000
+num_samples = 20000
+num_models = 4
+
+# # Load generated data from rose diagram as observation
 y_obs = np.load("output/rose_diagram.npy")
 y_obs = jnp.radians(y_obs)
 
 # Required random seeds
 # random_seed = jnp.frombuffer(os.urandom(8), dtype=jnp.int64)[0]
-random_seed = -4980610957694664259  # Seed for reproducing the results
-print(f"Random seed: {random_seed}")
-np.save("output/random_seed_von_mises_fixture_mixture.npy", random_seed)
-key, subkey = random.split(random.PRNGKey(random_seed))
-
+random_seed = -167652586371646984  # Seed for reproducing the results
+print(random_seed)
+np.save("output/random_seed_model_selection.npy", random_seed)
 
 @numpyro.handlers.reparam(
     config={
@@ -58,11 +64,11 @@ def model(y_obs=None):
         _ = numpyro.sample("y", dist.MixtureGeneral(mix, [vm_1, vm_2]), obs=y_obs)
 
 
-key, subkey = random.split(random.PRNGKey(random_seed))
-del subkey
-
 nuts_kernel = numpyro.infer.NUTS(model)
-mcmc = numpyro.infer.MCMC(nuts_kernel, num_warmup=5000, num_samples=50000, num_chains=NUM_CHAINS)
+mcmc = numpyro.infer.MCMC(
+    nuts_kernel, num_warmup=num_warmup, num_samples=num_samples, num_chains=NUM_CHAINS
+)
+key = random.PRNGKey(random_seed)
 key, *subkey = random.split(key, NUM_CHAINS + 1)
 mcmc.run(jnp.array(subkey), y_obs=y_obs)
 del subkey
@@ -72,10 +78,6 @@ posterior_predictive = Predictive(model, posterior_samples=posterior_samples)
 key, subkey = random.split(key)
 posterior_predictive_samples = posterior_predictive(subkey)
 del subkey
-np.save("output/random_rotation_angle.npy", posterior_predictive_samples["y"][::25].flatten())
-
-print(posterior_predictive_samples["y"][::25].flatten())
-print(len(posterior_predictive_samples["y"][::25].flatten()))
 
 data = az.from_numpyro(
     posterior=mcmc,
@@ -90,21 +92,14 @@ np.savetxt(file_name, summary, delimiter=",")
 
 # Plot mu_1 and mu_2 distributions
 az.plot_trace(data, var_names=["mu_1", "mu_2"])
-plt.show()
+plt.savefig("output/plot_trace_2vm.pdf")
 
-plt.hist(
-    posterior_predictive_samples["y"][::50].flatten(),
-    density=True,
-    bins=30,
-    alpha=0.5,
-    label="posterior predictive",
-)
-plt.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
-plt.title("Mixture of two von-Mises model")
-plt.xlabel("Rotation angle")
-plt.ylabel("Density")
-plt.legend()
-plt.xlim(1.3, 2.7)
-plt.ylim(0.0, 4.2)
-plt.tight_layout()
-plt.savefig("output/fitted_model.pdf")
+# --- save smaples of mixture of 2 vm model ---
+random_rotation_angles = posterior_predictive_samples["y"][::10].flatten()
+print(len(random_rotation_angles))
+np.save("output/random_rotation_angle.npy", random_rotation_angles)
+
+# Plot rose diagram of random rotation angles
+theta, count = extract_bar_parameters(random_angles=random_rotation_angles)
+plot_rose_diagram(theta, count)
+plt.savefig('output/rose_diagram_random_rotation_angle.pdf')

@@ -8,16 +8,19 @@ import numpy as np
 import numpyro
 import numpyro.distributions as dist
 import numpyro.infer.reparam
+import scienceplots
 from jax import config
 from numpyro.infer import Predictive
+
+plt.style.use(['science'])
 
 config.update("jax_enable_x64", True)
 NUM_CHAINS = 4
 numpyro.set_host_device_count(NUM_CHAINS)
 
 # parameters:
-num_warmup = 1000
-num_samples = 9000
+num_warmup = 2000
+num_samples = 20000
 num_models = 4
 
 # # Load generated data from rose diagram as observation
@@ -25,8 +28,8 @@ y_obs = np.load("output/rose_diagram.npy")
 y_obs = jnp.radians(y_obs)
 
 # Required random seeds
-random_seed = jnp.frombuffer(os.urandom(8), dtype=jnp.int64)[0]
-# random_seed = -2348937356786479415  # Seed for reproducing the results
+# random_seed = jnp.frombuffer(os.urandom(8), dtype=jnp.int64)[0]
+random_seed = -4980610957694664259  # Seed for reproducing the results
 print(random_seed)
 np.save("output/random_seed_model_selection.npy", random_seed)
 
@@ -39,7 +42,7 @@ def model1(y_obs=None):
 
     # Non-informative prior
     mu = numpyro.sample(
-        "mu", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(90) ** 2)
+        "mu", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(180) ** 2)
     )
 
     with numpyro.plate("y_obs", len(y_obs) if y_obs is not None else 1):
@@ -83,10 +86,10 @@ def model2(y_obs=None):
 
     # Non-informative prior
     mu_1 = numpyro.sample(
-        "mu_1", dist.VonMises(loc=jnp.radians(-60), concentration=1 / jnp.radians(60) ** 2)
+        "mu_1", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(180) ** 2)
     )
     mu_2 = numpyro.sample(
-        "mu_2", dist.VonMises(loc=jnp.radians(60), concentration=1 / jnp.radians(60) ** 2)
+        "mu_2", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(180) ** 2)
     )
 
     vm_1 = dist.VonMises(loc=mu_1, concentration=kappa_1)
@@ -137,13 +140,13 @@ def model3(y_obs=None):
 
     # Non-informative prior
     mu_01 = numpyro.sample(
-        "mu_01", dist.VonMises(loc=jnp.radians(-90), concentration=1 / jnp.radians(40) ** 2)
+        "mu_01", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(180) ** 2)
     )
     mu_02 = numpyro.sample(
-        "mu_02", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(40) ** 2)
+        "mu_02", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(180) ** 2)
     )
     mu_03 = numpyro.sample(
-        "mu_03", dist.VonMises(loc=jnp.radians(90), concentration=1 / jnp.radians(40) ** 2)
+        "mu_03", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(180) ** 2)
     )
 
     vm_01 = dist.VonMises(loc=mu_01, concentration=kappa_01)
@@ -180,6 +183,7 @@ print(summary3)
 
 # --- Comparison ---
 
+
 waic1 = az.waic(data1, var_name="y")
 print(waic1)
 waic2 = az.waic(data2, var_name="y")
@@ -208,55 +212,59 @@ df_comp_waic = az.compare(
 )
 print(df_comp_waic)
 
-# Compare posterior of 4 models
-
-fig, axs = plt.subplots(3, 1, figsize=(8, 12))
-
 # Plot posterior predictive samples for model 1
-axs[0].hist(
+fig1, ax1 = plt.subplots(figsize=(4, 3))
+ax1.hist(
     posterior_predictive_samples1["y"][::20].flatten(),
     density=True,
     bins=30,
     alpha=0.5,
     label="Posterior Predictive (Simple)",
 )
-axs[0].hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
+ax1.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
+ax1.set_xlabel("Rotation angle")
+ax1.set_ylabel("Density")
+ax1.set_xlim(1.3, 2.7)
+ax1.set_ylim(0.0, 4.2)
+ax1.legend()
+fig1.tight_layout()
+fig1.savefig("output/posterior_predictive_compare_models_simple.pdf")
 
 # Plot posterior predictive samples for model 2
-axs[1].hist(
+fig2, ax2 = plt.subplots(figsize=(4, 3))
+ax2.hist(
     posterior_predictive_samples2["y"][::20].flatten(),
     density=True,
     bins=30,
     alpha=0.5,
     label="Posterior Predictive (2VM)",
 )
-axs[1].hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
+ax2.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
+ax2.set_xlabel("Rotation angle")
+ax2.set_ylabel("Density")
+ax2.set_xlim(1.3, 2.7)
+ax2.set_ylim(0.0, 4.2)
+ax2.legend()
+fig2.tight_layout()
+fig2.savefig("output/posterior_predictive_compare_models_2vm.pdf")
 
 # Plot posterior predictive samples for model 3
-axs[2].hist(
+fig3, ax3 = plt.subplots(figsize=(4, 3))
+ax3.hist(
     posterior_predictive_samples3["y"][::20].flatten(),
     density=True,
     bins=30,
     alpha=0.5,
     label="Posterior Predictive (3VM)",
 )
-axs[2].hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
-
-# Set common x and y labels
-for ax in axs.flat:
-    ax.set_xlabel("Rotation angle")
-    ax.set_ylabel("Density")
-
-axs[0].legend()
-axs[1].legend()
-axs[2].legend()
-
-for ax in axs:
-    ax.set_xlim(1.3, 2.7)
-    ax.set_ylim(0.0, 4.2)
-
-plt.tight_layout()
-plt.show()
+ax3.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
+ax3.set_xlabel("Rotation angle")
+ax3.set_ylabel("Density")
+ax3.set_xlim(1.3, 2.7)
+ax3.set_ylim(0.0, 4.2)
+ax3.legend()
+fig3.tight_layout()
+fig3.savefig("output/posterior_predictive_compare_models_3vm.pdf")
 
 az.plot_compare(df_comp_loo, insample_dev=False)
 plt.gcf().set_size_inches(10, 6)  # Adjust size as needed
