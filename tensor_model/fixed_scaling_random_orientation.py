@@ -29,16 +29,16 @@ def plot_angle_distribution(random_angles):
     plt.title("Random Rotation Angles from von Mises Distribution")
     plt.xlabel("Angle (radian)")
     plt.ylabel("Frequency")
-    plt.savefig("output/plots/rotation_angle_distribution.png")  # save as png
+    plt.savefig("output/rotation_angle_distribution.pdf")
 
 
-random_angles = np.load("./output/data/random_rotation_angle.npy")
+random_angles = np.load("../random_angle/output/random_rotation_angle.npy")
 num_samples = len(random_angles)
 random_angles = random_angles - np.radians(110.0)
 plot_angle_distribution(random_angles)
 
 plot_rose_diagram(random_angles=random_angles)
-plt.savefig("output/plots/rotation_angle_distribution_circular.png")  # save as png
+plt.savefig("output/plots/rotation_angle_distribution_circular.pdf")
 
 k_initial = np.array([[parameters["k_x_aqfr"], 0], [0, parameters["k_y_aqfr"]]])
 R = [np.empty((2, 2)) for _ in range(num_samples)]
@@ -49,7 +49,7 @@ for i, angle in enumerate(random_angles):
     k[i] = R @ (k_initial @ np.transpose(R))
 
 # Save the random hydraulic conductivity tensor
-file_name = "output/data/ahct_random_rotation.npy"
+file_name = "output/fixed_scaling_random_rotation.npy"
 
 if os.path.exists(file_name):
     os.remove(file_name)

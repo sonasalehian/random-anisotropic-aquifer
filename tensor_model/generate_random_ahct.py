@@ -42,24 +42,24 @@ def write_result(hydraulic_conductivity, file_name):
     np.save(file_name, hydraulic_conductivity)
     print(f"Random values have been saved to {file_name}")
 
+num_samples = 8000
 
 # -----------------Step 1: random AHC tensor with random scaling -------------------
 # Initialize variables
 mu_1 = parameters["k_x_aqfr"]  # Mean for first eigenvalue
 mu_2 = parameters["k_y_aqfr"]  # Mean for second eigenvalue
 std = 0.08  # Standard deviation for distribution
-num_samples = 8000
 
 eigenvalues = generating_random_scaling(mu_1, mu_2, std, num_samples)
 k_s = eigenvalues
 
 # Save the random values
-file_name = "output/data/ahct_random_scaling.npy"
+file_name = "output/random_scaling.npy"
 write_result(k_s, file_name)
 
 # -----------------Step 2: random AHC tensor with random orientation -------------------
 # Load generated random rotation angle
-random_angles = np.load("./output/data/random_rotation_angle.npy")
+random_angles = np.load("output/random_scaling_rotation.npy")
 random_angles = random_angles - np.radians(110.0)
 
 # Fixed scaling
@@ -69,11 +69,11 @@ fixed_eigenvalues = np.tile(k_initial, (num_samples, 1))
 
 k_r = generating_random_rotation(random_angles, fixed_eigenvalues)
 
-file_name = "output/data/ahct_random_rotation.npy"
+file_name = "output/random_rotation.npy"
 write_result(np.array(k_r).reshape(num_samples, -1), file_name)
 
 # -----------------Step 3: random AHC tensor with random scaling and orientation -------------------
 k_sr = generating_random_rotation(random_angles, eigenvalues)
 
-file_name = "output/data/ahct_random_scaling_and_rotation.npy"
+file_name = "output/data/random_scaling_and_rotation.npy"
 write_result(np.array(k_sr).reshape(num_samples, -1), file_name)

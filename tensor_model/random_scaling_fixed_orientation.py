@@ -98,13 +98,13 @@ hydraulic_conductivity, lambda_1, lambda_2 = generating_random_eigenvalues(
     mu_1, mu_2, std, num_samples
 )
 
-filename_1 = "output/plots/Distribution_xx.png"
-filename_2 = "output/plots/Distribution_yy.png"
+filename_1 = "output/distribution_xx.pdf"
+filename_2 = "output/distribution_yy.pdf"
 
 plot_result(lambda_1, lambda_2, filename_1, filename_2)
 
 # Save the random values to a CSV file
-file_name = "output/data/ahct_random_scaling.npy"
+file_name = "output/random_scaling_fixed_orientation.npy"
 
 write_result(hydraulic_conductivity, file_name)
 

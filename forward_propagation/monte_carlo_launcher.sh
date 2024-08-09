@@ -20,7 +20,8 @@ set -e
 # 
 # Instructions on GNU parallel sizing (aion).
 #
-# The parameter passed to --jobs should be equal to (nodes*ntasks-per-node)/32.
+# The parameter passed to --jobs should be equal to
+# (nodes*jobs per node)/(mpi ranks per run).
 
 source ../setup-env.sh
 ../print-env.sh
