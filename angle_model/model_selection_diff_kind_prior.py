@@ -19,8 +19,8 @@ NUM_CHAINS = 4
 numpyro.set_host_device_count(NUM_CHAINS)
 
 # parameters:
-num_warmup = 2000
-num_samples = 20000
+num_warmup = 1000
+num_samples = 9000
 num_models = 4
 
 # # Load generated data from rose diagram as observation
@@ -33,27 +33,37 @@ random_seed = -4980610957694664259  # Seed for reproducing the results
 print(random_seed)
 np.save("output/random_seed_model_selection.npy", random_seed)
 
-# --- Model 1 ---
 
+# ---------------------------------------Model1---------------------------------------------
 
-@numpyro.handlers.reparam(config={"mu": numpyro.infer.reparam.CircularReparam()})
+@numpyro.handlers.reparam(
+    config={"mu_001": numpyro.infer.reparam.CircularReparam(), 
+            "mu_002": numpyro.infer.reparam.CircularReparam()})
+
 def model1(y_obs=None):
-    kappa = numpyro.sample("kappa", dist.Gamma(20.0, 0.1))
+    kappa_001 = numpyro.sample("kappa_001", dist.Gamma(20.0, 0.1))
+    kappa_002 = numpyro.sample("kappa_002", dist.Gamma(20.0, 0.1))
 
     # Non-informative prior
-    mu = numpyro.sample(
-        "mu", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(180) ** 2)
-    )
+    mu_001 = numpyro.sample("mu_001", dist.VonMises(loc=jnp.radians(0), concentration=1/jnp.radians(180)**2))
+    mu_002 = numpyro.sample("mu_002", dist.VonMises(loc=jnp.radians(0), concentration=1/jnp.radians(180)**2))
+    
+    vm_001 = dist.VonMises(loc=mu_001, concentration=kappa_001)
+    vm_002 = dist.VonMises(loc=mu_002, concentration=kappa_002)
+
+    mix_weights = numpyro.sample("mix_weights", dist.Dirichlet(jnp.ones((2,))))
+    mix_00 = dist.Categorical(mix_weights)
 
     with numpyro.plate("y_obs", len(y_obs) if y_obs is not None else 1):
-        _ = numpyro.sample("y", dist.VonMises(loc=mu, concentration=kappa), obs=y_obs)
+        _ = numpyro.sample("y", dist.MixtureGeneral(mix_00, [vm_001, vm_002]), obs=y_obs)
 
+key, subkey = random.split(random.PRNGKey(random_seed))
+del subkey
 
 nuts_kernel1 = numpyro.infer.NUTS(model1)
 mcmc1 = numpyro.infer.MCMC(
     nuts_kernel1, num_warmup=num_warmup, num_samples=num_samples, num_chains=NUM_CHAINS
 )
-key = random.PRNGKey(random_seed)
 key, *subkey = random.split(key, NUM_CHAINS + 1)
 mcmc1.run(jnp.array(subkey), y_obs=y_obs)
 del subkey
@@ -71,27 +81,21 @@ data1 = az.from_numpyro(
 summary1 = az.summary(data1)
 print(summary1)
 
-# --- Model 2 ---
 
+# ---------------------------------------Model2---------------------------------------------
 
 @numpyro.handlers.reparam(
-    config={
-        "mu_1": numpyro.infer.reparam.CircularReparam(),
-        "mu_2": numpyro.infer.reparam.CircularReparam(),
-    }
-)
+    config={"mu_1": numpyro.infer.reparam.CircularReparam(), 
+            "mu_2": numpyro.infer.reparam.CircularReparam()})
+
 def model2(y_obs=None):
     kappa_1 = numpyro.sample("kappa_1", dist.Gamma(20.0, 0.1))
     kappa_2 = numpyro.sample("kappa_2", dist.Gamma(20.0, 0.1))
 
     # Non-informative prior
-    mu_1 = numpyro.sample(
-        "mu_1", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(180) ** 2)
-    )
-    mu_2 = numpyro.sample(
-        "mu_2", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(180) ** 2)
-    )
-
+    mu_1 = numpyro.sample("mu_1", dist.VonMises(loc=jnp.radians(-60), concentration=1/jnp.radians(60)**2))
+    mu_2 = numpyro.sample("mu_2", dist.VonMises(loc=jnp.radians(60), concentration=1/jnp.radians(60)**2))
+    
     vm_1 = dist.VonMises(loc=mu_1, concentration=kappa_1)
     vm_2 = dist.VonMises(loc=mu_2, concentration=kappa_2)
 
@@ -101,6 +105,8 @@ def model2(y_obs=None):
     with numpyro.plate("y_obs", len(y_obs) if y_obs is not None else 1):
         _ = numpyro.sample("y", dist.MixtureGeneral(mix, [vm_1, vm_2]), obs=y_obs)
 
+key, subkey = random.split(random.PRNGKey(random_seed))
+del subkey
 
 nuts_kernel2 = numpyro.infer.NUTS(model2)
 mcmc2 = numpyro.infer.MCMC(
@@ -123,42 +129,31 @@ data2 = az.from_numpyro(
 summary2 = az.summary(data2)
 print(summary2)
 
-# --- Model 3 ---
-
+# ---------------------------------------Model3---------------------------------------------
 
 @numpyro.handlers.reparam(
-    config={
-        "mu_01": numpyro.infer.reparam.CircularReparam(),
-        "mu_02": numpyro.infer.reparam.CircularReparam(),
-        "mu_03": numpyro.infer.reparam.CircularReparam(),
-    }
-)
+    config={"mu_01": numpyro.infer.reparam.CircularReparam(), 
+            "mu_02": numpyro.infer.reparam.CircularReparam()})
+
 def model3(y_obs=None):
     kappa_01 = numpyro.sample("kappa_01", dist.Gamma(20.0, 0.1))
     kappa_02 = numpyro.sample("kappa_02", dist.Gamma(20.0, 0.1))
-    kappa_03 = numpyro.sample("kappa_03", dist.Gamma(20.0, 0.1))
 
-    # Non-informative prior
-    mu_01 = numpyro.sample(
-        "mu_01", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(180) ** 2)
-    )
-    mu_02 = numpyro.sample(
-        "mu_02", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(180) ** 2)
-    )
-    mu_03 = numpyro.sample(
-        "mu_03", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(180) ** 2)
-    )
-
+    # Informative prior
+    mu_01 = numpyro.sample("mu_01", dist.VonMises(loc=jnp.radians(105), concentration=1/jnp.radians(10)**2))
+    mu_02 = numpyro.sample("mu_02", dist.VonMises(loc=jnp.radians(125), concentration=1/jnp.radians(10)**2))
+    
     vm_01 = dist.VonMises(loc=mu_01, concentration=kappa_01)
     vm_02 = dist.VonMises(loc=mu_02, concentration=kappa_02)
-    vm_03 = dist.VonMises(loc=mu_03, concentration=kappa_03)
 
-    mix_weights = numpyro.sample("mix_weights", dist.Dirichlet(jnp.ones((3,))))
+    mix_weights = numpyro.sample("mix_weights", dist.Dirichlet(jnp.ones((2,))))
     mix_0 = dist.Categorical(mix_weights)
 
     with numpyro.plate("y_obs", len(y_obs) if y_obs is not None else 1):
-        _ = numpyro.sample("y", dist.MixtureGeneral(mix_0, [vm_01, vm_02, vm_03]), obs=y_obs)
+        _ = numpyro.sample("y", dist.MixtureGeneral(mix_0, [vm_01, vm_02]), obs=y_obs)
 
+key, subkey = random.split(random.PRNGKey(random_seed))
+del subkey
 
 nuts_kernel3 = numpyro.infer.NUTS(model3)
 mcmc3 = numpyro.infer.MCMC(
@@ -181,8 +176,8 @@ data3 = az.from_numpyro(
 summary3 = az.summary(data3)
 print(summary3)
 
-# --- Comparison ---
 
+# ------------------------------------------Comparison-----------------------------------------------
 
 waic1 = az.waic(data1, var_name="y")
 print(waic1)
@@ -194,84 +189,82 @@ print(waic3)
 print("Compare results:")
 df_comp_loo = az.compare(
     {
-        "simple_model": data1,
-        "mixture_model_2vm": data2,
-        "mixture_model_3vm": data3,
+        "non-informative_prior": data1,
+        "weakly-informative_prior": data2,
+        "informative_prior": data3,
     },
     var_name="y",
 )
 print(df_comp_loo)
 df_comp_waic = az.compare(
     {
-        "simple_model": data1,
-        "mixture_model_2vm": data2,
-        "mixture_model_3vm": data3,
+        "non-informative_prior": data1,
+        "weakly-informative_prior": data2,
+        "informative_prior": data3,
     },
     var_name="y",
     ic="waic",
 )
 print(df_comp_waic)
 
+# Compare posterior of 4 models
+
+fig, axs = plt.subplots(3, 1, figsize=(8, 12))
+
 # Plot posterior predictive samples for model 1
-fig1, ax1 = plt.subplots(figsize=(4, 3))
-ax1.hist(
+axs[0].hist(
     posterior_predictive_samples1["y"][::20].flatten(),
     density=True,
     bins=30,
     alpha=0.5,
-    label="Posterior Predictive (Simple)",
+    label="Posterior Predictive (non-informative)",
 )
-ax1.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
-ax1.set_xlabel("Rotation angle")
-ax1.set_ylabel("Density")
-ax1.set_xlim(1.3, 2.7)
-ax1.set_ylim(0.0, 4.2)
-ax1.legend()
-fig1.tight_layout()
-fig1.savefig("output/posterior_predictive_compare_models_simple.pdf")
+axs[0].hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
 
 # Plot posterior predictive samples for model 2
-fig2, ax2 = plt.subplots(figsize=(4, 3))
-ax2.hist(
+axs[1].hist(
     posterior_predictive_samples2["y"][::20].flatten(),
     density=True,
     bins=30,
     alpha=0.5,
-    label="Posterior Predictive (2VM)",
+    label="Posterior Predictive (weakly-informative)",
 )
-ax2.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
-ax2.set_xlabel("Rotation angle")
-ax2.set_ylabel("Density")
-ax2.set_xlim(1.3, 2.7)
-ax2.set_ylim(0.0, 4.2)
-ax2.legend()
-fig2.tight_layout()
-fig2.savefig("output/posterior_predictive_compare_models_2vm.pdf")
+axs[1].hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
 
 # Plot posterior predictive samples for model 3
-fig3, ax3 = plt.subplots(figsize=(4, 3))
-ax3.hist(
+axs[2].hist(
     posterior_predictive_samples3["y"][::20].flatten(),
     density=True,
     bins=30,
     alpha=0.5,
-    label="Posterior Predictive (3VM)",
+    label="Posterior Predictive (informative)",
 )
-ax3.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
-ax3.set_xlabel("Rotation angle")
-ax3.set_ylabel("Density")
-ax3.set_xlim(1.3, 2.7)
-ax3.set_ylim(0.0, 4.2)
-ax3.legend()
-fig3.tight_layout()
-fig3.savefig("output/posterior_predictive_compare_models_3vm.pdf")
+axs[2].hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
+
+# Set common x and y labels
+for ax in axs.flat:
+    ax.set_xlabel("Rotation angle")
+    ax.set_ylabel("Density")
+
+axs[0].legend()
+axs[1].legend()
+axs[2].legend()
+
+for ax in axs:
+    ax.set_xlim(1.3, 2.7)
+    ax.set_ylim(0.0, 4.2)
+
+plt.tight_layout()
+plt.show()
 
 az.plot_compare(df_comp_loo, insample_dev=False)
 plt.gcf().set_size_inches(10, 6)  # Adjust size as needed
 plt.savefig("output/compare_models.pdf", bbox_inches="tight")
 
 az.plot_elpd(
-    {"simple_model": data1, "mixture_model_2vm": data2, "mixture_model_3vm": data3},
+    {"non-informative_prior": data1,
+        "weakly-informative_prior": data2,
+        "informative_prior": data3,},
     var_name="y",
     xlabels=True,
 )
