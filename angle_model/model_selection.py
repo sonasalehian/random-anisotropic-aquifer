@@ -219,15 +219,15 @@ ax1.hist(
     density=True,
     bins=30,
     alpha=0.5,
-    label="Posterior Predictive (Simple)",
+    label="Posterior predictive (Simple)",
 )
-ax1.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
-ax1.set_xlabel("Rotation angle")
+ax1.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="Observed data")
+ax1.set_xlabel(r'Rotation angle (rad)')
 ax1.set_ylabel("Density")
 ax1.set_xlim(1.3, 2.7)
 ax1.set_ylim(0.0, 4.2)
 ax1.legend()
-fig1.tight_layout()
+# fig1.tight_layout()
 fig1.savefig("output/posterior_predictive_compare_models_simple.pdf")
 
 # Plot posterior predictive samples for model 2
@@ -237,15 +237,15 @@ ax2.hist(
     density=True,
     bins=30,
     alpha=0.5,
-    label="Posterior Predictive (2VM)",
+    label="Posterior predictive (2VM)",
 )
-ax2.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
-ax2.set_xlabel("Rotation angle")
+ax2.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="Observed data")
+ax2.set_xlabel(r'Rotation angle (rad)')
 ax2.set_ylabel("Density")
 ax2.set_xlim(1.3, 2.7)
 ax2.set_ylim(0.0, 4.2)
 ax2.legend()
-fig2.tight_layout()
+# fig2.tight_layout()
 fig2.savefig("output/posterior_predictive_compare_models_2vm.pdf")
 
 # Plot posterior predictive samples for model 3
@@ -255,15 +255,15 @@ ax3.hist(
     density=True,
     bins=30,
     alpha=0.5,
-    label="Posterior Predictive (3VM)",
+    label="Posterior predictive (3VM)",
 )
-ax3.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
-ax3.set_xlabel("Rotation angle")
+ax3.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="Observed data")
+ax3.set_xlabel(r'Rotation angle (rad)')
 ax3.set_ylabel("Density")
 ax3.set_xlim(1.3, 2.7)
 ax3.set_ylim(0.0, 4.2)
 ax3.legend()
-fig3.tight_layout()
+# fig3.tight_layout()
 fig3.savefig("output/posterior_predictive_compare_models_3vm.pdf")
 
 az.plot_compare(df_comp_loo, insample_dev=False)

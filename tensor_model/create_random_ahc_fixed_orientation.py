@@ -2,7 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from scipy import stats
+import sys
+sys.path.insert(0, "../forward_propagation")
 from default_parameters import create_default_parameters
+import scienceplots
+
+plt.style.use(['science'])
 
 parameters = create_default_parameters()
 
@@ -26,23 +31,25 @@ def plot_result(lambda_1, lambda_2, filename_1, filename_2):
     pdf_2 = lambda_2.pdf(x_2)
 
     # Plot the histogram of random values
+    fig = plt.figure(figsize=(5.5, 3))
     plt.figure(1)
-    plt.hist(hydraulic_conductivity[:, 0], bins=100, density=True, alpha=0.5, color='b', label='Distribution k_xx', range=(8e-12, 1.4e-11))
-    plt.plot(x_1, pdf_1, 'r-', label='PDF k_xx')
-    plt.plot([mu_1*0.79, mu_1*1.21], [0, 0], marker='o', color='red', markersize=8, label='21 percent interval')
-    plt.title('Random Hydraulic Conductivity Distribution')
-    plt.xlabel('Hydraulic Conductivity')
-    plt.ylabel('Frequency')
+    # plt.hist(hydraulic_conductivity[:, 0], bins=100, density=True, alpha=0.5, color='b', label=r'Distribution $k_{xx}$', range=(8e-12, 1.4e-11))
+    plt.plot(x_1, pdf_1, 'indianred', label=r'PDF $k_{xx}$')
+    plt.plot([mu_1*0.79, mu_1*1.21], [0, 0], marker='o', color='darkred', markersize=8, label=r'$k_{xx}\pm 21\%$')
+    # plt.title('Random Hydraulic Conductivity Distribution')
+    plt.xlabel(r'Hydraulic conductivity ($m^3skg^{-1}$)')
+    plt.ylabel('Probability density')
     plt.legend()
     plt.savefig(filename_1)  # save as png
 
+    fig = plt.figure(figsize=(5.5, 3))
     plt.figure(2)
-    plt.hist(hydraulic_conductivity[:, 3], bins=100, density=True, alpha=0.5, color='r', label='Distribution k_yy', range=(3e-13, 7e-13))
-    plt.plot(x_2, pdf_2, 'b-', label='PDF k_yy')
-    plt.plot([mu_2*0.81, mu_2*1.19], [0, 0], marker='o', color='blue', markersize=8, label='19 percent interval')
-    plt.title('Random Hydraulic Conductivity Distribution')
-    plt.xlabel('Hydraulic Conductivity')
-    plt.ylabel('Frequency')
+    # plt.hist(hydraulic_conductivity[:, 3], bins=100, density=True, alpha=0.5, color='r', label=r'Distribution $k_{yy}$', range=(3e-13, 7e-13))
+    plt.plot(x_2, pdf_2, 'c-', label=r'PDF $k_{yy}$')
+    plt.plot([mu_2*0.81, mu_2*1.19], [0, 0], marker='o', color='darkcyan', markersize=8, label=r'$k_{yy}\pm 19\%$')
+    # plt.title('Random Hydraulic Conductivity Distribution')
+    plt.xlabel('Hydraulic conductivity($m^3skg^{-1}$)')
+    plt.ylabel('Probability density')
     plt.legend()
     plt.savefig(filename_2)  # save as png
 
@@ -61,13 +68,13 @@ num_samples = 8000
 
 hydraulic_conductivity, lambda_1, lambda_2 = generating_random_eigenvalues(mu_1, mu_2, std, num_samples)
 
-filename_1 = "output/plots/Distribution_xx.png"
-filename_2 = "output/plots/Distribution_yy.png"
+filename_1 = "output/Distribution_xx.pdf"
+filename_2 = "output/Distribution_yy.pdf"
 
 plot_result(lambda_1, lambda_2, filename_1, filename_2)
 
 # Save the random values to a CSV file
-file_name = 'output/data/ahct_random_scaling.npy'
+file_name = 'output/ahct_random_scaling.npy'
 
 write_result(hydraulic_conductivity, file_name)
 

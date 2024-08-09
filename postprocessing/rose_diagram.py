@@ -17,22 +17,24 @@ def extract_bar_parameters(random_angles, gradation=5.):
     return theta, count
 
 def plot_rose_diagram(theta, count, gradation=5.0):
-    # angle = np.radians(gradation)
-    # patches = int(np.radians(360.)/angle)
-    # width = angle * np.ones(patches)
     width = np.radians(gradation)  # Width of each bin in radians
-
     # force square figure and square axes looks better for polar, IMO
     fig = plt.figure(figsize=(4, 3))
     ax = fig.add_axes([0.1, 0.1, 0.8, 0.8], polar=True)
+
     rmax = max(count) + 1
     ax.set_rlim(0,rmax)
     ax.set_theta_offset(np.pi/2)
     ax.set_thetamin(90)
     ax.set_thetamax(180)
-    ax.set_thetagrids(np.arange(90,181,10))
+    # ax.set_thetagrids(np.arange(90,181,10))
+    ax.set_thetagrids(np.degrees([np.pi / 2, 3 * np.pi / 4, np.pi]), labels=[r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$', r'$\pi$'])
     ax.set_yticklabels([])  # Hide r-axis labels
     ax.set_theta_direction(-1)
+
+    # Set axis labels
+    ax.set_xlabel(r"Angle (rad)")
+    ax.set_ylabel(r"Frequency")
 
     # project strike distribution as histogram bars
     theta = theta + np.radians(gradation / 2)  # Centering the bars

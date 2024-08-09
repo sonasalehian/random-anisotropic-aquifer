@@ -43,7 +43,6 @@ frequencies_original = np.array([9, 14, 4, 22, 4])
 # )
 
 # Plot original rose diagram
-# bin_centers = (bin_edges_original[:-1] + bin_edges_original[1:]) / 2.
 theta = np.radians(bin_edges_original[0:-1])
 plot_rose_diagram(theta, frequencies_original, gradation=10.)
 plt.savefig('output/rose_diagram_Heilweil.pdf')
