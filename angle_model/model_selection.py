@@ -1,5 +1,3 @@
-import os
-
 import arviz as az
 import jax.numpy as jnp
 import jax.random as random
@@ -8,11 +6,11 @@ import numpy as np
 import numpyro
 import numpyro.distributions as dist
 import numpyro.infer.reparam
-import scienceplots
+import scienceplots  # noqa: F401
 from jax import config
 from numpyro.infer import Predictive
 
-plt.style.use(['science'])
+plt.style.use(["science"])
 
 config.update("jax_enable_x64", True)
 NUM_CHAINS = 4

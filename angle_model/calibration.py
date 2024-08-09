@@ -1,4 +1,4 @@
-import os
+import sys
 
 import arviz as az
 import jax.numpy as jnp
@@ -8,14 +8,13 @@ import numpy as np
 import numpyro
 import numpyro.distributions as dist
 import numpyro.infer.reparam
-import scienceplots
-import sys
+
 sys.path.insert(0, "../postprocessing")
-from rose_diagram import plot_rose_diagram, extract_bar_parameters
 from jax import config
 from numpyro.infer import Predictive
+from rose_diagram import extract_bar_parameters, plot_rose_diagram
 
-plt.style.use(['science'])
+plt.style.use(["science"])
 
 config.update("jax_enable_x64", True)
 NUM_CHAINS = 4
@@ -35,6 +34,7 @@ y_obs = jnp.radians(y_obs)
 random_seed = -167652586371646984  # Seed for reproducing the results
 print(random_seed)
 np.save("output/random_seed_model_selection.npy", random_seed)
+
 
 @numpyro.handlers.reparam(
     config={
@@ -102,4 +102,4 @@ np.save("output/random_rotation_angle.npy", random_rotation_angles)
 # Plot rose diagram of random rotation angles
 theta, count = extract_bar_parameters(random_angles=random_rotation_angles)
 plot_rose_diagram(theta, count)
-plt.savefig('output/rose_diagram_random_rotation_angle.pdf')
+plt.savefig("output/rose_diagram_random_rotation_angle.pdf")

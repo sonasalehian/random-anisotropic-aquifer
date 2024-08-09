@@ -1,11 +1,12 @@
+import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
-sys.path.insert(0, "../postprocessing")
-from rose_diagram import plot_rose_diagram, extract_bar_parameters
-import scienceplots
 
-plt.style.use(['science'])
+sys.path.insert(0, "../postprocessing")
+from rose_diagram import extract_bar_parameters, plot_rose_diagram
+
+plt.style.use(["science"])
 
 # Original histogram data (bin edges and frequencies)
 bin_edges_original = np.array([90, 100, 110, 120, 130, 140])
@@ -45,12 +46,12 @@ frequencies_original = np.array([9, 14, 4, 22, 4])
 # Plot original rose diagram
 # bin_centers = (bin_edges_original[:-1] + bin_edges_original[1:]) / 2.
 theta = np.radians(bin_edges_original[0:-1])
-plot_rose_diagram(theta, frequencies_original, gradation=10.)
-plt.savefig('output/rose_diagram_Heilweil.pdf')
+plot_rose_diagram(theta, frequencies_original, gradation=10.0)
+plt.savefig("output/rose_diagram_Heilweil.pdf")
 
 # Plot rose diagram of generated data
-generated_data = np.load('output/rose_diagram.npy')
+generated_data = np.load("output/rose_diagram.npy")
 random_angles = np.radians(generated_data)
 theta, count = extract_bar_parameters(random_angles=random_angles)
 plot_rose_diagram(theta, count)
-plt.savefig('output/rose_diagram_generated_data_from_rose_diagram.pdf')
+plt.savefig("output/rose_diagram_generated_data_from_rose_diagram.pdf")
