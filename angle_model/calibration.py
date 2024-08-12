@@ -63,6 +63,14 @@ def model(y_obs=None):
     with numpyro.plate("y_obs", len(y_obs) if y_obs is not None else 1):
         _ = numpyro.sample("y", dist.MixtureGeneral(mix, [vm_1, vm_2]), obs=y_obs)
 
+graph = numpyro.render_model(
+    model=model,
+    model_args=(y_obs,),
+    render_distributions=True,
+    render_params=True,
+     filename="output/dag-model.pdf"
+)
+graph
 
 nuts_kernel = numpyro.infer.NUTS(model)
 mcmc = numpyro.infer.MCMC(
