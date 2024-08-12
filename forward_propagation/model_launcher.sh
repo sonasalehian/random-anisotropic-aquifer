@@ -10,4 +10,4 @@ set -e
 source ../setup-env.sh
 ../print-env.sh
 
-srun python model.py
+srun python read_write_checkpoints.py
