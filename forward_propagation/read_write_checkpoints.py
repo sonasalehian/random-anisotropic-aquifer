@@ -1,13 +1,9 @@
-import os, sys
-sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
-
 import basix
 import basix.ufl
 import dolfinx
 from mpi4py import MPI
 import numpy as np
 import adios4dolfinx
-from default_parameters import parameters
 
 random_folder = 'single_run'
 # n = 0
