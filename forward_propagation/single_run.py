@@ -9,7 +9,7 @@ parameters = create_default_parameters()
 n = int(sys.argv[1])
 
 # Load the list of arrays
-# k_flat = np.load("output/data/ahct_random_scaling_and_rotation.npy")
+# k_flat = np.load("../tensor_model/output/ahct_random_scaling_and_rotation.npy")
 
 # Adjust the tansor in parameters
 # parameters["k_x_aqfr"] = k_flat[n, 0]
