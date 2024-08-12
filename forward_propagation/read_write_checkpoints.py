@@ -8,7 +8,7 @@ import adios4dolfinx
 random_folder = 'single_run'
 # n = 0
 filename_output_ts = f'output/{random_folder}/output_ts.npy'
-ts = np.save(filename_output_ts)
+ts = np.load(filename_output_ts)
 
 filename = f'output/{random_folder}/solution.bp'
 engine = "BP4"
