@@ -459,6 +459,7 @@ def solve(parameters):
     print_root("Starting pumping phase...")
 
     output_ts = []
+    output_ts.append(t)
     for i in range(num_steps):
         # Updating the solution and right hand side per time step
         t += dt
