@@ -9,8 +9,6 @@ import numpyro
 import numpyro.distributions as dist
 import numpyro.infer.reparam
 import scienceplots
-import sys
-sys.path.insert(0, "../postprocessing")
 from rose_diagram import plot_rose_diagram, extract_bar_parameters
 from jax import config
 from numpyro.infer import Predictive

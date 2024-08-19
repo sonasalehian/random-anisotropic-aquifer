@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
-sys.path.insert(0, "../postprocessing")
 from rose_diagram import plot_rose_diagram, extract_bar_parameters
 import scienceplots
 
