@@ -7,7 +7,7 @@ import numpy as np
 from mpi4py import MPI
 
 def count_files_starting_with(folder_path, prefix):
-    return len([f for f in os.listdir(folder_path) if f.startswith(prefix) and os.path.isfile(os.path.join(folder_path, f))])
+    return len([f for f in os.listdir(folder_path) if f.startswith(prefix)])
 
 random_folder = "random_sr"
 
