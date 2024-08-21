@@ -6,7 +6,6 @@ import numpy as np
 import adios4dolfinx
 
 random_folder = 'single_run'
-# n = 0
 filename_output_ts = f'output/{random_folder}/output_ts.npy'
 ts = np.load(filename_output_ts)
 

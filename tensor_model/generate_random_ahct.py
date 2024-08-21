@@ -26,7 +26,7 @@ def generating_random_scaling(mu_1, mu_2, std, num_samples):
 def generating_random_rotation(random_angles, k_s):
     num_samples = len(random_angles)
     
-    # Initialize the 3D array for the output
+    # Initialize the tensor for AHC
     k = np.zeros((num_samples, 2, 2))
 
     for i, angle in enumerate(random_angles):
@@ -48,7 +48,7 @@ def plot_pdfs(lambda_1, lambda_2, mu_1, mu_2, filename_1, filename_2):
     pdf_1 = lambda_1.pdf(x_1)
     pdf_2 = lambda_2.pdf(x_2)
 
-    # Plot the histogram of random values
+    # Plot the histogram of random eigenvalues
     fig = plt.figure(figsize=(5.5, 3))
     plt.figure(1)
     plt.plot(x_1, pdf_1, 'indianred', label=r'PDF $k_{xx}$')

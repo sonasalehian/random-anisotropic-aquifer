@@ -29,8 +29,8 @@ y_obs = np.load("output/rose_diagram.npy")
 y_obs = jnp.radians(y_obs)
 
 # Required random seeds
-# random_seed = jnp.frombuffer(os.urandom(8), dtype=jnp.int64)[0]
-random_seed = -167652586371646984  # Seed for reproducing the results
+random_seed = jnp.frombuffer(os.urandom(8), dtype=jnp.int64)[0]
+# random_seed = -167652586371646984  # Seed for reproducing the results
 print(random_seed)
 np.save("output/random_seed_model_selection.npy", random_seed)
 
@@ -44,7 +44,6 @@ def model(y_obs=None):
     kappa_1 = numpyro.sample("kappa_1", dist.Gamma(20.0, 0.1))
     kappa_2 = numpyro.sample("kappa_2", dist.Gamma(20.0, 0.1))
 
-    # Non-informative prior
     mu_1 = numpyro.sample(
         "mu_1", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(180) ** 2)
     )

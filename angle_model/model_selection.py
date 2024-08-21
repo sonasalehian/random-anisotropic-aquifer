@@ -28,13 +28,13 @@ y_obs = np.load("output/rose_diagram.npy")
 y_obs = jnp.radians(y_obs)
 
 # Required random seeds
-# random_seed = jnp.frombuffer(os.urandom(8), dtype=jnp.int64)[0]
-random_seed = -4980610957694664259  # Seed for reproducing the results
+random_seed = jnp.frombuffer(os.urandom(8), dtype=jnp.int64)[0]
+# random_seed = -4980610957694664259  # Seed for reproducing the results
 print(random_seed)
 np.save("output/random_seed_model_selection.npy", random_seed)
 
-# --- Model 1 ---
 
+# --- Model 1 ---
 
 @numpyro.handlers.reparam(config={"mu": numpyro.infer.reparam.CircularReparam()})
 def model1(y_obs=None):
@@ -71,8 +71,8 @@ data1 = az.from_numpyro(
 summary1 = az.summary(data1)
 print(summary1)
 
-# --- Model 2 ---
 
+# --- Model 2 ---
 
 @numpyro.handlers.reparam(
     config={
@@ -123,8 +123,8 @@ data2 = az.from_numpyro(
 summary2 = az.summary(data2)
 print(summary2)
 
-# --- Model 3 ---
 
+# --- Model 3 ---
 
 @numpyro.handlers.reparam(
     config={
@@ -181,8 +181,8 @@ data3 = az.from_numpyro(
 summary3 = az.summary(data3)
 print(summary3)
 
-# --- Comparison ---
 
+# --- Comparison ---
 
 waic1 = az.waic(data1, var_name="y")
 print(waic1)
@@ -227,7 +227,6 @@ ax1.set_ylabel("Density")
 ax1.set_xlim(1.3, 2.7)
 ax1.set_ylim(0.0, 4.2)
 ax1.legend()
-# fig1.tight_layout()
 fig1.savefig("output/posterior_predictive_compare_models_simple.pdf")
 
 # Plot posterior predictive samples for model 2
@@ -245,7 +244,6 @@ ax2.set_ylabel("Density")
 ax2.set_xlim(1.3, 2.7)
 ax2.set_ylim(0.0, 4.2)
 ax2.legend()
-# fig2.tight_layout()
 fig2.savefig("output/posterior_predictive_compare_models_2vm.pdf")
 
 # Plot posterior predictive samples for model 3
@@ -263,7 +261,6 @@ ax3.set_ylabel("Density")
 ax3.set_xlim(1.3, 2.7)
 ax3.set_ylim(0.0, 4.2)
 ax3.legend()
-# fig3.tight_layout()
 fig3.savefig("output/posterior_predictive_compare_models_3vm.pdf")
 
 az.plot_compare(df_comp_loo, insample_dev=False)
