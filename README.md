@@ -20,7 +20,7 @@ instructions below are designed around a HPC environment with SLURM and Spack
 A Spack environment file `spack.yaml` is provided to install the basic
 dependencies.
 
-    sbatch build-enviroment.sh
+    sbatch build-environment.sh
 
 To quickly bring up the environment:
 

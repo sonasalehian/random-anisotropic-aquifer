@@ -9,6 +9,9 @@ import scienceplots
 
 plt.style.use(['science'])
 
+# Disable LaTeX rendering to avoid missing font issues
+plt.rcParams['text.usetex'] = False
+
 parameters = create_default_parameters()
 
 def generating_random_scaling(mu_1, mu_2, std, num_samples):

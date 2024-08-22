@@ -3,7 +3,7 @@
 #SBATCH -p batch
 #SBATCH --time=00:10:00
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=28
+#SBATCH --ntasks-per-node=32
 #SBATCH --output=logs/%x-%j.out
 set -e
 

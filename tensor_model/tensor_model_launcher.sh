@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#SBATCH --job-name=angle_model
+#SBATCH --job-name=tensor_model
 #SBATCH -p batch
-#SBATCH --time=00:10:00
+#SBATCH --time=00:05:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=4
 #SBATCH --output=logs/%x-%j.out

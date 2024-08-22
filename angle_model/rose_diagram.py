@@ -33,8 +33,8 @@ def plot_rose_diagram(theta, count, gradation=5.0):
     ax.set_theta_direction(-1)
 
     # Set axis labels
-    ax.set_xlabel(r"Angle (rad)")
-    ax.set_ylabel(r"Frequency")
+    ax.set_xlabel("Angle (rad)")
+    ax.set_ylabel("Frequency")
 
     # project strike distribution as histogram bars
     theta = theta + np.radians(gradation / 2)  # Centering the bars
@@ -42,9 +42,9 @@ def plot_rose_diagram(theta, count, gradation=5.0):
 
 
 # How to use the functions
-# random_angles = np.load('./output/data/generated_data_from_rose_diagram.npy')
+# # random_angles = np.load('./output/data/generated_data_from_rose_diagram.npy')
 # # random_angles = np.radians(random_angles) # if the angles are in degree
 # random_angles = np.load('./output/data/random_rotation_angle.npy')
 # theta, count, width = extract_bar_parameters(random_angles=random_angles)
 # plot_rose_diagram(theta, count, width)
-# plt.savefig('./output/plots/rose_diagram_random_rotation_angle_5deg_quarter_noclr.pdf')
+# plt.savefig('./output/plots/rose_diagram_random_rotation_angle.pdf')

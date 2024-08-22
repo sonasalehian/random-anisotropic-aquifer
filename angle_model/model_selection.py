@@ -14,6 +14,9 @@ from numpyro.infer import Predictive
 
 plt.style.use(['science'])
 
+# Disable LaTeX rendering to avoid missing font issues
+plt.rcParams['text.usetex'] = False
+
 config.update("jax_enable_x64", True)
 NUM_CHAINS = 4
 numpyro.set_host_device_count(NUM_CHAINS)

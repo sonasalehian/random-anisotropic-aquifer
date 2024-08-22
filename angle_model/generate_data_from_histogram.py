@@ -5,6 +5,9 @@ import scienceplots
 
 plt.style.use(['science'])
 
+# Disable LaTeX rendering to avoid missing font issues
+plt.rcParams['text.usetex'] = False
+
 # Original histogram data (bin edges and frequencies)
 bin_edges_original = np.array([90, 100, 110, 120, 130, 140])
 frequencies_original = np.array([9, 14, 4, 22, 4])

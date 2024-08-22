@@ -5,6 +5,9 @@ import scienceplots
 
 plt.style.use(['science'])
 
+# Disable LaTeX rendering to avoid missing font issues
+plt.rcParams['text.usetex'] = False
+
 k_x_origin = 1.1E-11
 k_y_origin = 4.7E-13
 
@@ -17,7 +20,7 @@ def plot_ellipse(center, radius_x, radius_y, angle):
     # Set plt 
     plt.xlim(-1.5*k_x_origin, 1.5*k_x_origin)
     plt.ylim(-1.5*k_x_origin, 1.5*k_x_origin)
-    plt.tight_layout()
+    # plt.tight_layout()
     plt.subplots_adjust(top=0.9)  # Increase the top parameter to adjust spacing
     plt.xticks([])
     plt.yticks([])
