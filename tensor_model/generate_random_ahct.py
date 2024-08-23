@@ -72,6 +72,16 @@ def plot_pdfs(lambda_1, lambda_2, mu_1, mu_2, filename_1, filename_2):
     plt.savefig(filename_2)  # save as png
     print(f"{filename_2} have been ploted.")
 
+def anisotropy_hist(k_s, file_name):
+    fig = plt.figure(figsize=(5.5, 3))
+    anisotropy_ratio = np.zeros((len(k_s)))
+    anisotropy_ratio[:] = k_s[:, 0, 0]/k_s[:, 1, 1]
+    plt.hist(anisotropy_ratio, bins=10)
+    plt.title('Histogram Example')
+    plt.xlabel(r'Anisotropy ratio ($\frac{k_{xx}}{k_{yy}}$)')
+    plt.ylabel('Frequency')
+    plt.savefig(file_name)
+
 def write_result(hydraulic_conductivity, file_name):
     if os.path.exists(file_name):
         os.remove(file_name)
@@ -92,6 +102,9 @@ k_s = eigenvalues
 filename_1 = "output/Distribution_xx.pdf"
 filename_2 = "output/Distribution_yy.pdf"
 plot_pdfs(lambda_1, lambda_2, mu_1, mu_2, filename_1, filename_2)
+
+file_name_ar = "output/anisotropy_ratio_histogram.pdf"
+anisotropy_hist(k_s, file_name_ar)
 
 # Save the random values
 file_name = 'output/ahct_random_scaling.npy'
