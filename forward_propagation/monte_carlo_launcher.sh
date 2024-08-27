@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=monte_carlo_runner
 #SBATCH --partition batch
-#SBATCH --time=11:00:00
+#SBATCH --time=03:00:00
 #SBATCH --nodes=32
 #SBATCH --ntasks-per-node=128
 #SBATCH --cpus-per-task=1
@@ -30,7 +30,7 @@ echo "Starting parallel..."
 PARALLEL_JOBLOG_FILE="logs/${SLURM_JOB_NAME}-${SLURM_JOB_ID}-parallel.txt"
 parallel --delay 0.2 --jobs 128 \
     --joblog ${PARALLEL_JOBLOG_FILE} \
-    "srun --output=logs/%x-%j-{}.txt --exclusive -N 1 -n 32 python3 single_run.py {}" \
-    ::: {0..7999}
+    "srun --output=logs/%x-%j/%x-%j-{}.txt --exclusive -N 1 -n 32 python3 single_run.py {}" \
+    ::: {0..2000}
 
 echo "Finished."

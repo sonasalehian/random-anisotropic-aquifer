@@ -23,6 +23,6 @@ parameters["k_xy_aqfr"] = k[n, 0, 1]
 parameters["k_yx_aqfr"] = k[n, 1, 0]
 parameters["k_y_aqfr"] = k[n, 1, 1]
 
-parameters["output_dir"] = f"output/{random_folder}/run_{str(n).zfill(4)}"
+parameters["output_dir"] = f"{os.getenv('SCRATCH')}/stochastic_model/forward_propagation/output/{random_folder}/run_{str(n).zfill(4)}"
 
 solve(parameters)
