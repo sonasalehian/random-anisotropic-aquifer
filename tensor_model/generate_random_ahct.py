@@ -76,11 +76,12 @@ def anisotropy_hist(k_s, file_name):
     fig = plt.figure(figsize=(5.5, 3))
     anisotropy_ratio = np.zeros((len(k_s)))
     anisotropy_ratio[:] = k_s[:, 0, 0]/k_s[:, 1, 1]
-    plt.hist(anisotropy_ratio, bins=10)
-    plt.title('Histogram Example')
+    plt.hist(anisotropy_ratio, bins=20)
+    # plt.title('Anisotropy ratio histogram')
     plt.xlabel(r'Anisotropy ratio ($\frac{k_{xx}}{k_{yy}}$)')
     plt.ylabel('Frequency')
     plt.savefig(file_name)
+    print(f"{file_name} have been ploted.")
 
 def write_result(hydraulic_conductivity, file_name):
     if os.path.exists(file_name):

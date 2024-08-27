@@ -34,11 +34,11 @@ u_los_mean = dolfinx.fem.Function(U_sub)
 u_los_std = dolfinx.fem.Function(U_sub)
 
 file_vtx_mean = dolfinx.io.VTXWriter(
-    submesh.comm, f"output/{random_folder}/final_mean{n_0}-{n_outputs}.bp", [u_los_mean], engine
+    submesh.comm, f"output/{random_folder}/final_mean{n_0}-{n_outputs-1}.bp", [u_los_mean], engine
 )
 
 file_vtx_std = dolfinx.io.VTXWriter(
-    submesh.comm, f"output/{random_folder}/final_std{n_0}-{n_outputs}.bp", [u_los_std], engine
+    submesh.comm, f"output/{random_folder}/final_std{n_0}-{n_outputs-1}.bp", [u_los_std], engine
 )
 
 for t in ts:
