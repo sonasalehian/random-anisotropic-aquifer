@@ -1,9 +1,9 @@
 #!/bin/bash -l
 #SBATCH --job-name=statistic
 #SBATCH -p batch
-#SBATCH --time=00:10:00
+#SBATCH --time=00:30:00
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=32
+#SBATCH --ntasks-per-node=1
 #SBATCH --output=logs/%x-%j.out
 set -e
 
