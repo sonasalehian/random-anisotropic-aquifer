@@ -6,7 +6,7 @@ from model import solve
 
 parameters = create_default_parameters()
 
-random_folder = "random_sr"
+random_folder = "random_s"
 n = int(sys.argv[1])
 
 # Load the list of arrays

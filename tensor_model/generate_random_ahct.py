@@ -2,8 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from scipy import stats
-import sys
-sys.path.insert(0, "../forward_propagation")
 from default_parameters import create_default_parameters
 import scienceplots
 
@@ -35,6 +33,8 @@ def generating_random_rotation(random_angles, k_s):
     for i, angle in enumerate(random_angles):
         W = np.array([[0, -angle], [angle, 0]])
         # Calculate the rotation matrix R_r
+        # TODO: Floating point angle will 'almost never' be equal to zero.
+        # Never use equality with floating point values.
         if angle != 0:
             R_r = np.identity(2) + (np.sin(angle)/angle) * W + ((1 - np.cos(angle))/angle**2) * (W @ W)
         else:
@@ -100,8 +100,8 @@ num_samples = 8000
 eigenvalues, lambda_1, lambda_2 = generating_random_scaling(mu_1, mu_2, std, num_samples)
 k_s = eigenvalues
 
-filename_1 = "output/Distribution_xx.pdf"
-filename_2 = "output/Distribution_yy.pdf"
+filename_1 = "output/distribution_xx.pdf"
+filename_2 = "output/distribution_yy.pdf"
 plot_pdfs(lambda_1, lambda_2, mu_1, mu_2, filename_1, filename_2)
 
 file_name_ar = "output/anisotropy_ratio_histogram.pdf"

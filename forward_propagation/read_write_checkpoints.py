@@ -1,15 +1,17 @@
+from mpi4py import MPI
+
+import adios4dolfinx
+import numpy as np
+
 import basix
 import basix.ufl
 import dolfinx
-from mpi4py import MPI
-import numpy as np
-import adios4dolfinx
 
-random_folder = 'single_run'
-filename_output_ts = f'output/{random_folder}/output_ts.npy'
+random_folder = "single_run"
+filename_output_ts = f"output/{random_folder}/output_ts.npy"
 ts = np.load(filename_output_ts)
 
-filename = f'output/{random_folder}/solution.bp'
+filename = f"output/{random_folder}/solution.bp"
 engine = "BP4"
 MPI.COMM_WORLD.Barrier()
 submesh = adios4dolfinx.read_mesh(
@@ -19,7 +21,9 @@ U_sub = dolfinx.fem.functionspace(submesh, basix.ufl.element("Lagrange", "tetrah
 u_los = dolfinx.fem.Function(U_sub)
 output = dolfinx.fem.Function(U_sub)
 
-sub_file_vtx = dolfinx.io.VTXWriter(submesh.comm, f'output/{random_folder}/solution_readable.bp', [output], engine)
+sub_file_vtx = dolfinx.io.VTXWriter(
+    submesh.comm, f"output/{random_folder}/solution_readable.bp", [output], engine
+)
 
 for t in ts:
     output.x.array[:] = 0

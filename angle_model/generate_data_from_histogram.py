@@ -46,7 +46,7 @@ print(
 # Plot original rose diagram
 theta = np.radians(bin_edges_original[0:-1])
 plot_rose_diagram(theta, frequencies_original, gradation=10.)
-plt.savefig('output/rose_diagram_Heilweil.pdf')
+plt.savefig('output/rose_diagram_heilweil.pdf')
 
 # Plot rose diagram of generated data
 generated_data = np.load('output/rose_diagram.npy')
