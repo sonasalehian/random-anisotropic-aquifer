@@ -452,6 +452,7 @@ def solve(parameters):
                 u_n_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
                     parent * W.dofmap.bs + bb
                 ]
+    u_n_sub.x.scatter_forward()
 
     adios2_filename = f"{parameters['output_dir']}/solution.bp"
 
@@ -465,6 +466,9 @@ def solve(parameters):
     file_sub_vtx = dolfinx.io.VTXWriter(
         submesh.comm, f"{parameters['output_dir']}/vtx_sub_solution.bp", [u_n_sub]
     )
+
+    file_vtx.write(0.0)
+    file_sub_vtx.write(0.0)
 
     print_root("Starting pumping phase...")
 
@@ -513,6 +517,7 @@ def solve(parameters):
                     u_n_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
                         parent * W.dofmap.bs + bb
                     ]
+        u_n_sub.x.scatter_forward()
 
         if (i + 1) % parameters["output_every_n_steps"] == 0:
             print_root(f"Writing solution t = {t}...")
@@ -607,6 +612,7 @@ def solve(parameters):
                     u_n_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
                         parent * W.dofmap.bs + bb
                     ]
+        u_n_sub.x.scatter_forward()
 
         if (i + 1) % parameters["output_every_n_steps"] == 0:
             print_root(f"Writing solution t = {t}...")
