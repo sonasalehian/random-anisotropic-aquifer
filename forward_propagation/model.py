@@ -436,11 +436,13 @@ def solve(parameters):
     submesh, cell_map, _, _ = dolfinx.mesh.create_submesh(domain, domain.topology.dim, cells)
 
     W_sub = dolfinx.fem.functionspace(submesh, W.ufl_element())
+    # TODO: This should be called u_los_sub?
     u_n_sub = dolfinx.fem.Function(W_sub)
     u_n_sub.name = "u_n_sub"
 
     num_sub_cells = submesh.topology.index_map(submesh.topology.dim).size_local
 
+    # Transfer solution to submesh
     for cell in range(num_sub_cells):
         sub_dofs = W_sub.dofmap.cell_dofs(cell)
         parent_dofs = W.dofmap.cell_dofs(cell_map[cell])
@@ -455,6 +457,14 @@ def solve(parameters):
 
     adios4dolfinx.write_mesh(adios2_filename, submesh)
     adios4dolfinx.write_function(adios2_filename, u_n_sub, time=t)
+
+    file_vtx = dolfinx.io.VTXWriter(
+        domain.comm, f"{parameters['output_dir']}/vtx_solution.bp", [u_los_h]
+    )
+
+    file_sub_vtx = dolfinx.io.VTXWriter(
+        submesh.comm, f"{parameters['output_dir']}/vtx_sub_solution.bp", [u_n_sub]
+    )
 
     print_root("Starting pumping phase...")
 
@@ -492,6 +502,8 @@ def solve(parameters):
         p_n.x.array[:] = ph.x.array
         q_n.x.array[:] = qh.x.array
         u_n.x.array[:] = uh.x.array
+
+        # Transfer solution to submesh
         for cell in range(num_sub_cells):
             sub_dofs = W_sub.dofmap.cell_dofs(cell)
             parent_dofs = W.dofmap.cell_dofs(cell_map[cell])
@@ -510,6 +522,8 @@ def solve(parameters):
             qh_Q0.x.scatter_forward()
             ph_P0.x.scatter_forward()
             adios4dolfinx.write_function(adios2_filename, u_n_sub, time=t)
+            file_vtx.write(t)
+            file_sub_vtx.write(t)
             output_ts.append(t)
             print_root("Done.")
 
@@ -582,6 +596,8 @@ def solve(parameters):
         p_n.x.array[:] = ph.x.array
         q_n.x.array[:] = qh.x.array
         u_n.x.array[:] = uh.x.array
+
+        # Transfer solution to submesh
         for cell in range(num_sub_cells):
             sub_dofs = W_sub.dofmap.cell_dofs(cell)
             parent_dofs = W.dofmap.cell_dofs(cell_map[cell])
@@ -600,6 +616,8 @@ def solve(parameters):
             qh_Q0.x.scatter_forward()
             ph_P0.x.scatter_forward()
             adios4dolfinx.write_function(adios2_filename, u_n_sub, time=t)
+            file_vtx.write(t)
+            file_sub_vtx.write(t)
             output_ts.append(t)
             print_root("Done.")
 
@@ -607,6 +625,8 @@ def solve(parameters):
     if MPI.COMM_WORLD.rank == 0:
         np.save(filename_output_ts, output_ts)
 
+    file_vtx.close()
+    file_sub_vtx.close()
     print_root("Finished solution.")
 
 

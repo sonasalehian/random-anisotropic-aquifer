@@ -15,7 +15,7 @@ filename = f"output/{random_folder}/solution.bp"
 engine = "BP4"
 MPI.COMM_WORLD.Barrier()
 submesh = adios4dolfinx.read_mesh(
-    MPI.COMM_WORLD, filename, engine, dolfinx.mesh.GhostMode.shared_facet
+    filename, MPI.COMM_WORLD, engine, dolfinx.mesh.GhostMode.shared_facet
 )
 U_sub = dolfinx.fem.functionspace(submesh, basix.ufl.element("Lagrange", "tetrahedron", 1))
 u_los = dolfinx.fem.Function(U_sub)
@@ -29,7 +29,7 @@ for t in ts:
     output.x.array[:] = 0
     output.x.scatter_forward()
     u_los.name = "u_n_sub"
-    adios4dolfinx.read_function(u_los, filename, engine, time=t)
+    adios4dolfinx.read_function(filename, u_los, engine, time=t)
     output.x.array[:] = u_los.x.array
     output.x.scatter_forward()
     sub_file_vtx.write(t)

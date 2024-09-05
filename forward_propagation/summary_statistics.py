@@ -22,7 +22,6 @@ ts = np.load(filename_output_ts)
 
 # Read mesh
 filename = f"{folder_path}/run_{str(0).zfill(4)}/solution.bp"
-print(filename)
 engine = "BP4"
 submesh = adios4dolfinx.read_mesh(
     filename, MPI.COMM_WORLD, engine, dolfinx.mesh.GhostMode.shared_facet
