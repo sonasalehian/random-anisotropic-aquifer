@@ -10,7 +10,7 @@ parameters = create_default_parameters()
 random_type = "random_scaling_and_rotation"
 n = int(sys.argv[1])
 
-k = np.load("../tensor_model/output/ahct_{random_type}.npy")
+k = np.load(f"../tensor_model/output/ahct_{random_type}.npy")
 
 # Adjust the tansor in parameters
 parameters["k_x_aqfr"] = k[n, 0, 0]
