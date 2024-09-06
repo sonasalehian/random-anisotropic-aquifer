@@ -61,7 +61,7 @@ for t in ts:
     for n in range(n_0, n_outputs):
         u_los.name = "u_n_sub"
         filename = f"{os.getenv('SCRATCH')}/stochastic_model/forward_propagation/output/{random_folder}/run_{str(n).zfill(4)}/solution.bp"
-        adios4dolfinx.read_function(u_los, filename, engine, time=t)
+        adios4dolfinx.read_function(filename, u_los, engine, time=t)
         u_los_std.x.array[:] += (u_los.x.array - u_los_mean.x.array) ** 2
         u_los_std.x.scatter_forward()
 
