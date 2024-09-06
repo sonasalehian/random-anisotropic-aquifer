@@ -7,7 +7,7 @@ from model import solve
 
 parameters = create_default_parameters()
 
-random_type = "random_scaling_rotation"
+random_type = "random_scaling_and_rotation"
 n = int(sys.argv[1])
 
 k = np.load("../tensor_model/output/ahct_{random_type}.npy")
