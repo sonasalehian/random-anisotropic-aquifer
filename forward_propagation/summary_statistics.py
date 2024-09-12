@@ -56,13 +56,11 @@ for t in ts:
     u_los_mean.x.array[:] = 0.0
     
     for n in range(0, num_outputs):
-        print_root(f"Processing sample {n}...")
         u_los.name = "u_n_sub"
         filename = f"{folder_path}/run_{str(n).zfill(4)}/solution.bp"
         adios4dolfinx.read_function(filename, u_los, engine, time=t)
         u_los_mean.x.array[:] += u_los.x.array
         u_los_mean.x.scatter_forward()
-        print_root(f"Done.")
 
     u_los_mean.x.array[:] /= num_outputs
     file_vtx_mean.write(t)
@@ -71,17 +69,16 @@ for t in ts:
     u_los_std.x.array[:] = 0.0
     
     for n in range(0, num_outputs):
-        print_root(f"Processing sample {n}...")
         u_los.name = "u_n_sub"
         filename = f"{folder_path}/run_{str(n).zfill(4)}/solution.bp"
         adios4dolfinx.read_function(filename, u_los, engine, time=t)
         u_los_std.x.array[:] += (u_los.x.array - u_los_mean.x.array) ** 2
         u_los_std.x.scatter_forward()
-        print_root(f"Done.")
 
-    u_los_std.x.array[:] /= num_outputs
+    u_los_std.x.array[:] /= (num_outputs-1)
     u_los_std.x.array[:] = np.sqrt(u_los_std.x.array[:])
     file_vtx_std.write(t)
 
 file_vtx_mean.close()
 file_vtx_std.close()
+print_root(f"mean and std calculated successfully.")
