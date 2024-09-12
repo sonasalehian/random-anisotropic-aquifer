@@ -436,9 +436,8 @@ def solve(parameters):
     submesh, cell_map, _, _ = dolfinx.mesh.create_submesh(domain, domain.topology.dim, cells)
 
     W_sub = dolfinx.fem.functionspace(submesh, W.ufl_element())
-    # TODO: This should be called u_los_sub?
-    u_n_sub = dolfinx.fem.Function(W_sub)
-    u_n_sub.name = "u_n_sub"
+    u_los_sub = dolfinx.fem.Function(W_sub)
+    u_los_sub.name = "u_los_sub"
 
     num_sub_cells = submesh.topology.index_map(submesh.topology.dim).size_local
 
@@ -449,26 +448,15 @@ def solve(parameters):
         assert W_sub.dofmap.bs == W.dofmap.bs
         for parent, child in zip(parent_dofs, sub_dofs):
             for bb in range(W_sub.dofmap.bs):
-                u_n_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
+                u_los_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
                     parent * W.dofmap.bs + bb
                 ]
-    u_n_sub.x.scatter_forward()
+    u_los_sub.x.scatter_forward()
 
     adios2_filename = f"{parameters['output_dir']}/solution.bp"
 
     adios4dolfinx.write_mesh(adios2_filename, submesh)
-    adios4dolfinx.write_function(adios2_filename, u_n_sub, time=t)
-
-    file_vtx = dolfinx.io.VTXWriter(
-        domain.comm, f"{parameters['output_dir']}/vtx_solution.bp", [u_los_h]
-    )
-
-    file_sub_vtx = dolfinx.io.VTXWriter(
-        submesh.comm, f"{parameters['output_dir']}/vtx_sub_solution.bp", [u_n_sub]
-    )
-
-    file_vtx.write(0.0)
-    file_sub_vtx.write(0.0)
+    adios4dolfinx.write_function(adios2_filename, u_los_sub, time=t)
 
     print_root("Starting pumping phase...")
 
@@ -514,10 +502,10 @@ def solve(parameters):
             assert W_sub.dofmap.bs == W.dofmap.bs
             for parent, child in zip(parent_dofs, sub_dofs):
                 for bb in range(W_sub.dofmap.bs):
-                    u_n_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
+                    u_los_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
                         parent * W.dofmap.bs + bb
                     ]
-        u_n_sub.x.scatter_forward()
+        u_los_sub.x.scatter_forward()
 
         if (i + 1) % parameters["output_every_n_steps"] == 0:
             print_root(f"Writing solution t = {t}...")
@@ -526,9 +514,7 @@ def solve(parameters):
             ph_P0.interpolate(p_n)
             qh_Q0.x.scatter_forward()
             ph_P0.x.scatter_forward()
-            adios4dolfinx.write_function(adios2_filename, u_n_sub, time=t)
-            file_vtx.write(t)
-            file_sub_vtx.write(t)
+            adios4dolfinx.write_function(adios2_filename, u_los_sub, time=t)
             output_ts.append(t)
             print_root("Done.")
 
@@ -609,10 +595,10 @@ def solve(parameters):
             assert W_sub.dofmap.bs == W.dofmap.bs
             for parent, child in zip(parent_dofs, sub_dofs):
                 for bb in range(W_sub.dofmap.bs):
-                    u_n_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
+                    u_los_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
                         parent * W.dofmap.bs + bb
                     ]
-        u_n_sub.x.scatter_forward()
+        u_los_sub.x.scatter_forward()
 
         if (i + 1) % parameters["output_every_n_steps"] == 0:
             print_root(f"Writing solution t = {t}...")
@@ -621,9 +607,7 @@ def solve(parameters):
             ph_P0.interpolate(p_n)
             qh_Q0.x.scatter_forward()
             ph_P0.x.scatter_forward()
-            adios4dolfinx.write_function(adios2_filename, u_n_sub, time=t)
-            file_vtx.write(t)
-            file_sub_vtx.write(t)
+            adios4dolfinx.write_function(adios2_filename, u_los_sub, time=t)
             output_ts.append(t)
             print_root("Done.")
 
@@ -631,8 +615,6 @@ def solve(parameters):
     if MPI.COMM_WORLD.rank == 0:
         np.save(filename_output_ts, output_ts)
 
-    file_vtx.close()
-    file_sub_vtx.close()
     print_root("Finished solution.")
 
 

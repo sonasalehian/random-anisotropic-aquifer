@@ -56,7 +56,7 @@ for t in ts:
     u_los_mean.x.array[:] = 0.0
     
     for n in range(0, num_outputs):
-        u_los.name = "u_n_sub"
+        u_los.name = "u_los_sub"
         filename = f"{folder_path}/run_{str(n).zfill(4)}/solution.bp"
         adios4dolfinx.read_function(filename, u_los, engine, time=t)
         u_los_mean.x.array[:] += u_los.x.array
@@ -69,7 +69,7 @@ for t in ts:
     u_los_std.x.array[:] = 0.0
     
     for n in range(0, num_outputs):
-        u_los.name = "u_n_sub"
+        u_los.name = "u_los_sub"
         filename = f"{folder_path}/run_{str(n).zfill(4)}/solution.bp"
         adios4dolfinx.read_function(filename, u_los, engine, time=t)
         u_los_std.x.array[:] += (u_los.x.array - u_los_mean.x.array) ** 2
