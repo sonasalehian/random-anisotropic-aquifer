@@ -1,0 +1,13 @@
+--- initold.py	2024-07-25 11:02:21.000000000 +0200
++++ __init__.py	2024-07-25 11:02:32.000000000 +0200
+@@ -24,6 +24,10 @@
+ 
+ __all__ = ['MPI']
+ 
++import os
++import sys
++
++sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
+ 
+ class Rc:
+     """Runtime configuration options.
