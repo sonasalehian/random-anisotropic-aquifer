@@ -33,15 +33,10 @@ def generating_random_rotation(random_angles, k_s):
     for i, angle in enumerate(random_angles):
         W = np.array([[0, -angle], [angle, 0]])
         # Calculate the rotation matrix R_r
-        # TODO: Floating point angle will 'almost never' be equal to zero.
-        # Never use equality with floating point values.
-        if angle != 0:
-            R_r = np.identity(2) + (np.sin(angle)/angle) * W + ((1 - np.cos(angle))/angle**2) * (W @ W)
-        else:
-            R_r = np.identity(2)  # Avoid division by zero for angle == 0
+        R_r = np.identity(2) + (np.sin(angle)/angle) * W + ((1 - np.cos(angle))/angle**2) * (W @ W)
         # Compute the rotated matrix
         k[i, :, :] = R_r @ (k_s[i, :, :] @ np.transpose(R_r))
-    
+
     return k
 
 def plot_pdfs(lambda_1, lambda_2, mu_1, mu_2, filename_1, filename_2):
@@ -54,21 +49,27 @@ def plot_pdfs(lambda_1, lambda_2, mu_1, mu_2, filename_1, filename_2):
     # Plot the histogram of random eigenvalues
     fig = plt.figure(figsize=(5.5, 3))
     plt.figure(1)
-    plt.plot(x_1, pdf_1, 'indianred', label=r'PDF $k_{xx}$')
-    plt.plot([mu_1*0.79, mu_1*1.21], [0, 0], marker='o', color='darkred', markersize=8, label=r'$k_{xx}\pm 21\%$')
-    plt.xlabel(r'Hydraulic conductivity ($m^3skg^{-1}$)')
-    plt.ylabel('Probability density')
-    plt.legend()
+    plt.plot(x_1, pdf_1, 'chocolate', label=r'PDF $k_{xx}$')
+    plt.axvline(x=mu_1*0.79, color='darkgreen', linestyle='--')
+    plt.axvline(x=mu_1*1.21, color='darkgreen', linestyle='--')
+    plt.text(mu_1*0.755, 2.5e11, r'$k_{xx} - 21\%$', color='darkgreen', rotation=90, va='bottom')
+    plt.text(mu_1*1.22, 2.5e11, r'$k_{xx} + 21\%$', color='darkgreen', rotation=90, va='bottom')
+    plt.xlabel(r'Hydraulic conductivity ($\mathrm{m^3skg^{-1}}$)')
+    plt.ylabel(r'Probability density ($\mathrm{kgs^{-1}m^{-3}}$)')
+    plt.legend(loc='lower center')
     plt.savefig(filename_1)  # save as png
     print(f"{filename_1} have been ploted.")
 
     fig = plt.figure(figsize=(5.5, 3))
     plt.figure(2)
-    plt.plot(x_2, pdf_2, 'c-', label=r'PDF $k_{yy}$')
-    plt.plot([mu_2*0.81, mu_2*1.19], [0, 0], marker='o', color='darkcyan', markersize=8, label=r'$k_{yy}\pm 19\%$')
-    plt.xlabel('Hydraulic conductivity($m^3skg^{-1}$)')
-    plt.ylabel('Probability density')
-    plt.legend()
+    plt.plot(x_2, pdf_2, 'cornflowerblue', label=r'PDF $k_{yy}$')
+    plt.axvline(x=mu_2*0.81, color='indianred', linestyle='--')
+    plt.axvline(x=mu_2*1.19, color='indianred', linestyle='--')
+    plt.text(mu_2*0.775, 0.6e13, r'$k_{yy} - 19\%$', color='indianred', rotation=90, va='bottom')
+    plt.text(mu_2*1.20, 0.6e13, r'$k_{yy} + 19\%$', color='indianred', rotation=90, va='bottom')
+    plt.xlabel(r'Hydraulic conductivity ($\mathrm{m^3skg^{-1}}$)')
+    plt.ylabel(r'Probability density ($\mathrm{kgs^{-1}m^{-3}}$)')
+    plt.legend(loc='lower center')
     plt.savefig(filename_2)  # save as png
     print(f"{filename_2} have been ploted.")
 
