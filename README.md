@@ -16,6 +16,7 @@ All scripts necessary to generate random angles are available in the `angle_mode
 1.	Generate outcrop data from the rose diagram using `generate_data_from_histogram.py`.
 2.	Compare prior models to determine the best fit using `model_selection.py`.
 3.	Produce random angles based on the selected model using `calibration.py`.
+
 To execute, simply run:
 
 	sbatch angle_model_launcher.sh
@@ -27,13 +28,16 @@ All scripts required for generating random AHC tensors are located in the `tenso
 To execute these scripts on an HPC system, use the provided `tensor_model_launcher.sh` file. This script runs:
 1.	`generate_random_ahct.py` to generate the three sets of random AHC tensors.
 2.	`plot_elliptics.py` to create elliptical representations for each set.
+
 To run the script on an HPC, use the following command:
 	
     sbatch tensor_model_launcher.sh
 
 ## Forward uncertainty analysis
 The uncertainty in AHC is propagated through a PDE-based model [[AHC_Poroelastic_Model]( https://github.com/sonasalehian/AHC-Poroelastic-Model)] of the Anderson Junction site, where it represents the uncertainty in the in-plane hydraulic conductivity tensor. Furthermore, statistical analysis is performed on the resulting line-of-sight (LOS) surface displacements to compute key metrics, enabling evaluation of how AHC variations influence the uncertainty in LOS surface displacements.
+
 You can find all the following scripts in the `forward_propagation/` directory.
+
 Use the following command to run the Monte Carlo simulations for uncertainty propagation: 
 	
     sbatch monte_carlo_launcher.sh
@@ -53,6 +57,7 @@ First, ensure ParaView is installed on your system. Then, use the following comm
 ## Mesh generation
 
 The scripts for generating the aquifer mesh are located in the `forward_propagation/` directory. 
+
 Use gmsh to generate the aquifer mesh by submitting the job script:
 	
 	sbatch build_mesh_launcher.sh
