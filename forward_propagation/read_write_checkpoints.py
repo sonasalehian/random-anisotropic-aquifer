@@ -13,7 +13,7 @@ ts = np.load(filename_output_ts)
 
 filename = f"output/{random_folder}/solution.bp"
 engine = "BP4"
-MPI.COMM_WORLD.Barrier()
+# MPI.COMM_WORLD.Barrier()
 submesh = adios4dolfinx.read_mesh(
     filename, MPI.COMM_WORLD, engine, dolfinx.mesh.GhostMode.shared_facet
 )
@@ -26,12 +26,12 @@ sub_file_vtx = dolfinx.io.VTXWriter(
 )
 
 for t in ts:
-    output.x.array[:] = 0
-    output.x.scatter_forward()
-    u_los.name = "u_n_sub"
+    # output.x.array[:] = 0
+    # output.x.scatter_forward()
+    u_los.name = "u_los_sub"
     adios4dolfinx.read_function(filename, u_los, engine, time=t)
     output.x.array[:] = u_los.x.array
-    output.x.scatter_forward()
+    # output.x.scatter_forward()
     sub_file_vtx.write(t)
 
 sub_file_vtx.close()
