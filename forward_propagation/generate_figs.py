@@ -16,7 +16,7 @@ for random_type in random_types:
         paraview.simple._DisableFirstRenderCameraReset()
 
         # create a new 'ADIOS2VTXReader'
-        meanbp = ADIOS2VTXReader(registrationName=f'{statistic}.bp', FileName=f'output/{random_type}/{statistic}.bp')*1000
+        meanbp = ADIOS2VTXReader(registrationName=f'{statistic}.bp', FileName=f'output/{random_type}/{statistic}.bp')
 
         # get animation scene
         animationScene1 = GetAnimationScene()
