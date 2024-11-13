@@ -52,11 +52,13 @@ def plot_pdfs(lambda_1, lambda_2, mu_1, mu_2, filename_1, filename_2):
     plt.plot(x_1, pdf_1, 'chocolate', label=r'PDF $k_{xx}$')
     plt.axvline(x=mu_1*0.79, color='darkgreen', linestyle='--')
     plt.axvline(x=mu_1*1.21, color='darkgreen', linestyle='--')
+    plt.axvline(x=mu_1, color='darkgreen', linestyle='--')
     plt.text(mu_1*0.755, 2.5e11, r'$k_{xx} - 21\%$', color='darkgreen', rotation=90, va='bottom')
     plt.text(mu_1*1.22, 2.5e11, r'$k_{xx} + 21\%$', color='darkgreen', rotation=90, va='bottom')
+    plt.text(mu_1*1.01, 2.5e11, r'$k_{xx}$', color='darkgreen', rotation=90, va='bottom')
     plt.xlabel(r'Hydraulic conductivity ($\mathrm{m^3skg^{-1}}$)')
     plt.ylabel(r'Probability density ($\mathrm{kgs^{-1}m^{-3}}$)')
-    plt.legend(loc='lower center')
+    plt.legend(loc='upper right')
     plt.savefig(filename_1)  # save as png
     print(f"{filename_1} have been ploted.")
 
@@ -65,11 +67,13 @@ def plot_pdfs(lambda_1, lambda_2, mu_1, mu_2, filename_1, filename_2):
     plt.plot(x_2, pdf_2, 'cornflowerblue', label=r'PDF $k_{yy}$')
     plt.axvline(x=mu_2*0.81, color='indianred', linestyle='--')
     plt.axvline(x=mu_2*1.19, color='indianred', linestyle='--')
+    plt.axvline(x=mu_2, color='indianred', linestyle='--')
     plt.text(mu_2*0.775, 0.6e13, r'$k_{yy} - 19\%$', color='indianred', rotation=90, va='bottom')
     plt.text(mu_2*1.20, 0.6e13, r'$k_{yy} + 19\%$', color='indianred', rotation=90, va='bottom')
+    plt.text(mu_2*1.01, 0.6e13, r'$k_{yy}$', color='indianred', rotation=90, va='bottom')
     plt.xlabel(r'Hydraulic conductivity ($\mathrm{m^3skg^{-1}}$)')
     plt.ylabel(r'Probability density ($\mathrm{kgs^{-1}m^{-3}}$)')
-    plt.legend(loc='lower center')
+    plt.legend(loc='upper right')
     plt.savefig(filename_2)  # save as png
     print(f"{filename_2} have been ploted.")
 
