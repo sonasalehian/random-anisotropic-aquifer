@@ -1,18 +1,34 @@
 # Anisotropic Hydraulic Conductivity Stochastic Model
 
-The AHC-Stochastic-Model is a stochastic model developed for anisotropic hydraulic conductivity (AHC) in an aquifer system, designed to model the uncertainty in AHC based on fracture outcrop data. The calibration and construction of this model follow three key steps:
-1.	Modeling Directional Component: A parametric Bayesian model, consisting of a mixture of circular von Mises distributions, is fitted to represent the directional component of AHC using fracture outcrop data.
-2.	Modeling Magnitudes: A Bayesian model of two independent log-normal distributions is used to fit existing estimates of hydraulic conductivity magnitudes in the principal directions.
-3.	Modeling AHC tensors: These directional and magnitude models are integrated into a multimodal random symmetric positive definite (SPD) tensor model, capturing the full stochastic nature of AHC.
+The AHC-Stochastic-Model is a stochastic model developed for anisotropic hydraulic conductivity (AHC) 
+in an aquifer system, designed to model the uncertainty in AHC based on fracture outcrop data. The 
+calibration and construction of this model follow three key steps:
+1.	Modeling Directional Component: A parametric Bayesian model, consisting of a mixture of
+   	circular von Mises distributions, is fitted to represent the directional component of AHC
+  	using fracture outcrop data.
+3.	Modeling Magnitudes: A Bayesian model of two independent log-normal distributions is used
+   	to fit existing estimates of hydraulic conductivity magnitudes in the principal directions.
+5.	Modeling AHC tensors: These directional and magnitude models are integrated into a multimodal
+   	random symmetric positive definite (SPD) tensor model, capturing the full stochastic nature of AHC.
 
-For more details, please refer to the corresponding paper: [[Stochastic modeling of hydraulic conductivity in a poroelastic aquifer system simulation](https://hdl.handle.net/10993/xxxxx)].
+For more details, please refer to the corresponding paper: 
+[[Stochastic modeling of hydraulic conductivity in a poroelastic aquifer system simulation](https://hdl.handle.net/10993/xxxxx)].
 
 This repository was also permanently archived at: [[10.5281/zenodo.10890121](https://zenodo.org/records/xxxxxxxx)].
 
 ## Calibration of Bayesian angle model
 
-To model the direction of AHC, we developed a Bayesian parametric model to account for the observed multimodality in fracture outcrop data (rose diagram of fracture directions at the Anderson Junction site). We explored three prior models: a simple von Mises distribution, a mixture of two von Mises distributions, and a mixture of three von Mises distributions. To estimate the posterior distributions and generate random rotation angles, we used the No-U-Turn Sampler (NUTS) algorithm within the Markov Chain Monte Carlo (MCMC) framework. To identify the “best” fit for the fracture outcrop data, we applied Pareto-smoothed importance sampling (PSIS) combined with Leave-One-Out Cross-Validation (LOOCV).
-All scripts necessary to generate random angles are available in the `angle_model/` directory. A `.sh` file is included for running tasks on a High-Performance Computing (HPC) system. This script enables you to:
+To model the direction of AHC, we developed a Bayesian parametric model to account for the observed 
+multimodality in fracture outcrop data (rose diagram of fracture directions at the Anderson Junction 
+site). We explored three prior models: a simple von Mises distribution, a mixture of two von Mises 
+distributions, and a mixture of three von Mises distributions. To estimate the posterior distributions 
+and generate random rotation angles, we used the No-U-Turn Sampler (NUTS) algorithm within the Markov 
+Chain Monte Carlo (MCMC) framework. To identify the “best” fit for the fracture outcrop data, we applied 
+Pareto-smoothed importance sampling (PSIS) combined with Leave-One-Out Cross-Validation (LOOCV).
+
+All scripts necessary to generate random angles are available in the `angle_model/` directory. 
+A `.sh` file is included for running tasks on a High-Performance Computing (HPC) system. This 
+script enables you to:
 1.	Generate outcrop data from the rose diagram using `generate_data_from_histogram.py`.
 2.	Compare prior models to determine the best fit using `model_selection.py`.
 3.	Produce random angles based on the selected model using `calibration.py`.
@@ -23,9 +39,14 @@ To execute, simply run:
 
 ## Stochastic model of AHC
 
-We model random AHC tensor using a multimodal random SPD model. Since an SPD matrix can be decomposed into a diagonal matrix of positive eigenvalues (scaling) and an orthogonal matrix of eigenvectors (rotation), we generate three distinct sets of random AHC tensors: Random scaling, Random rotation, Random scaling combined with rotation.
+We model random AHC tensor using a multimodal random SPD model. Since an SPD matrix can be 
+decomposed into a diagonal matrix of positive eigenvalues (scaling) and an orthogonal matrix of 
+eigenvectors (rotation), we generate three distinct sets of random AHC tensors: Random scaling, 
+Random rotation, Random scaling combined with rotation.
+
 All scripts required for generating random AHC tensors are located in the `tensor_model/` directory.
-To execute these scripts on an HPC system, use the provided `tensor_model_launcher.sh` file. This script runs:
+To execute these scripts on an HPC system, use the provided `tensor_model_launcher.sh` file. 
+This script runs:
 1.	`generate_random_ahct.py` to generate the three sets of random AHC tensors.
 2.	`plot_elliptics.py` to create elliptical representations for each set.
 
@@ -34,9 +55,14 @@ To run the script on an HPC, use the following command:
     sbatch tensor_model_launcher.sh
 
 ## Forward uncertainty analysis
-The uncertainty in AHC is propagated through a PDE-based model [[AHC_Poroelastic_Model]( https://github.com/sonasalehian/AHC-Poroelastic-Model)] of the Anderson Junction site, where it represents the uncertainty in the in-plane hydraulic conductivity tensor. Furthermore, statistical analysis is performed on the resulting line-of-sight (LOS) surface displacements to compute key metrics, enabling evaluation of how AHC variations influence the uncertainty in LOS surface displacements.
+The uncertainty in AHC is propagated through a PDE-based model [[AHC_Poroelastic_Model]
+(https://github.com/sonasalehian/AHC-Poroelastic-Model)] of the Anderson Junction site, where it 
+represents the uncertainty in the in-plane hydraulic conductivity tensor. Furthermore, statistical 
+analysis is performed on the resulting line-of-sight (LOS) surface displacements to compute key 
+metrics, enabling evaluation of how AHC variations influence the uncertainty in LOS surface 
+displacements.
 
-You can find all the following scripts in the `forward_propagation/` directory.
+All the following scripts are located in the `forward_propagation/` directory.
 
 Use the following command to run the Monte Carlo simulations for uncertainty propagation: 
 	
@@ -50,7 +76,8 @@ To simulate the model with Anderson Junction AHC data, use:
 
 	sbatch model_launcher.sh
 
-First, ensure ParaView is installed on your system. Then, use the following command to generate figures from the statistical analysis:
+First, ensure ParaView is installed on your system. Then, use the following command to generate 
+figures from the statistical analysis:
 	
     pvpython 02_[name_of_file].py
 
@@ -62,17 +89,22 @@ Use gmsh to generate the aquifer mesh by submitting the job script:
 	
 	sbatch build_mesh_launcher.sh
 
-The generated mesh is written in a DOLFINx-compatible XDMF format and saved in `forward_propagation/output/mesh/*`.
+The generated mesh is written in a DOLFINx-compatible XDMF format and saved in 
+`forward_propagation/output/mesh/*`.
 
 ## Software environment
 
-This stochastic part of this study involves a Monte Carlo forward uncertainty analysis through a finite element model. This is only feasible on an HPC. The instructions below are designed around an HPC environment with SLURM and Spack `v0.22` available at `$HOME/spack`.
+This stochastic part of this study involves a Monte Carlo forward uncertainty analysis through a 
+finite element model. This is only feasible on an HPC. The instructions below are designed around 
+an HPC environment with SLURM and Spack `v0.22` available at `$HOME/spack`.
 
-A Spack environment file `spack.yaml` is provided to define the necessary dependencies. To install them, submit the following SLURM job:
+A Spack environment file `spack.yaml` is provided to define the necessary dependencies. To install 
+them, submit the following SLURM job:
 
     sbatch build-environment.sh
  
-Once the dependencies are installed, you can quickly bring up the environment by sourcing the provided `setup-env.sh` script:
+Once the dependencies are installed, you can quickly bring up the environment by sourcing the 
+provided `setup-env.sh` script:
 
     . setup-env.sh
 
@@ -117,7 +149,8 @@ Please consider citing this code and related paper if you find it useful.
          month = sep,
          year = {2024},
          doi = {10.5281/zenodo.xxxxxxx},
-         keywords = {stochastic model, anisotropy hydraulic conductivity, symmetric positive definite, mixture of von Mises distribution, poroelastic model, FEniCS, finite element methods},
+         keywords = {stochastic model, anisotropy hydraulic conductivity, symmetric positive definite, 
+	 mixture of von Mises distribution, poroelastic model, FEniCS, finite element methods},
    }
 
 along with the appropriate general `FEniCS citations <http://fenicsproject.org/citing>`.
