@@ -55,8 +55,9 @@ To run the script on an HPC, use the following command:
     sbatch tensor_model_launcher.sh
 
 ## Forward uncertainty analysis
-The uncertainty in AHC is propagated through a PDE-based model [[AHC_Poroelastic_Model]
-(https://github.com/sonasalehian/AHC-Poroelastic-Model)] of the Anderson Junction site, where it 
+The uncertainty in AHC is propagated through a PDE-based model 
+[[AHC_Poroelastic_Model](https://github.com/sonasalehian/AHC-Poroelastic-Model)] 
+of the Anderson Junction site, where it 
 represents the uncertainty in the in-plane hydraulic conductivity tensor. Furthermore, statistical 
 analysis is performed on the resulting line-of-sight (LOS) surface displacements to compute key 
 metrics, enabling evaluation of how AHC variations influence the uncertainty in LOS surface 
