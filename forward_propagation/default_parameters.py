@@ -29,7 +29,7 @@ def create_default_parameters():
     parameters["t"] = 0.0  # Start time
     parameters["T"] = 691200.0  # (8d) # Final pumping time
     parameters["num_steps"] = 360
-    parameters["T2"] = 86400.0  # (1d) # Final time
+    parameters["T2"] = 86400.0  # (1d) # Relaxation time
     parameters["num_steps2"] = 20
 
     # Aquitard layer parameters
