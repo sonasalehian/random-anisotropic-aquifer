@@ -94,24 +94,24 @@ for random_type in random_types:
             fLUT.InvertTransferFunction()
 
             # Rescale transfer function
-            fLUT.RescaleTransferFunction(-0.00222, 0.0)
+            fLUT.RescaleTransferFunction(-0.0133, 0.0)
 
             # Rescale transfer function
-            fPWF.RescaleTransferFunction(-0.00222, 0.0)
+            fPWF.RescaleTransferFunction(-0.0133, 0.0)
 
         elif statistic == "std":
 
             # Rescale transfer function
-            fLUT.RescaleTransferFunction(0.0, 4.2e-04)
+            fLUT.RescaleTransferFunction(0.0, 0.0021)
 
             # Rescale transfer function
-            fPWF.RescaleTransferFunction(0.0, 4.2e-04)
+            fPWF.RescaleTransferFunction(0.0, 0.0021)
 
         # reset view to fit data
         renderView1.ResetCamera(False)
 
         # Properties modified on animationScene1
-        animationScene1.AnimationTime = 345600.0
+        animationScene1.AnimationTime = 691200.0
 
         # get the time-keeper
         timeKeeper1 = GetTimeKeeper()
