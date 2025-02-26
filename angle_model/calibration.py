@@ -34,7 +34,7 @@ y_obs = jnp.radians(y_obs)
 # Required random seeds
 random_seed = jnp.frombuffer(os.urandom(8), dtype=jnp.int64)[0]
 # random_seed = -167652586371646984  # Seed for reproducing the results
-print(random_seed)
+print("Random seed:",random_seed)
 np.save("output/random_seed_model_selection.npy", random_seed)
 
 @numpyro.handlers.reparam(
@@ -68,7 +68,7 @@ graph = numpyro.render_model(
     model_args=(y_obs,),
     render_distributions=True,
     render_params=True,
-     filename="output/dag-model.pdf"
+    filename="output/dag-model.pdf"
 )
 graph
 
@@ -104,7 +104,7 @@ plt.savefig("output/plot_trace_2vm.pdf")
 
 # --- save smaples of mixture of 2 vm model ---
 random_rotation_angles = posterior_predictive_samples["y"][::10].flatten()
-print(len(random_rotation_angles))
+print("Number of random rotation angles:",len(random_rotation_angles))
 np.save("output/random_rotation_angle.npy", random_rotation_angles)
 
 # Plot rose diagram of random rotation angles

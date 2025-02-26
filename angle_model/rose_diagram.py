@@ -26,7 +26,6 @@ def plot_rose_diagram(theta, count, gradation=5.0):
     density = [c / total_count for c in count]  # Convert counts to densities
 
     rmax = max(density) + 0.05
-    print(rmax)
     ax.set_rlim(0, rmax)
     ax.set_theta_offset(np.pi/2)
     ax.set_thetamin(90)
