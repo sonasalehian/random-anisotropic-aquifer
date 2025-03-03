@@ -7,7 +7,7 @@ import basix
 import basix.ufl
 import dolfinx
 
-random_folder = "single_run"
+random_folder = "random_scaling_and_rotation_intermediate_ratio1-7/run_3609"
 filename_output_ts = f"output/{random_folder}/output_ts.npy"
 ts = np.load(filename_output_ts)
 
