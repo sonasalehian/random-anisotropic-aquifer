@@ -1,6 +1,6 @@
 # Supplementary material: A random model of anisotropic hydraulic conductivity tailored to the InSAR-based analysis of aquifers 
 
-The `ahc-stochastic-model` repository contains code implementing a stochastic model
+The `random-anisotropic-aquifer` repository contains code implementing a stochastic model
 developed for anisotropic hydraulic conductivity (AHC) of an aquifer system that is
 designed around the requirements of InSAR-based analysis of aquifer systems.
 
@@ -9,7 +9,7 @@ anisotropic hydraulic conductivity tailored to the InSAR-based analysis of
 aquifers](https://hdl.handle.net/10993/xxxxx).
 
 This repository was also permanently archived at:
-[doi:10.5281/zenodo.10890121](https://doi.org/10.5281.10890121).
+[doi:10.5281/zenodo.14170026](10.5281/zenodo.14170026).
 
 ## Citing
 
@@ -20,7 +20,7 @@ Please consider citing this code and related paper if you find it useful.
           author = {Salehian Ghamsari, Sona, and Hale, Jack S.},
           month = jul,
           year = {2025},
-          doi = {10.5281/zenodo.xxxxxxx},
+          doi = {10.5281/zenodo.14170026},
           keywords = {stochastic model, anisotropy hydraulic conductivity, symmetric positive definite, 
 	          mixture of von Mises distribution, poroelastic model, FEniCS, finite element methods},
     }
