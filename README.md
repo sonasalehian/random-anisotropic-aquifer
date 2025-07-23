@@ -4,26 +4,26 @@ The `ahc-stochastic-model` repository contains code implementing a stochastic mo
 developed for anisotropic hydraulic conductivity (AHC) of an aquifer system that is
 designed around the needs of InSAR-based analysis of aquifer systems.
 
-For full details, please refer to the corresponding paper: [[Stochastic
-modeling of hydraulic conductivity in a poroelastic aquifer system
-simulation](https://hdl.handle.net/10993/xxxxx)].
+For full details, please refer to the corresponding paper: [A random model of
+anisotropic hydraulic conductivity tailored to the InSAR-based analysis of
+aquifers](https://hdl.handle.net/10993/xxxxx).
 
 This repository was also permanently archived at:
-[[10.5281/zenodo.10890121](https://zenodo.org/records/xxxxxxxx)].
+[[10.5281/zenodo.10890121](https://zenodo.org/records/xxxxxxxx).
 
 ## Citing
 
 Please consider citing this code and related paper if you find it useful.
 
-   @misc{salehian_supplement-ahc_2025,
-         title = {Supplementary material: A random model of anisotropic hydraulic conductivity tailored to the InSAR-based analysis of aquifers},
-         author = {Salehian Ghamsari, Sona, and Hale, Jack S.},
-         month = jul,
-         year = {2025},
-         doi = {10.5281/zenodo.xxxxxxx},
-         keywords = {stochastic model, anisotropy hydraulic conductivity, symmetric positive definite, 
-	         mixture of von Mises distribution, poroelastic model, FEniCS, finite element methods},
-   }
+    @misc{salehian_supplement-ahc_2025,
+          title = {Supplementary material: A random model of anisotropic hydraulic conductivity tailored to the InSAR-based analysis of aquifers},
+          author = {Salehian Ghamsari, Sona, and Hale, Jack S.},
+          month = jul,
+          year = {2025},
+          doi = {10.5281/zenodo.xxxxxxx},
+          keywords = {stochastic model, anisotropy hydraulic conductivity, symmetric positive definite, 
+	          mixture of von Mises distribution, poroelastic model, FEniCS, finite element methods},
+    }
 
 along with the appropriate general `FEniCS citations <http://fenicsproject.org/citing>`.
 
