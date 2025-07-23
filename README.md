@@ -30,6 +30,7 @@ along with the appropriate general `FEniCS citations <http://fenicsproject.org/c
 ## Authors (alphabetical)
 
 | Sona Salehian Ghamsari, University of Luxembourg, Luxembourg.
+
 | Jack S. Hale, University of Luxembourg, Luxembourg.
 
 ## Description
