@@ -16,7 +16,7 @@ This repository was also permanently archived at:
 Please consider citing this code and related paper if you find it useful.
 
     @misc{salehian_supplement-ahc_2025,
-          title = {Supplementary material: A random model of anisotropic hydraulic conductivity tailored to the InSAR-based analysis of aquifers},
+          title = {Supplementary material for A random model of anisotropic hydraulic conductivity tailored to the InSAR-based analysis of aquifers},
           author = {Salehian Ghamsari, Sona, and Hale, Jack S.},
           month = jul,
           year = {2025},
