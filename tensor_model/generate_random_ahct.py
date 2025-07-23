@@ -1,39 +1,94 @@
+import numpy as np
+import matplotlib.pyplot as plt
 import os
 
 import numpy as np
 from default_parameters import create_default_parameters
-from scipy import stats
+import scienceplots
+
+plt.style.use(['science'])
+
+# Disable LaTeX rendering to avoid missing font issues
+plt.rcParams['text.usetex'] = False
 
 parameters = create_default_parameters()
 
 
 def generating_random_scaling(mu_1, mu_2, std, num_samples):
-    hydraulic_conductivity = np.zeros([num_samples, 4])
+    hydraulic_conductivity = np.zeros((num_samples, 2, 2))
 
     # Generate random values from a lognorm distribution
     lambda_1 = stats.lognorm(s=std, scale=mu_1)
     lambda_2 = stats.lognorm(s=std, scale=mu_2)
 
-    hydraulic_conductivity[:, 0] = lambda_1.rvs(size=num_samples)
-    hydraulic_conductivity[:, 3] = lambda_2.rvs(size=num_samples)
+    hydraulic_conductivity[:, 0, 0] = lambda_1.rvs(size=num_samples)
+    hydraulic_conductivity[:, 1, 1] = lambda_2.rvs(size=num_samples)
 
-    return hydraulic_conductivity
+    return hydraulic_conductivity, lambda_1, lambda_2
 
-
-def generating_random_rotation(random_angles, eigenvalues):
+def generating_random_rotation(random_angles, k_s):
     num_samples = len(random_angles)
-    k = [np.zeros((2, 2)) for _ in range(num_samples)]
+    
+    # Initialize the tensor for AHC
+    k = np.zeros((num_samples, 2, 2))
+
     for i, angle in enumerate(random_angles):
         W = np.array([[0, -angle], [angle, 0]])
-        R_r = (
-            np.identity(2)
-            + (np.sin(angle) / angle) * W
-            + ((1 - np.cos(angle)) / angle**2) * (W @ W)
-        )
-        k_s = np.array([[eigenvalues[i, 0], 0], [0, eigenvalues[i, 3]]])
-        k[i] = R_r @ (k_s @ np.transpose(R_r))
+        # Calculate the rotation matrix R_r
+        R_r = np.identity(2) + (np.sin(angle)/angle) * W + ((1 - np.cos(angle))/angle**2) * (W @ W)
+        # Compute the rotated matrix
+        k[i, :, :] = R_r @ (k_s[i, :, :] @ np.transpose(R_r))
+
     return k
 
+def plot_pdfs(lambda_1, lambda_2, mu_1, mu_2, filename_1, filename_2):
+    # Plot the PDF of lognormal distribution
+    x_1 = np.linspace(0.6*mu_1, 1.4*mu_1, 1000)  
+    x_2 = np.linspace(0.6*mu_2, 1.4*mu_2, 1000)  
+    pdf_1 = lambda_1.pdf(x_1)
+    pdf_2 = lambda_2.pdf(x_2)
+
+    # Plot the histogram of random eigenvalues
+    fig = plt.figure(figsize=(5.5, 3))
+    plt.figure(1)
+    plt.plot(x_1, pdf_1, 'chocolate', label=r'PDF $k_{xx}$')
+    plt.axvline(x=mu_1*0.79, color='darkgreen', linestyle='--')
+    plt.axvline(x=mu_1*1.21, color='darkgreen', linestyle='--')
+    plt.axvline(x=mu_1, color='darkgreen', linestyle='--')
+    plt.text(mu_1*0.755, 2.5e11, r'$k_{xx} - 21\%$', color='darkgreen', rotation=90, va='bottom')
+    plt.text(mu_1*1.22, 2.5e11, r'$k_{xx} + 21\%$', color='darkgreen', rotation=90, va='bottom')
+    plt.text(mu_1*1.01, 2.5e11, r'$k_{xx}$', color='darkgreen', rotation=90, va='bottom')
+    plt.xlabel(r'Hydraulic conductivity ($\mathrm{m^3skg^{-1}}$)')
+    plt.ylabel(r'Probability density ($\mathrm{kgs^{-1}m^{-3}}$)')
+    plt.legend(loc='upper right')
+    plt.savefig(filename_1)  # save as png
+    print(f"{filename_1} have been ploted.")
+
+    fig = plt.figure(figsize=(5.5, 3))
+    plt.figure(2)
+    plt.plot(x_2, pdf_2, 'cornflowerblue', label=r'PDF $k_{yy}$')
+    plt.axvline(x=mu_2*0.81, color='indianred', linestyle='--')
+    plt.axvline(x=mu_2*1.19, color='indianred', linestyle='--')
+    plt.axvline(x=mu_2, color='indianred', linestyle='--')
+    plt.text(mu_2*0.775, 0.6e13, r'$k_{yy} - 19\%$', color='indianred', rotation=90, va='bottom')
+    plt.text(mu_2*1.20, 0.6e13, r'$k_{yy} + 19\%$', color='indianred', rotation=90, va='bottom')
+    plt.text(mu_2*1.01, 0.6e13, r'$k_{yy}$', color='indianred', rotation=90, va='bottom')
+    plt.xlabel(r'Hydraulic conductivity ($\mathrm{m^3skg^{-1}}$)')
+    plt.ylabel(r'Probability density ($\mathrm{kgs^{-1}m^{-3}}$)')
+    plt.legend(loc='upper right')
+    plt.savefig(filename_2)  # save as png
+    print(f"{filename_2} have been ploted.")
+
+def anisotropy_hist(k_s, file_name):
+    fig = plt.figure(figsize=(5.5, 3))
+    anisotropy_ratio = np.zeros((len(k_s)))
+    anisotropy_ratio[:] = k_s[:, 0, 0]/k_s[:, 1, 1]
+    plt.hist(anisotropy_ratio, bins=20)
+    # plt.title('Anisotropy ratio histogram')
+    plt.xlabel(r'Anisotropy ratio ($\frac{k_{xx}}{k_{yy}}$)')
+    plt.ylabel('Frequency')
+    plt.savefig(file_name)
+    print(f"{file_name} have been ploted.")
 
 def write_result(hydraulic_conductivity, file_name):
     if os.path.exists(file_name):
@@ -50,30 +105,38 @@ mu_1 = parameters["k_x_aqfr"]  # Mean for first eigenvalue
 mu_2 = parameters["k_y_aqfr"]  # Mean for second eigenvalue
 std = 0.08  # Standard deviation for distribution
 
-eigenvalues = generating_random_scaling(mu_1, mu_2, std, num_samples)
+eigenvalues, lambda_1, lambda_2 = generating_random_scaling(mu_1, mu_2, std, num_samples)
 k_s = eigenvalues
 
+filename_1 = "output/distribution_xx.pdf"
+filename_2 = "output/distribution_yy.pdf"
+plot_pdfs(lambda_1, lambda_2, mu_1, mu_2, filename_1, filename_2)
+
+file_name_ar = "output/anisotropy_ratio_histogram.pdf"
+anisotropy_hist(k_s, file_name_ar)
+
 # Save the random values
-file_name = "output/random_scaling.npy"
+file_name = 'output/ahct_random_scaling.npy'
 write_result(k_s, file_name)
 
 # -----------------Step 2: random AHC tensor with random orientation -------------------
 # Load generated random rotation angle
-random_angles = np.load("output/random_scaling_rotation.npy")
+random_angles = np.load('../angle_model/output/random_rotation_angle.npy')
 random_angles = random_angles - np.radians(110.0)
 
 # Fixed scaling
-k_initial = np.array([parameters["k_x_aqfr"], 0, 0, parameters["k_y_aqfr"]])
-fixed_eigenvalues = np.zeros([num_samples, 4])
-fixed_eigenvalues = np.tile(k_initial, (num_samples, 1))
+k_initial = np.array([[parameters["k_x_aqfr"], 0], [0, parameters["k_y_aqfr"]]])
+fixed_eigenvalues = np.zeros((num_samples, 2, 2))
+fixed_eigenvalues[:] = k_initial
+
 
 k_r = generating_random_rotation(random_angles, fixed_eigenvalues)
 
-file_name = "output/random_rotation.npy"
-write_result(np.array(k_r).reshape(num_samples, -1), file_name)
+file_name = 'output/ahct_random_rotation.npy'
+write_result(k_r, file_name)
 
 # -----------------Step 3: random AHC tensor with random scaling and orientation -------------------
-k_sr = generating_random_rotation(random_angles, eigenvalues)
+k_sr = generating_random_rotation(random_angles, k_s)
 
-file_name = "output/data/random_scaling_and_rotation.npy"
-write_result(np.array(k_sr).reshape(num_samples, -1), file_name)
+file_name = 'output/ahct_random_scaling_and_rotation.npy'
+write_result(k_sr, file_name)

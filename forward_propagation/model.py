@@ -436,29 +436,32 @@ def solve(parameters):
     submesh, cell_map, _, _ = dolfinx.mesh.create_submesh(domain, domain.topology.dim, cells)
 
     W_sub = dolfinx.fem.functionspace(submesh, W.ufl_element())
-    u_n_sub = dolfinx.fem.Function(W_sub)
-    u_n_sub.name = "u_n_sub"
+    u_los_sub = dolfinx.fem.Function(W_sub)
+    u_los_sub.name = "u_los_sub"
 
     num_sub_cells = submesh.topology.index_map(submesh.topology.dim).size_local
 
+    # Transfer solution to submesh
     for cell in range(num_sub_cells):
         sub_dofs = W_sub.dofmap.cell_dofs(cell)
         parent_dofs = W.dofmap.cell_dofs(cell_map[cell])
         assert W_sub.dofmap.bs == W.dofmap.bs
         for parent, child in zip(parent_dofs, sub_dofs):
             for bb in range(W_sub.dofmap.bs):
-                u_n_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
+                u_los_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
                     parent * W.dofmap.bs + bb
                 ]
+    u_los_sub.x.scatter_forward()
 
     adios2_filename = f"{parameters['output_dir']}/solution.bp"
 
     adios4dolfinx.write_mesh(adios2_filename, submesh)
-    adios4dolfinx.write_function(adios2_filename, u_n_sub, time=t)
+    adios4dolfinx.write_function(adios2_filename, u_los_sub, time=t)
 
     print_root("Starting pumping phase...")
 
     output_ts = []
+    output_ts.append(t)
     for i in range(num_steps):
         # Updating the solution and right hand side per time step
         t += dt
@@ -491,15 +494,18 @@ def solve(parameters):
         p_n.x.array[:] = ph.x.array
         q_n.x.array[:] = qh.x.array
         u_n.x.array[:] = uh.x.array
+
+        # Transfer solution to submesh
         for cell in range(num_sub_cells):
             sub_dofs = W_sub.dofmap.cell_dofs(cell)
             parent_dofs = W.dofmap.cell_dofs(cell_map[cell])
             assert W_sub.dofmap.bs == W.dofmap.bs
             for parent, child in zip(parent_dofs, sub_dofs):
                 for bb in range(W_sub.dofmap.bs):
-                    u_n_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
+                    u_los_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
                         parent * W.dofmap.bs + bb
                     ]
+        u_los_sub.x.scatter_forward()
 
         if (i + 1) % parameters["output_every_n_steps"] == 0:
             print_root(f"Writing solution t = {t}...")
@@ -508,7 +514,7 @@ def solve(parameters):
             ph_P0.interpolate(p_n)
             qh_Q0.x.scatter_forward()
             ph_P0.x.scatter_forward()
-            adios4dolfinx.write_function(adios2_filename, u_n_sub, time=t)
+            adios4dolfinx.write_function(adios2_filename, u_los_sub, time=t)
             output_ts.append(t)
             print_root("Done.")
 
@@ -581,15 +587,18 @@ def solve(parameters):
         p_n.x.array[:] = ph.x.array
         q_n.x.array[:] = qh.x.array
         u_n.x.array[:] = uh.x.array
+
+        # Transfer solution to submesh
         for cell in range(num_sub_cells):
             sub_dofs = W_sub.dofmap.cell_dofs(cell)
             parent_dofs = W.dofmap.cell_dofs(cell_map[cell])
             assert W_sub.dofmap.bs == W.dofmap.bs
             for parent, child in zip(parent_dofs, sub_dofs):
                 for bb in range(W_sub.dofmap.bs):
-                    u_n_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
+                    u_los_sub.x.array[child * W_sub.dofmap.bs + bb] = u_los_h.x.array[
                         parent * W.dofmap.bs + bb
                     ]
+        u_los_sub.x.scatter_forward()
 
         if (i + 1) % parameters["output_every_n_steps"] == 0:
             print_root(f"Writing solution t = {t}...")
@@ -598,7 +607,7 @@ def solve(parameters):
             ph_P0.interpolate(p_n)
             qh_Q0.x.scatter_forward()
             ph_P0.x.scatter_forward()
-            adios4dolfinx.write_function(adios2_filename, u_n_sub, time=t)
+            adios4dolfinx.write_function(adios2_filename, u_los_sub, time=t)
             output_ts.append(t)
             print_root("Done.")
 

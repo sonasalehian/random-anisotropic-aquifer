@@ -8,13 +8,16 @@ import numpy as np
 import numpyro
 import numpyro.distributions as dist
 import numpyro.infer.reparam
-
-sys.path.insert(0, "../postprocessing")
+import scienceplots
+from rose_diagram import plot_rose_diagram, extract_bar_parameters
 from jax import config
 from numpyro.infer import Predictive
 from rose_diagram import extract_bar_parameters, plot_rose_diagram
 
 plt.style.use(["science"])
+
+# Disable LaTeX rendering to avoid missing font issues
+plt.rcParams['text.usetex'] = False
 
 config.update("jax_enable_x64", True)
 NUM_CHAINS = 4
@@ -30,9 +33,9 @@ y_obs = np.load("output/rose_diagram.npy")
 y_obs = jnp.radians(y_obs)
 
 # Required random seeds
-# random_seed = jnp.frombuffer(os.urandom(8), dtype=jnp.int64)[0]
-random_seed = -167652586371646984  # Seed for reproducing the results
-print(random_seed)
+random_seed = jnp.frombuffer(os.urandom(8), dtype=jnp.int64)[0]
+# random_seed = -167652586371646984  # Seed for reproducing the results
+print("Random seed:",random_seed)
 np.save("output/random_seed_model_selection.npy", random_seed)
 
 
@@ -46,7 +49,6 @@ def model(y_obs=None):
     kappa_1 = numpyro.sample("kappa_1", dist.Gamma(20.0, 0.1))
     kappa_2 = numpyro.sample("kappa_2", dist.Gamma(20.0, 0.1))
 
-    # Non-informative prior
     mu_1 = numpyro.sample(
         "mu_1", dist.VonMises(loc=jnp.radians(0), concentration=1 / jnp.radians(180) ** 2)
     )
@@ -63,6 +65,14 @@ def model(y_obs=None):
     with numpyro.plate("y_obs", len(y_obs) if y_obs is not None else 1):
         _ = numpyro.sample("y", dist.MixtureGeneral(mix, [vm_1, vm_2]), obs=y_obs)
 
+graph = numpyro.render_model(
+    model=model,
+    model_args=(y_obs,),
+    render_distributions=True,
+    render_params=True,
+    filename="output/dag-model.pdf"
+)
+graph
 
 nuts_kernel = numpyro.infer.NUTS(model)
 mcmc = numpyro.infer.MCMC(
@@ -96,7 +106,7 @@ plt.savefig("output/plot_trace_2vm.pdf")
 
 # --- save smaples of mixture of 2 vm model ---
 random_rotation_angles = posterior_predictive_samples["y"][::10].flatten()
-print(len(random_rotation_angles))
+print("Number of random rotation angles:",len(random_rotation_angles))
 np.save("output/random_rotation_angle.npy", random_rotation_angles)
 
 # Plot rose diagram of random rotation angles

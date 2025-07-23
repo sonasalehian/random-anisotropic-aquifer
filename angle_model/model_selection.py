@@ -12,6 +12,9 @@ from numpyro.infer import Predictive
 
 plt.style.use(["science"])
 
+# Disable LaTeX rendering to avoid missing font issues
+plt.rcParams['text.usetex'] = False
+
 config.update("jax_enable_x64", True)
 NUM_CHAINS = 4
 numpyro.set_host_device_count(NUM_CHAINS)
@@ -26,13 +29,13 @@ y_obs = np.load("output/rose_diagram.npy")
 y_obs = jnp.radians(y_obs)
 
 # Required random seeds
-# random_seed = jnp.frombuffer(os.urandom(8), dtype=jnp.int64)[0]
+random_seed = jnp.frombuffer(os.urandom(8), dtype=jnp.int64)[0]
 random_seed = -4980610957694664259  # Seed for reproducing the results
 print(random_seed)
 np.save("output/random_seed_model_selection.npy", random_seed)
 
-# --- Model 1 ---
 
+# --- Model 1 ---
 
 @numpyro.handlers.reparam(config={"mu": numpyro.infer.reparam.CircularReparam()})
 def model1(y_obs=None):
@@ -69,8 +72,8 @@ data1 = az.from_numpyro(
 summary1 = az.summary(data1)
 print(summary1)
 
-# --- Model 2 ---
 
+# --- Model 2 ---
 
 @numpyro.handlers.reparam(
     config={
@@ -121,8 +124,8 @@ data2 = az.from_numpyro(
 summary2 = az.summary(data2)
 print(summary2)
 
-# --- Model 3 ---
 
+# --- Model 3 ---
 
 @numpyro.handlers.reparam(
     config={
@@ -179,8 +182,8 @@ data3 = az.from_numpyro(
 summary3 = az.summary(data3)
 print(summary3)
 
-# --- Comparison ---
 
+# --- Comparison ---
 
 waic1 = az.waic(data1, var_name="y")
 print(waic1)
@@ -217,16 +220,21 @@ ax1.hist(
     density=True,
     bins=30,
     alpha=0.5,
-    label="Posterior Predictive (Simple)",
+    label="Posterior predictive (1VM)",
 )
-ax1.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
-ax1.set_xlabel("Rotation angle")
-ax1.set_ylabel("Density")
+ax1.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="Observed data")
+ax1.set_xlabel(r'Rotation angle ($\mathrm{rad}$)')
+ax1.set_ylabel(r'Density ($\mathrm{rad^{-1}}$)')
 ax1.set_xlim(1.3, 2.7)
 ax1.set_ylim(0.0, 4.2)
+
+# Set custom x-ticks and labels
+x_ticks = [np.pi/2, 3*np.pi/4]
+ax1.set_xticks(x_ticks)  # Set the x-tick positions
+ax1.set_xticklabels([r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$'], fontsize=14)  # Set the corresponding labels
+
 ax1.legend()
-fig1.tight_layout()
-fig1.savefig("output/posterior_predictive_compare_models_simple.pdf")
+fig1.savefig("output/posterior_predictive_compare_models_1VM.pdf")
 
 # Plot posterior predictive samples for model 2
 fig2, ax2 = plt.subplots(figsize=(4, 3))
@@ -235,15 +243,19 @@ ax2.hist(
     density=True,
     bins=30,
     alpha=0.5,
-    label="Posterior Predictive (2VM)",
+    label="Posterior predictive (2VM)",
 )
-ax2.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
-ax2.set_xlabel("Rotation angle")
-ax2.set_ylabel("Density")
+ax2.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="Observed data")
+ax2.set_xlabel(r'Rotation angle ($\mathrm{rad}$)')
+ax2.set_ylabel(r'Density ($\mathrm{rad^{-1}}$)')
 ax2.set_xlim(1.3, 2.7)
 ax2.set_ylim(0.0, 4.2)
+
+# Set custom x-ticks and labels
+ax2.set_xticks(x_ticks)  # Set the x-tick positions
+ax2.set_xticklabels([r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$'], fontsize=14)  # Set the corresponding labels
+
 ax2.legend()
-fig2.tight_layout()
 fig2.savefig("output/posterior_predictive_compare_models_2vm.pdf")
 
 # Plot posterior predictive samples for model 3
@@ -253,15 +265,19 @@ ax3.hist(
     density=True,
     bins=30,
     alpha=0.5,
-    label="Posterior Predictive (3VM)",
+    label="Posterior predictive (3VM)",
 )
-ax3.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="observed data")
-ax3.set_xlabel("Rotation angle")
-ax3.set_ylabel("Density")
+ax3.hist(y_obs.flatten(), density=True, bins=30, alpha=0.5, label="Observed data")
+ax3.set_xlabel(r'Rotation angle ($\mathrm{rad}$)')
+ax3.set_ylabel(r'Density ($\mathrm{rad^{-1}}$)')
 ax3.set_xlim(1.3, 2.7)
 ax3.set_ylim(0.0, 4.2)
+
+# Set custom x-ticks and labels
+ax3.set_xticks(x_ticks)  # Set the x-tick positions
+ax3.set_xticklabels([r'$\frac{\pi}{2}$', r'$\frac{3\pi}{4}$'], fontsize=14)  # Set the corresponding labels
+
 ax3.legend()
-fig3.tight_layout()
 fig3.savefig("output/posterior_predictive_compare_models_3vm.pdf")
 
 az.plot_compare(df_comp_loo, insample_dev=False)

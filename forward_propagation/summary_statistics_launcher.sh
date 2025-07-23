@@ -1,25 +1,14 @@
 #!/bin/bash -l
-#SBATCH --job-name=statistical_analysis_r
-#SBATCH --output=logs/%x-%j.out
-#SBATCH --nodes=1
-#SBATCH --cpus-per-task=1
-#SBATCH --time=1-18:00:00
-#SBATCH --ntasks-per-node=28
+#SBATCH --job-name=summary_statistics
 #SBATCH -p batch
-#SBATCH --mail-type=END,FAIL
-#SBATCH --mail-user=sona.salehian.001@student.uni.lu
+#SBATCH --qos long
+#SBATCH --time=4-0:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=8
+#SBATCH --output=logs/%x-%j.out
+set -e
 
-source $SCRATCH/spack/share/spack/setup-env.sh
-spack env activate fenicsx-main-20230214
+source ../setup-env.sh
+../print-env.sh
 
-export WDIR=$SCRATCH/stochastic_model
-cd $WDIR
-
-# set number of jobs based on number of cores available and number of threads per job
-export JOBS_PER_NODE=$(( $SLURM_CPUS_ON_NODE / $SLURM_CPUS_PER_TASK ))
-
-spack env status
-scontrol show job $SLURM_JOB_ID
-echo"2200-2400"
-
-srun -c 1 python3 statistical_analysis_checkpoints.py
+srun python summary_statistics.py
