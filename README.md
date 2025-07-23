@@ -6,17 +6,17 @@ designed around the requirements of InSAR-based analysis of aquifer systems.
 
 For full details, please refer to the corresponding paper: [A random model of
 anisotropic hydraulic conductivity tailored to the InSAR-based analysis of
-aquifers](https://hdl.handle.net/10993/xxxxx).
+aquifers](https://hdl.handle.net/10993/65440).
 
 This repository was also permanently archived at:
-[doi:10.5281/zenodo.14170026](10.5281/zenodo.14170026).
+[doi:10.5281/zenodo.14170026](https://doi.org/10.5281/zenodo.14170026).
 
 ## Citing
 
 Please consider citing this code and related paper if you find it useful.
 
     @misc{salehian_supplement-ahc_2025,
-          title = {Supplementary material for A random model of anisotropic hydraulic conductivity tailored to the InSAR-based analysis of aquifers},
+          title = {Supplementary material for ``A random model of anisotropic hydraulic conductivity tailored to the InSAR-based analysis of aquifers''},
           author = {Salehian Ghamsari, Sona, and Hale, Jack S.},
           month = jul,
           year = {2025},
