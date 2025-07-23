@@ -2,14 +2,14 @@
 
 The `ahc-stochastic-model` repository contains code implementing a stochastic model
 developed for anisotropic hydraulic conductivity (AHC) of an aquifer system that is
-designed around the needs of InSAR-based analysis of aquifer systems.
+designed around the requirements of InSAR-based analysis of aquifer systems.
 
 For full details, please refer to the corresponding paper: [A random model of
 anisotropic hydraulic conductivity tailored to the InSAR-based analysis of
 aquifers](https://hdl.handle.net/10993/xxxxx).
 
 This repository was also permanently archived at:
-[[10.5281/zenodo.10890121](https://zenodo.org/records/xxxxxxxx).
+[doi:10.5281/zenodo.10890121](https://doi.org/10.5281.10890121).
 
 ## Citing
 
@@ -25,30 +25,17 @@ Please consider citing this code and related paper if you find it useful.
 	          mixture of von Mises distribution, poroelastic model, FEniCS, finite element methods},
     }
 
-along with the appropriate general `FEniCS citations <http://fenicsproject.org/citing>`.
-
 ## Authors (alphabetical)
 
-| Sona Salehian Ghamsari, University of Luxembourg, Luxembourg.
+Sona Salehian Ghamsari, University of Luxembourg, Luxembourg.
 
-| Jack S. Hale, University of Luxembourg, Luxembourg.
+Jack S. Hale, University of Luxembourg, Luxembourg.
 
 ## Description
 
-### Calibration of Bayesian angle model
+### Model of principal direction
 
-To model the direction of AHC, we developed a Bayesian parametric model to
-account for the observed multimodality in fracture outcrop data (rose diagram
-of fracture directions at the Anderson Junction site). We explored three prior
-models: a simple von Mises distribution, a mixture of two von Mises
-distributions, and a mixture of three von Mises distributions. To estimate the
-posterior distributions and generate random rotation angles, we used the
-No-U-Turn Sampler (NUTS) algorithm within the Markov Chain Monte Carlo (MCMC)
-framework. To identify the “best” fit for the fracture outcrop data, we applied
-Pareto-smoothed importance sampling (PSIS) combined with Leave-One-Out
-Cross-Validation (LOOCV).
-
-All scripts necessary to generate random angles are available in the
+All scripts necessary to calibrate the principal direction models are available in the
 `angle_model/` directory. 
 
 A `.sh` file is included for running tasks on a High-Performance Computing (HPC) system. This 
@@ -63,13 +50,7 @@ To execute, simply run:
 
 	sbatch angle_model_launcher.sh
 
-### Stochastic model of AHC
-
-We model random AHC tensor using a multimodal random SPD model. Since an SPD
-matrix can be decomposed into a diagonal matrix of positive eigenvalues
-(scaling) and an orthogonal matrix of eigenvectors (rotation), we generate
-three distinct sets of random AHC tensors: Random scaling, Random rotation,
-Random scaling combined with rotation.
+### Model of AHC
 
 All scripts required for generating random AHC tensors are located in the
 `tensor_model/` directory. To execute these scripts on an HPC system, use the
@@ -92,17 +73,11 @@ Use gmsh to generate the aquifer mesh by submitting the job script:
 	sbatch build_mesh_launcher.sh
 
 The generated mesh is written in a DOLFINx-compatible XDMF format and saved in 
-`forward_propagation/output/mesh/*`.
+`forward_propagation/output/mesh`.
 
 ### Forward uncertainty analysis
 
-The uncertainty in AHC is propagated through a PDE-based model
-[[AHC_Poroelastic_Model](https://github.com/sonasalehian/AHC-Poroelastic-Model)]
-of the Anderson Junction site, where it represents the uncertainty in the
-in-plane hydraulic conductivity tensor. Furthermore, statistical analysis is
-performed on the resulting line-of-sight (LOS) surface displacements to compute
-key metrics, enabling evaluation of how AHC variations influence the
-uncertainty in LOS surface displacements.
+The uncertainty in the m
 
 All the following scripts are located in the `forward_propagation/` directory.
 
@@ -173,9 +148,7 @@ as it is not found via Spack's venv integration.
 
 This fix is already applied in `setup-env.sh`.
 
-
-License
-==========
+## License
 
 AHC-Stochastic-Model is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by the
